@@ -34,10 +34,10 @@ namespace Game
             }
             else
             {
-                var gameObject = GameObject.Instantiate(prefab);
+                var gameObject = Instantiate(prefab);
 
                 gameObject.name = nameof(Core);
-                GameObject.DontDestroyOnLoad(gameObject);
+                DontDestroyOnLoad(gameObject);
 
                 Initializer.Perform(gameObject);
 
@@ -46,8 +46,8 @@ namespace Game
             }
         }
 
+        #region Modules
         public AudioCore Audio { get; protected set; }
-
         public UICore UI { get; protected set; }
 
         public class Module<TModule> : MonoBehaviour, IReference<TModule>
@@ -68,6 +68,7 @@ namespace Game
         {
             public Core Core => Reference;
         }
+        #endregion
 
         protected virtual void Configure()
         {
