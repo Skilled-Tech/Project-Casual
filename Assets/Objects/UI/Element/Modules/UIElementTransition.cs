@@ -19,13 +19,14 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
+    [RequireComponent(typeof(UIElement))]
     public class UIElementTransition : Transition
     {
         public UIElement Element { get; protected set; }
 
         public override void Configure()
         {
-            Element = Dependancy.Get<UIElement>(gameObject, Dependancy.Scope.RecursiveToParents);
+            Element = GetComponent<UIElement>();
 
             base.Configure();
         }

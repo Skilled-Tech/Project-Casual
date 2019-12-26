@@ -174,8 +174,8 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -315,7 +315,7 @@ GameObject:
   - component: {fileID: 6032520912302318431}
   - component: {fileID: 6032520912302318418}
   - component: {fileID: 6032520912302318420}
-  - component: {fileID: 6032520912302318419}
+  - component: {fileID: 8464863362214225537}
   m_Layer: 5
   m_Name: Panel Menu
   m_TagString: Untagged
@@ -381,7 +381,7 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &6032520912302318419
+--- !u!114 &8464863362214225537
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -390,9 +390,42 @@ MonoBehaviour:
   m_GameObject: {fileID: 6032520912302318426}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bcb9d8e3b40e7324ea5470079821e949, type: 3}
+  m_Script: {fileID: 11500000, guid: 1e32343b61a052543bd820cff1a8e140, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.40983862
+      value: 1.1751983
+      inSlope: 1.4902217
+      outSlope: 1.4902217
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &348863338347285958
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -473,12 +506,12 @@ PrefabInstance:
     - target: {fileID: 348863339886799062, guid: f8e972818d62a524d94ac14b5fede5a4,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 80
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 348863339886799062, guid: f8e972818d62a524d94ac14b5fede5a4,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 80
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 348863339886799062, guid: f8e972818d62a524d94ac14b5fede5a4,
         type: 3}
