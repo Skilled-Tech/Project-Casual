@@ -78,7 +78,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Game  By
+  m_Text: 'Game By
 
     Moe Baker'
 --- !u!1001 &561701480603888262
@@ -227,11 +227,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Padding.m_Bottom
       value: 80
-      objectReference: {fileID: 0}
-    - target: {fileID: 5769543869136266002, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c93e1212da9c82b4a8cb7c35b7f8fa63, type: 3}

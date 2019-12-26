@@ -34,10 +34,10 @@ RectTransform:
   m_Father: {fileID: 6115461549777803131}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -40, y: -50}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -10, y: 0}
+  m_SizeDelta: {x: -20, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2880948523857581660
 MonoBehaviour:
@@ -300,7 +300,7 @@ PrefabInstance:
     - target: {fileID: 4724540040781765386, guid: 5de3e7810c2cd1e4aaf02d437a7e2b6e,
         type: 3}
       propertyPath: m_Name
-      value: Audio Slider
+      value: Audio Slider Widget
       objectReference: {fileID: 0}
     - target: {fileID: 8257132732448211310, guid: 5de3e7810c2cd1e4aaf02d437a7e2b6e,
         type: 3}
@@ -370,32 +370,32 @@ PrefabInstance:
     - target: {fileID: 8257132732448211310, guid: 5de3e7810c2cd1e4aaf02d437a7e2b6e,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 800
       objectReference: {fileID: 0}
     - target: {fileID: 8257132732448211310, guid: 5de3e7810c2cd1e4aaf02d437a7e2b6e,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 8257132732448211310, guid: 5de3e7810c2cd1e4aaf02d437a7e2b6e,
         type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8257132732448211310, guid: 5de3e7810c2cd1e4aaf02d437a7e2b6e,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8257132732448211310, guid: 5de3e7810c2cd1e4aaf02d437a7e2b6e,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8257132732448211310, guid: 5de3e7810c2cd1e4aaf02d437a7e2b6e,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8257132732448211310, guid: 5de3e7810c2cd1e4aaf02d437a7e2b6e,
         type: 3}

@@ -36,18 +36,30 @@ namespace Game
             for (int i = 0; i < roots.Length; i++)
                 targets.AddRange(Dependancy.GetAll<IInitialize>(roots[i]));
 
-            for (int i = 0; i < targets.Count; i++)
-                targets[i].Configure();
-
-            for (int i = 0; i < targets.Count; i++)
-                targets[i].Init();
+            Perform(targets);
         }
 
-        static void Perform(IInitialize target)
+        static void Perform(IList<IInitialize> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+                list[i].Configure();
+
+            for (int i = 0; i < list.Count; i++)
+                list[i].Init();
+        }
+
+        public static void Perform(IInitialize target)
         {
             target.Configure();
 
             target.Init();
+        }
+
+        public static void Perform(GameObject gameObject)
+        {
+            var targets = Dependancy.GetAll<IInitialize>(gameObject);
+
+            Perform(targets);
         }
     }
 

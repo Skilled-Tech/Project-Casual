@@ -37,8 +37,9 @@ namespace Game
                 var gameObject = GameObject.Instantiate(prefab);
 
                 gameObject.name = nameof(Core);
-
                 GameObject.DontDestroyOnLoad(gameObject);
+
+                Initializer.Perform(gameObject);
 
                 Instance = gameObject.GetComponent<Core>();
                 Instance.Configure();
@@ -46,6 +47,8 @@ namespace Game
         }
 
         public AudioCore Audio { get; protected set; }
+
+        public UICore UI { get; protected set; }
 
         public class Module<TModule> : MonoBehaviour, IReference<TModule>
         {
@@ -69,6 +72,9 @@ namespace Game
         protected virtual void Configure()
         {
             Audio = this.GetDependancy<AudioCore>();
+            UI = this.GetDependancy<UICore>();
+
+            Application.targetFrameRate = 60;
 
             References.Configure(this);
 
