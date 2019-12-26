@@ -47,7 +47,7 @@ namespace Game
 
             return component;
         }
-
+        
         public static List<TComponent> GetAll<TComponent>(GameObject target)
         {
             return GetAll<TComponent>(target, Scope.RecursiveToChildern);
@@ -104,6 +104,27 @@ namespace Game
             if (target.Equals(null)) return true;
 
             return false;
+        }
+    }
+
+    public static class DependancyExtensions
+    {
+        public static TComponent GetDependancy<TComponent>(this Component target)
+        {
+            return Dependancy.Get<TComponent>(target.gameObject);
+        }
+        public static TComponent GetDependancy<TComponent>(this Component target, Dependancy.Scope scope)
+        {
+            return Dependancy.Get<TComponent>(target.gameObject, scope);
+        }
+
+        public static List<TComponent> GetAllDependancies<TComponent>(this Component target)
+        {
+            return Dependancy.GetAll<TComponent>(target.gameObject);
+        }
+        public static List<TComponent> GetAllDependancies<TComponent>(this Component target, Dependancy.Scope scope)
+        {
+            return Dependancy.GetAll<TComponent>(target.gameObject, scope);
         }
     }
 }
