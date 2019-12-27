@@ -41,6 +41,9 @@ namespace Game
             {
                 get
                 {
+                    if(Application.isEditor)
+                        return android;
+
                     switch (Application.platform)
                     {
                         case RuntimePlatform.Android:
@@ -55,10 +58,6 @@ namespace Game
                 }
             }
         }
-
-        [SerializeField]
-        protected string placementID = "rewardedVideo";
-        public string PlacementID { get { return placementID; } }
 
         public ListenerProperty Listener { get; protected set; }
         public class ListenerProperty : IUnityAdsListener
@@ -77,7 +76,7 @@ namespace Game
                 StartEvent?.Invoke(placementId);
             }
 
-            public delegate void FinishDelegate(string placementId, ShowResult showResult);
+            public delegate void FinishDelegate(string placementId, ShowResult result);
             public event FinishDelegate FinishEvent;
             public void OnUnityAdsDidFinish(string placementId, ShowResult showResult)
             {
@@ -88,8 +87,25 @@ namespace Game
             public event ErrorDelegate ErrorEvent;
             public void OnUnityAdsDidError(string message)
             {
+                Debug.LogError("Ads Error: " + message);
+
                 ErrorEvent?.Invoke(message);
             }
+        }
+
+        public List<AdsPlacementModule> Placements { get; protected set; }
+        public AdsPlacementModule Find(string ID)
+        {
+            for (int i = 0; i < Placements.Count; i++)
+                if (Placements[i].ID == ID)
+                    return Placements[i];
+
+            return null;
+        }
+
+        public class Module : Core.Module<AdsCore>
+        {
+            public AdsCore Ads => Reference;
         }
 
         public bool TestMode
@@ -107,10 +123,21 @@ namespace Game
         {
             base.Configure(reference);
 
-            Advertisement.Initialize(gameID.Current, TestMode);
-
             Listener = new ListenerProperty();
             Advertisement.AddListener(Listener);
+
+            Placements = this.GetAllDependancies<AdsPlacementModule>();
+
+            References.Configure(this);
+
+            Advertisement.Initialize(gameID.Current, TestMode);
+        }
+
+        public override void Init()
+        {
+            base.Init();
+
+            References.Init(this);
         }
     }
 }

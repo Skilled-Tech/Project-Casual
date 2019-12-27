@@ -50,6 +50,7 @@ namespace Game
         public AudioCore Audio { get; protected set; }
         public ScenesCore Scenes { get; protected set; }
         public UICore UI { get; protected set; }
+        public AdsCore Ads { get; protected set; }
 
         public class Module<TModule> : MonoBehaviour, IReference<TModule>
         {
@@ -76,6 +77,7 @@ namespace Game
             Audio = this.GetDependancy<AudioCore>();
             Scenes = this.GetDependancy<ScenesCore>();
             UI = this.GetDependancy<UICore>();
+            Ads = this.GetDependancy<AdsCore>();
 
             Application.targetFrameRate = 60;
 
