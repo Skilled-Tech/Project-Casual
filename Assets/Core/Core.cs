@@ -48,6 +48,7 @@ namespace Game
 
         #region Modules
         public AudioCore Audio { get; protected set; }
+        public ScenesCore Scenes { get; protected set; }
         public UICore UI { get; protected set; }
 
         public class Module<TModule> : MonoBehaviour, IReference<TModule>
@@ -73,6 +74,7 @@ namespace Game
         protected virtual void Configure()
         {
             Audio = this.GetDependancy<AudioCore>();
+            Scenes = this.GetDependancy<ScenesCore>();
             UI = this.GetDependancy<UICore>();
 
             Application.targetFrameRate = 60;

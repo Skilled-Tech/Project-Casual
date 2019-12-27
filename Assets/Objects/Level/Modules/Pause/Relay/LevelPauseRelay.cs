@@ -19,21 +19,21 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class UICore : Core.Module
+	public class LevelPauseRelay : Relay
 	{
-		[SerializeField]
-        protected UIElement optionsMenu;
-        public UIElement OptionsMenu { get { return optionsMenu; } }
+        public LevelPauseState[] conditions;
 
-        [SerializeField]
-        protected FaderUI fader;
-        public FaderUI Fader { get { return fader; } }
+        public LevelPause Pause { get { return Level.Instance.Pause; } }
 
-        public override void Init()
+        private void Start()
         {
-            base.Init();
+            Pause.OnStateChange += OnStateChagned;
+        }
 
-            fader.Value = 0f;
+        private void OnStateChagned(LevelPauseState state)
+        {
+            if (conditions.Contains(Pause.State))
+                Invoke();
         }
     }
 }

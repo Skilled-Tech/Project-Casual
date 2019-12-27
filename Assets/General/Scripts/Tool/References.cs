@@ -43,14 +43,14 @@ namespace Game
         {
             var targets = Dependancy.GetAll<IReference<TReference>>(reference.gameObject);
 
-            Init<TReference>(targets);
+            Init<TReference>(reference, targets);
         }
-        public static void Init<TReference>(IList<IReference<TReference>> targets)
+        public static void Init<TReference>(TReference reference, IList<IReference<TReference>> targets)
         {
             for (int i = 0; i < targets.Count; i++)
-                Init(targets[i]);
+                Init(reference, targets[i]);
         }
-        public static void Init<TReference>(IReference<TReference> target)
+        public static void Init<TReference>(TReference reference, IReference<TReference> target)
         {
             target.Init();
         }

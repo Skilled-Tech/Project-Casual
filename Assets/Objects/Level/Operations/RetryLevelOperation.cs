@@ -19,21 +19,11 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class UICore : Core.Module
+	public class RetryLevelOperation : Operation
 	{
-		[SerializeField]
-        protected UIElement optionsMenu;
-        public UIElement OptionsMenu { get { return optionsMenu; } }
-
-        [SerializeField]
-        protected FaderUI fader;
-        public FaderUI Fader { get { return fader; } }
-
-        public override void Init()
+        public override void Execute()
         {
-            base.Init();
-
-            fader.Value = 0f;
+            Level.Instance.Retry();
         }
     }
 }

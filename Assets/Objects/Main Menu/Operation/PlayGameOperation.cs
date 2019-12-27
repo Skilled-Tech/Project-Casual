@@ -19,21 +19,13 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class UICore : Core.Module
+	public class PlayGameOperation : Operation
 	{
-		[SerializeField]
-        protected UIElement optionsMenu;
-        public UIElement OptionsMenu { get { return optionsMenu; } }
+        public Core Core => Core.Instance;
 
-        [SerializeField]
-        protected FaderUI fader;
-        public FaderUI Fader { get { return fader; } }
-
-        public override void Init()
+        public override void Execute()
         {
-            base.Init();
-
-            fader.Value = 0f;
+            Core.Scenes.Load(Core.Scenes.Level);
         }
     }
 }

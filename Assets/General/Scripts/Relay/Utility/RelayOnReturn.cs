@@ -19,21 +19,19 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class UICore : Core.Module
+	public class RelayOnReturn : MonoBehaviour
 	{
-		[SerializeField]
-        protected UIElement optionsMenu;
-        public UIElement OptionsMenu { get { return optionsMenu; } }
+        Relay relay;
 
-        [SerializeField]
-        protected FaderUI fader;
-        public FaderUI Fader { get { return fader; } }
-
-        public override void Init()
+        void Awake()
         {
-            base.Init();
+            relay = GetComponent<Relay>();
+        }
 
-            fader.Value = 0f;
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Home))
+                relay.Invoke();
         }
     }
 }
