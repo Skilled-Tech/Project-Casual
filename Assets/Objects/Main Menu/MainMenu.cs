@@ -40,7 +40,7 @@ namespace Game
             if (error == null)
             {
                 PlayFab.Player.Statistics.Update.OnResponse += UpdatePlayerStatisticsCallback;
-                PlayFab.Player.Statistics.Update.Request("Score", 200);
+                PlayFab.Player.Statistics.Update.Request("Score", 500);
             }
             else
             {
@@ -73,7 +73,7 @@ namespace Game
             {
                 foreach (var entry in result.Leaderboard)
                 {
-                    Debug.Log(entry.DisplayName + " | " + entry.PlayFabId + " | " + entry.Position + " | " + entry.StatValue);
+                    Debug.Log(entry.Position + " | " + entry.DisplayName + " | " + entry.PlayFabId + " | " +  entry.StatValue);
                     Debug.Log(JsonUtility.ToJson(entry, true));
                     Debug.Log("----------------------------------------------------");
                 }
