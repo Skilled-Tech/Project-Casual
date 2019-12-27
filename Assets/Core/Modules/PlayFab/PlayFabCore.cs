@@ -24,6 +24,186 @@ namespace Game
 {
 	public class PlayFabCore : Core.Module
 	{
+        [SerializeField]
+        protected LoginProperty login;
+        public LoginProperty Login { get { return login; } }
+        [Serializable]
+        public class LoginProperty : Property
+        {
+            public CustomIDRequest CustomID { get; protected set; }
+            public class CustomIDRequest : Request<LoginWithCustomIDRequest>
+            {
+                public override MethodDelegate Method => PlayFabClientAPI.LoginWithCustomID;
+
+                public virtual void Request() => Request(SystemInfo.deviceUniqueIdentifier);
+                public virtual void Request(string ID)
+                {
+                    Debug.Log("Custom ID Login: " + ID);
+
+                    var request = GenerateRequest();
+
+                    request.CreateAccount = true;
+                    request.CustomId = ID;
+
+                    Send(request);
+                }
+            }
+
+            public abstract class Request<TRequest> : Request<TRequest, LoginResult>
+                where TRequest : class, new()
+            {
+
+            }
+
+            public override void Configure(PlayFabCore reference)
+            {
+                base.Configure(reference);
+
+                CustomID = new CustomIDRequest();
+                Register(CustomID);
+            }
+
+            protected virtual void Register<TRequest>(Request<TRequest> request)
+                where TRequest : class, new()
+            {
+                request.OnResponse += ResponseCallback;
+
+                request.OnResult += ResultCallback;
+
+                request.OnError += ErrorCallback;
+            }
+
+            #region Events
+            public event CustomIDRequest.ResponseDelegate OnResponse;
+            void ResponseCallback(LoginResult result, PlayFabError error)
+            {
+                OnResponse?.Invoke(result, error);
+            }
+
+            public event CustomIDRequest.ResultDelegate OnResult;
+            void ResultCallback(LoginResult result)
+            {
+                OnResult?.Invoke(result);
+            }
+
+            public event CustomIDRequest.ErrorDelegate OnError;
+            void ErrorCallback(PlayFabError error)
+            {
+                OnError?.Invoke(error);
+            }
+            #endregion
+        }
+        
+        [SerializeField]
+        protected TitleProperty title;
+        public TitleProperty Title { get { return title; } }
+        [Serializable]
+        public class TitleProperty : Property
+        {
+            [SerializeField]
+            protected LeaderboardsProperty leaderboards;
+            public LeaderboardsProperty Leaderboards { get { return leaderboards; } }
+            [Serializable]
+            public class LeaderboardsProperty : Property
+            {
+                public GetRequest Get { get; protected set; }
+                public class GetRequest : Request<GetLeaderboardRequest, GetLeaderboardResult>
+                {
+                    public override MethodDelegate Method => PlayFabClientAPI.GetLeaderboard;
+
+                    public virtual void Request(string name)
+                    {
+                        var request = GenerateRequest();
+
+                        request.ProfileConstraints = new PlayerProfileViewConstraints()
+                        {
+                            ShowDisplayName = true,
+                            ShowLocations = true,
+                        };
+
+                        request.StatisticName = name;
+
+                        Send(request);
+                    }
+
+                    public override void ResultCallback(GetLeaderboardResult result)
+                    {
+                        base.ResultCallback(result);
+                    }
+                }
+
+                public override void Configure(PlayFabCore reference)
+                {
+                    base.Configure(reference);
+
+                    Get = new GetRequest();
+                }
+            }
+
+            public override void Configure(PlayFabCore reference)
+            {
+                base.Configure(reference);
+
+                Register(PlayFab, leaderboards);
+            }
+        }
+
+        [SerializeField]
+        protected PlayerProperty player;
+        public PlayerProperty Player { get { return player; } }
+        [Serializable]
+        public class PlayerProperty : Property
+        {
+            [SerializeField]
+            protected StatisticsProperty statistics;
+            public StatisticsProperty Statistics { get { return statistics; } }
+            [Serializable]
+            public class StatisticsProperty : Property
+            {
+                public UpdateRequest Update { get; protected set; }
+                public class UpdateRequest : Request<UpdatePlayerStatisticsRequest, UpdatePlayerStatisticsResult>
+                {
+                    public override MethodDelegate Method => PlayFabClientAPI.UpdatePlayerStatistics;
+
+                    public virtual void Request(string name, int value)
+                    {
+                        var request = GenerateRequest();
+
+                        request.Statistics = new List<StatisticUpdate>()
+                        {
+                            new StatisticUpdate()
+                            {
+                                StatisticName = name,
+                                Value = value
+                            }
+                        };
+
+                        Send(request);
+                    }
+                }
+
+                public override void Configure(PlayFabCore reference)
+                {
+                    base.Configure(reference);
+
+                    Update = new UpdateRequest();
+                }
+            }
+
+            public override void Configure(PlayFabCore reference)
+            {
+                base.Configure(reference);
+
+                Register(PlayFab, statistics);
+            }
+        }
+
+        [Serializable]
+        public class Property : Core.Property<PlayFabCore>
+        {
+            public PlayFabCore PlayFab => Reference;
+        }
+
         public abstract class Request<TRequest, TResult>
             where TRequest : class, new()
             where TResult : class
@@ -76,45 +256,13 @@ namespace Game
             #endregion
         }
 
-        public class Property : Core.Property<PlayFabCore>
-        {
-            public PlayFabCore PlayFab => Reference;
-        }
-
-        [SerializeField]
-        protected LoginProperty login;
-        public LoginProperty Login { get { return login; } }
-        [Serializable]
-        public class LoginProperty : Property
-        {
-            public CustomIDRequest CustomID { get; protected set; }
-            public class CustomIDRequest : Request<LoginWithCustomIDRequest, LoginResult>
-            {
-                public override MethodDelegate Method => PlayFabClientAPI.LoginWithCustomID;
-
-                public virtual void Request()
-                {
-                    var request = GenerateRequest();
-
-                    request.CreateAccount = true;
-
-                    Send(request);
-                }
-            }
-
-            public override void Configure(PlayFabCore reference)
-            {
-                base.Configure(reference);
-
-                CustomID = new CustomIDRequest();
-            }
-        }
-
         public override void Configure(Core reference)
         {
             base.Configure(reference);
 
             Register(this, login);
+            Register(this, title);
+            Register(this, player);
         }
     }
 }
