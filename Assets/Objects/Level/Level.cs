@@ -60,6 +60,8 @@ namespace Game
         {
             References.Init(this);
             References.Init(this, Menu);
+
+            Core.Ads.Placements.Common.Video.Show();
         }
 
         public virtual void Retry()

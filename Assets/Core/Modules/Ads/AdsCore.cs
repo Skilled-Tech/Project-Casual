@@ -115,6 +115,8 @@ namespace Game
         {
             base.Configure(reference);
 
+            Advertisement.debugMode = true;
+
             Listener = new ListenerProperty();
             Advertisement.AddListener(Listener);
 

@@ -37,9 +37,9 @@ namespace Game
         {
             base.Init();
 
-            popup.Hide();
+            if(popup.Visible) popup.Hide();
 
-            fader.Visible = true;
+            if(fader.Visible == false) fader.Visible = true;
             fader.Value = 0f;
         }
     }
