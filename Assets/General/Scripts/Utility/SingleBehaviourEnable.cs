@@ -22,8 +22,8 @@ namespace Game
 	public class SingleBehaviourEnable : MonoBehaviour
 	{
 		[SerializeField]
-        protected MonoBehaviour behaviour;
-        public MonoBehaviour Behaviour { get { return behaviour; } }
+        protected MonoBehaviour[] behaviours;
+        public MonoBehaviour[] Behaviour { get { return behaviours; } }
 
         public static Dictionary<Type, List<MonoBehaviour>> Dictionary = new Dictionary<Type, List<MonoBehaviour>>();
         public static void Add(MonoBehaviour behaviour)
@@ -65,26 +65,14 @@ namespace Game
 
         private void OnEnable()
         {
-            if(behaviour == null)
-            {
-                Debug.LogError("No behaviour defined for " + nameof(SingleBehaviourEnable), gameObject);
-            }
-            else
-            {
-                Add(behaviour);
-            }
+            for (int i = 0; i < behaviours.Length; i++)
+                Add(behaviours[i]);
         }
 
         private void OnDisable()
         {
-            if (behaviour == null)
-            {
-
-            }
-            else
-            {
-                Remove(behaviour);
-            }
+            for (int i = 0; i < behaviours.Length; i++)
+                Remove(behaviours[i]);
         }
     }
 }
