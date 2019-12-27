@@ -40,8 +40,10 @@ namespace Game
             }
         }
 
-        private void Awake()
+        public override void Configure()
         {
+            base.Configure();
+
             Image = GetComponent<Image>();
         }
 

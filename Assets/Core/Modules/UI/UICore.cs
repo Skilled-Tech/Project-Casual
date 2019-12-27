@@ -26,12 +26,18 @@ namespace Game
         public UIElement OptionsMenu { get { return optionsMenu; } }
 
         [SerializeField]
+        protected PopupUI popup;
+        public PopupUI Popup { get { return popup; } }
+
+        [SerializeField]
         protected FaderUI fader;
         public FaderUI Fader { get { return fader; } }
 
         public override void Init()
         {
             base.Init();
+
+            popup.Hide();
 
             fader.Value = 0f;
         }

@@ -19,13 +19,13 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class Relay : MonoBehaviour
+	public class Relay : MonoBehaviour, IInitialize
 	{
         protected IOperation[] targets;
 
         public RelayScope scope = RelayScope.GameObject;
 
-        protected virtual void Awake()
+        public virtual void Configure()
         {
             switch (scope)
             {
@@ -39,11 +39,16 @@ namespace Game
             }
         }
 
+        public virtual void Init()
+        {
+            
+        }
+
         public virtual void Invoke()
         {
             Operation.ExecuteAll(targets);
         }
-	}
+    }
 
     public enum RelayScope
     {

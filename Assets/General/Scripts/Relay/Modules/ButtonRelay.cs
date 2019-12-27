@@ -24,12 +24,11 @@ namespace Game
 	{
         Button button;
 
-        protected override void Awake()
+        public override void Configure()
         {
-            base.Awake();
+            base.Configure();
 
             button = GetComponent<Button>();
-
             button.onClick.AddListener(Invoke);
         }
     }

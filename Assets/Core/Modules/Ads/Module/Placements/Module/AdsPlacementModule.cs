@@ -21,17 +21,17 @@ using UnityEngine.Advertisements;
 
 namespace Game
 {
-	public class AdsPlacementModule : AdsCore.Module
+	public class AdsPlacementModule : AdsPlacementsCore.Module
 	{
         [SerializeField]
         protected string _ID = "";
         public string ID { get { return _ID; } }
 
-        public PlacementState PlacementState => Advertisement.GetPlacementState(ID);
+        public PlacementState State => Advertisement.GetPlacementState(ID);
 
         public bool IsReady => Advertisement.IsReady(ID);
 
-        public override void Configure(AdsCore reference)
+        public override void Configure(AdsPlacementsCore reference)
         {
             base.Configure(reference);
 
@@ -40,9 +40,12 @@ namespace Game
             Ads.Listener.FinishEvent += FinishCallback;
         }
 
-        public virtual void Show()
+        public virtual bool Show()
         {
+            if (IsReady == false) return false;
+
             Advertisement.Show(ID);
+            return true;
         }
 
         public virtual void Load()
@@ -59,7 +62,7 @@ namespace Game
         public event Action OnReady;
         protected virtual void ReadyAction()
         {
-            Debug.Log(ID + " Ready");
+            Debug.Log(ID + " Ad ready");
 
             OnReady?.Invoke();
         }
@@ -72,7 +75,7 @@ namespace Game
         public event Action OnStart;
         protected virtual void StartAction()
         {
-            Debug.Log(ID + " Start");
+            Debug.Log(ID + " Ad start");
 
             OnStart?.Invoke();
         }
@@ -86,7 +89,7 @@ namespace Game
         public event FinishDelegate OnFinish;
         protected virtual void FinishAction(ShowResult result)
         {
-            Debug.Log(ID + " finished, result: " + result);
+            Debug.Log(ID + " Ad finished, result: " + result);
 
             OnFinish?.Invoke(result);
         }

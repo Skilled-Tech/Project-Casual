@@ -93,15 +93,7 @@ namespace Game
             }
         }
 
-        public List<AdsPlacementModule> Placements { get; protected set; }
-        public AdsPlacementModule Find(string ID)
-        {
-            for (int i = 0; i < Placements.Count; i++)
-                if (Placements[i].ID == ID)
-                    return Placements[i];
-
-            return null;
-        }
+        public AdsPlacementsCore Placements { get; protected set; }
 
         public class Module : Core.Module<AdsCore>
         {
@@ -126,7 +118,7 @@ namespace Game
             Listener = new ListenerProperty();
             Advertisement.AddListener(Listener);
 
-            Placements = this.GetAllDependancies<AdsPlacementModule>();
+            Placements = this.GetDependancy<AdsPlacementsCore>();
 
             References.Configure(this);
 
