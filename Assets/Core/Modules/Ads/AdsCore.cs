@@ -107,6 +107,9 @@ namespace Game
                 if (Application.isEditor)
                     return true;
 
+                if (Debug.isDebugBuild)
+                    return true;
+
                 return false;
             }
         }
@@ -115,7 +118,7 @@ namespace Game
         {
             base.Configure(reference);
 
-            Advertisement.debugMode = true;
+            Advertisement.debugMode = TestMode;
 
             Listener = new ListenerProperty();
             Advertisement.AddListener(Listener);

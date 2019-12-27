@@ -95,6 +95,8 @@ GameObject:
   - component: {fileID: 111151189456450375}
   - component: {fileID: 1587014013170277216}
   - component: {fileID: 3190480014251389355}
+  - component: {fileID: 7104884660350115704}
+  - component: {fileID: 6620909362760701547}
   m_Layer: 5
   m_Name: Close Button
   m_TagString: Untagged
@@ -266,3 +268,28 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
   m_EffectDistance: {x: 2, y: 2}
   m_UseGraphicAlpha: 1
+--- !u!114 &7104884660350115704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348863339886799049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9482b3455381f4199ad92ede92ff25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6620909362760701547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348863339886799049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aab56a9997419ce438723992a3a8abfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  behaviour: {fileID: 7104884660350115704}

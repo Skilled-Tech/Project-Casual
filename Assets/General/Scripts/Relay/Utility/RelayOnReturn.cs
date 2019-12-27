@@ -23,12 +23,12 @@ namespace Game
 	{
         Relay relay;
 
-        void Awake()
+        private void Awake()
         {
             relay = GetComponent<Relay>();
         }
 
-        void Update()
+        private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Home))
                 relay.Invoke();

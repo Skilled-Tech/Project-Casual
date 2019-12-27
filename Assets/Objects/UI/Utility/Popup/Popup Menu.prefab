@@ -203,7 +203,7 @@ PrefabInstance:
     - target: {fileID: 6032520912302318426, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
       propertyPath: m_Name
-      value: Popup
+      value: Popup Menu
       objectReference: {fileID: 0}
     - target: {fileID: 6032520912302318426, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
@@ -384,15 +384,15 @@ PrefabInstance:
       propertyPath: m_HorizontalFit
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1355967825969944230, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
-        type: 3}
-      propertyPath: target
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 6638576892830863999, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1355967825969944230, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: target
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5769543869136266002, guid: c93e1212da9c82b4a8cb7c35b7f8fa63, type: 3}
@@ -420,7 +420,7 @@ PrefabInstance:
     - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
       propertyPath: m_Name
-      value: Horizontal Button
+      value: Button
       objectReference: {fileID: 0}
     - target: {fileID: 6991908327359174553, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
