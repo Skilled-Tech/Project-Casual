@@ -39,6 +39,7 @@ namespace Game
 
             popup.Hide();
 
+            fader.Visible = true;
             fader.Value = 0f;
         }
     }
