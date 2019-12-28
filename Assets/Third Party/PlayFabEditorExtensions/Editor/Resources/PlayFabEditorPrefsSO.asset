@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: PlayFabEditorPrefsSO
   m_EditorClassIdentifier: 
   DevAccountEmail: Moe4Baker@gmail.com
-  DevAccountToken: uk1aei71ju5yqbocit1wxgb358nhgnopcqtw47i9hqek3nj49bds1hgnzk9ofaq7j14woa4zwr1ix8gfxoskxsi9n3kuf4xmnwmbcizf9eb5ainfn334s51uo7fqgbi5jhhm8s48mrr31pxakrk41rkzj6b47zpgunaknber6zg9iexd1zimcgo31y6o1rz5o3858jcb
+  DevAccountToken: noa9j346ktdisedi7npshm6me3cakgnxqakyir4ygospchahuf1fbtfkegfjkqkk1k1ges37m5q1gkmx4ngsy1afpgjas6excp63bwp37zie5zhddtppq7pn9yw6kqux9zxic18eehyd4t1zf8ipg59j7px8xseuu78jekuj7qk3n1ddwrb3zizbefh6trd5cxeurfu6
   SelectedStudio: T4 Games
   SdkPath: Assets/Third Party/PlayFabSdk
-  EdExPath: 
+  EdExPath: Assets/Third Party/PlayFabEditorExtensions
   LocalCloudScriptPath: 
   PanelIsShown: 0
   curMainMenuIdx: 1
