@@ -35,12 +35,12 @@ namespace Game
 
         void LoginCallback(LoginResult result, PlayFabError error)
         {
-            PlayFab.Login.CustomID.OnResponse -= LoginCallback;
+            PlayFab.Login.OnResponse -= LoginCallback;
 
             if (error == null)
             {
                 PlayFab.Player.Statistics.Update.OnResponse += UpdatePlayerStatisticsCallback;
-                PlayFab.Player.Statistics.Update.Request("Score", 500);
+                PlayFab.Player.Statistics.Update.Request("Score", 600);
             }
             else
             {

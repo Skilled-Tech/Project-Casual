@@ -90,7 +90,6 @@ GameObject:
   - component: {fileID: 8366811115945440159}
   - component: {fileID: 1785174761993430826}
   - component: {fileID: 3940540869102728328}
-  - component: {fileID: 5769543869136266002}
   - component: {fileID: 3053397389621303178}
   m_Layer: 5
   m_Name: Panel
@@ -211,26 +210,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 2
---- !u!114 &5769543869136266002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3374804624990077192}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreLayout: 0
-  m_MinWidth: 400
-  m_MinHeight: 400
-  m_PreferredWidth: -1
-  m_PreferredHeight: -1
-  m_FlexibleWidth: -1
-  m_FlexibleHeight: -1
-  m_LayoutPriority: 1
 --- !u!114 &3053397389621303178
 MonoBehaviour:
   m_ObjectHideFlags: 0

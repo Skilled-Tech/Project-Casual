@@ -24,11 +24,42 @@ namespace Game
         [SerializeField]
         AnimationCurve curve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f));
 
+        [SerializeField]
+        AxisConstraintsData axisConstraints = new AxisConstraintsData();
+        [Serializable]
+        public class AxisConstraintsData
+        {
+            [SerializeField]
+            protected bool x;
+            public bool X { get { return x; } }
+
+            [SerializeField]
+            protected bool y;
+            public bool Y { get { return y; } }
+
+            [SerializeField]
+            protected bool z;
+            public bool Z { get { return z; } }
+
+            public AxisConstraintsData()
+            {
+                x = y = z = true;
+            }
+        }
+
         protected override void UpdateState(float value)
         {
-            transform.localScale = Vector3.one * curve.Evaluate(value);
-
             base.UpdateState(value);
+
+            var scale = transform.localScale;
+
+            var eval = curve.Evaluate(value);
+
+            if (axisConstraints.X) scale.x = eval;
+            if (axisConstraints.Y) scale.y = eval;
+            if (axisConstraints.Z) scale.z = eval;
+
+            transform.localScale = scale;
         }
     }
 }
