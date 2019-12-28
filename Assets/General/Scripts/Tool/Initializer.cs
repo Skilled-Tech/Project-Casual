@@ -39,6 +39,12 @@ namespace Game
             Perform(targets);
         }
 
+        public static void Perform(GameObject gameObject)
+        {
+            var targets = Dependancy.GetAll<IInitialize>(gameObject);
+
+            Perform(targets);
+        }
         static void Perform(IList<IInitialize> list)
         {
             for (int i = 0; i < list.Count; i++)
@@ -48,18 +54,28 @@ namespace Game
                 list[i].Init();
         }
 
-        public static void Perform(IInitialize target)
-        {
-            target.Configure();
-
-            target.Init();
-        }
-
-        public static void Perform(GameObject gameObject)
+        public static void Configure(GameObject gameObject)
         {
             var targets = Dependancy.GetAll<IInitialize>(gameObject);
 
-            Perform(targets);
+            Configure(targets);
+        }
+        static void Configure(IList<IInitialize> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+                list[i].Configure();
+        }
+
+        public static void Init(GameObject gameObject)
+        {
+            var targets = Dependancy.GetAll<IInitialize>(gameObject);
+
+            Init(targets);
+        }
+        static void Init(IList<IInitialize> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+                list[i].Init();
         }
     }
 

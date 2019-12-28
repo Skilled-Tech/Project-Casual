@@ -44,9 +44,12 @@ namespace Game
             
         }
 
+        public event Action OnInvoke;
         public virtual void Invoke()
         {
             Operation.ExecuteAll(targets);
+
+            OnInvoke?.Invoke();
         }
     }
 

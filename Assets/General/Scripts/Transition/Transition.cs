@@ -103,7 +103,7 @@ namespace Game
         {
             while (Value != target)
             {
-                Value = Mathf.MoveTowards(Value, target, speed * Time.deltaTime);
+                Value = Mathf.MoveTowards(Value, target, speed * Time.unscaledDeltaTime);
 
                 yield return null;
             }

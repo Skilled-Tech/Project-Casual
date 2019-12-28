@@ -39,8 +39,6 @@ namespace Game
                 gameObject.name = nameof(Core);
                 DontDestroyOnLoad(gameObject);
 
-                Initializer.Perform(gameObject);
-
                 Instance = gameObject.GetComponent<Core>();
                 Instance.Configure();
             }
@@ -151,6 +149,7 @@ namespace Game
             Application.targetFrameRate = 60;
 
             References.Configure(this);
+            Initializer.Configure(gameObject);
 
             Init();
         }
@@ -159,6 +158,7 @@ namespace Game
         protected virtual void Init()
         {
             References.Init(this);
+            Initializer.Init(gameObject);
 
             OnInit?.Invoke();
         }

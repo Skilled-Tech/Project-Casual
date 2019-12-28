@@ -21,9 +21,33 @@ namespace Game
 {
 	public class QuitLevelOperation : Operation
 	{
+        public Core Core => Core.Instance;
+        public Level Level => Level.Instance;
+
         public override void Execute()
         {
-            Level.Instance.Quit();
+            Core.UI.Choice.Show("Are You Sure You Wish To Quit The Level ?", ResultCallback);
+
+            void ResultCallback(bool result)
+            {
+                if (result)
+                {
+                    Core.UI.Popup.Show("Ok Boomer", PopupCallback, "Ok");
+
+                    void PopupCallback()
+                    {
+                        Core.UI.Popup.Hide();
+
+                        Core.UI.Choice.Hide();
+
+                        Level.Quit();
+                    }
+                }
+                else
+                {
+                    Core.UI.Choice.Hide();
+                }
+            }
         }
     }
 }

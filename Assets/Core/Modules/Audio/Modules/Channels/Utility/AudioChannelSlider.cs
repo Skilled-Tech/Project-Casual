@@ -22,7 +22,7 @@ using UnityEngine.Audio;
 namespace Game
 {
     [RequireComponent(typeof(Slider))]
-	public class AudioChannelSlider : MonoBehaviour
+	public class AudioChannelSlider : MonoBehaviour, IInitialize
 	{
         [SerializeField]
         AudioMixerGroup mixerGroup = null;
@@ -33,11 +33,11 @@ namespace Game
 
         public AudioChannelModule Channel { get; protected set; }
 
-        protected virtual void Awake()
+        public void Configure()
         {
             Channel = Channels.Find(mixerGroup);
 
-            if(Channel == null)
+            if (Channel == null)
             {
                 Debug.LogError("Cannot find channel with mixer group: " + mixerGroup.name + ", disabling " + nameof(AudioChannelSlider) + ": " + name);
                 enabled = false;
@@ -46,7 +46,7 @@ namespace Game
             Slider = GetComponent<Slider>();
         }
 
-        protected virtual void Start()
+        public void Init()
         {
             Slider.minValue = 0f;
             Slider.maxValue = 1f;

@@ -43,6 +43,25 @@ namespace Game
         public bool IsNone => state == LevelPauseState.None;
         public bool IsSoft => state == LevelPauseState.Soft;
         public bool IsHard => state == LevelPauseState.Hard;
+
+        public override void Configure(Level reference)
+        {
+            base.Configure(reference);
+
+            OnStateChange += StateChangeCallback;
+        }
+
+        protected virtual void StateChangeCallback(LevelPauseState state)
+        {
+            Time.timeScale = state == LevelPauseState.Hard ? 1f : 0f;
+        }
+
+        protected virtual void OnDestroy()
+        {
+            OnStateChange -= StateChangeCallback;
+
+            Time.timeScale = 1f;
+        }
     }
 
     public enum LevelPauseState

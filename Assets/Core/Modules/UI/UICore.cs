@@ -26,6 +26,10 @@ namespace Game
         public UIElement OptionsMenu { get { return optionsMenu; } }
 
         [SerializeField]
+        protected ChoiceUI choice;
+        public ChoiceUI Choice { get { return choice; } }
+
+        [SerializeField]
         protected PopupUI popup;
         public PopupUI Popup { get { return popup; } }
 
@@ -37,9 +41,13 @@ namespace Game
         {
             base.Init();
 
+            if (optionsMenu.Visible) optionsMenu.Hide();
+
+            if (choice.Visible) choice.Hide();
+
             if(popup.Visible) popup.Hide();
 
-            if(fader.Visible == false) fader.Visible = true;
+            if(fader.Visible == false) fader.Show();
             fader.Value = 0f;
         }
     }

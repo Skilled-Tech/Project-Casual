@@ -25,7 +25,14 @@ namespace Game
 
         public override void Execute()
         {
-            target.Invoke();
+            if(target == null)
+            {
+                Debug.LogWarning("No target set for " + nameof(InvokeRelayOperation), gameObject);
+            }
+            else
+            {
+                target.Invoke();
+            }
         }
     }
 }

@@ -37,6 +37,8 @@ namespace Game
 
                 if(list.Count > 0) list.Last().enabled = false;
 
+                behaviour.enabled = true;
+
                 list.Add(behaviour);
             }
             else
@@ -59,7 +61,7 @@ namespace Game
 
                 list.Remove(behaviour);
 
-                if(list.Count > 0) list.Last().enabled = true;
+                if (list.Count > 0) list.Last().enabled = true;
             }
         }
 

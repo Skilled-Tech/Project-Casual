@@ -19,19 +19,12 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class RelayOnReturn : MonoBehaviour
+	public class ReturnRelay : Relay
 	{
-        Relay relay;
-
-        private void Awake()
-        {
-            relay = GetComponent<Relay>();
-        }
-
-        private void Update()
+        protected virtual void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Home))
-                relay.Invoke();
+                Invoke();
         }
     }
 }

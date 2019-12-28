@@ -21,9 +21,11 @@ namespace Game
 {
     public class ShowOptionsMenuOperation : Operation
     {
+        public Core Core => Core.Instance;
+
         public override void Execute()
         {
-            Core.Instance.UI.OptionsMenu.Show();
+            Core.UI.OptionsMenu.Show();
         }
     }
 }

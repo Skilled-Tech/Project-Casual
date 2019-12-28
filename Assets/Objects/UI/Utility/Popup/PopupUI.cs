@@ -36,15 +36,17 @@ namespace Game
         public Text Instructions { get { return instructions; } }
 
         [SerializeField]
-        protected GameObject controls;
-        public GameObject Controls { get { return controls; } }
+        protected UIElement controls;
+        public UIElement Controls { get { return controls; } }
 
         [SerializeField]
-        protected GameObject loading;
-        public GameObject Loading { get { return loading; } }
+        protected UIElement loading;
+        public UIElement Loading { get { return loading; } }
 
-        protected virtual void Awake()
+        public override void Configure()
         {
+            base.Configure();
+
             button.onClick.AddListener(OnButton);
         }
 
@@ -58,9 +60,9 @@ namespace Game
             this.action = action;
 
             button.gameObject.SetActive(action != null);
-            if(controls != null) controls.SetActive(action != null);
+            if(controls != null) controls.Visible = action != null;
 
-            if(loading != null) loading.gameObject.SetActive(action == null);
+            if(loading != null) loading.Visible = action == null;
 
             if (action == null)
             {

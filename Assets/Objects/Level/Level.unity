@@ -564,9 +564,8 @@ GameObject:
   - component: {fileID: 943399194}
   - component: {fileID: 943399197}
   - component: {fileID: 943399198}
-  - component: {fileID: 943399199}
   - component: {fileID: 943399200}
-  - component: {fileID: 943399201}
+  - component: {fileID: 943399199}
   m_Layer: 5
   m_Name: Pause
   m_TagString: Untagged
@@ -726,23 +725,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 943399192}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da9482b3455381f4199ad92ede92ff25, type: 3}
+  m_Script: {fileID: 11500000, guid: d29d636c639456b4c8f5f6b5bafc1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &943399201
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943399192}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aab56a9997419ce438723992a3a8abfb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  behaviours:
-  - {fileID: 943399200}
+  use: 1
+  relay: {fileID: 943399198}
 --- !u!1 &1342573019
 GameObject:
   m_ObjectHideFlags: 0
@@ -1227,35 +1214,3 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b94fa3110c9f55a479f409d0c168802f, type: 3}
---- !u!1 &1858017807464101369 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8701305010040422553, guid: b94fa3110c9f55a479f409d0c168802f,
-    type: 3}
-  m_PrefabInstance: {fileID: 1858017807464101368}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1858017807464101370 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1858017807464101370, guid: b94fa3110c9f55a479f409d0c168802f,
-    type: 3}
-  m_PrefabInstance: {fileID: 1858017807464101368}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1858017807464101369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da9482b3455381f4199ad92ede92ff25, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1858017807464101371
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1858017807464101369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aab56a9997419ce438723992a3a8abfb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  behaviours:
-  - {fileID: 1858017807464101370}

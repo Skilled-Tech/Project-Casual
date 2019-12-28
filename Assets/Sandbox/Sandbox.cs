@@ -19,22 +19,16 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-    [RequireComponent(typeof(Relay))]
-	public class RelayOnKey : MonoBehaviour
+	public class Sandbox : MonoBehaviour
 	{
-        public KeyCode key;
-
-        Relay relay;
-
-        void Awake()
+        private void OnEnable()
         {
-            relay = GetComponent<Relay>();
+            Debug.Log("On Enable");
         }
 
-        void Update()
+        private void OnDisable()
         {
-            if (Input.GetKeyDown(key))
-                relay.Invoke();
+            Debug.Log("On Disable");
         }
     }
 }

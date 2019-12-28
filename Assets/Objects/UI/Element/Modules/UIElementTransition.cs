@@ -28,16 +28,12 @@ namespace Game
         {
             Element = GetComponent<UIElement>();
 
-            base.Configure();
-        }
-        public override void Init()
-        {
-            base.Init();
+            Element.OnShow += ShowCallback;
+            Element.OnHide += HideCallback;
 
             Value = Element.Visible ? 1f : 0f;
 
-            Element.OnShow += ShowCallback;
-            Element.OnHide += HideCallback;
+            base.Configure();
         }
 
         protected virtual void ShowCallback() => To(1f);
