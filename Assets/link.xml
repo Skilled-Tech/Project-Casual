@@ -1,0 +1,9 @@
+<linker>
+  <assembly fullname="System.Core">
+    <!-- This is required by JSon.NET and any expression.Compile caller -->
+    <type fullname="System.Linq.Expressions*" />
+  </assembly>
+  <assembly fullname="PlayFab">
+    <type fullname="PlayFab.*" preserve="all"/>
+  </assembly>
+</linker>
