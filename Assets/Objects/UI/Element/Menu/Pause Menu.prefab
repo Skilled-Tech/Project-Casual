@@ -135,19 +135,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: PAUSED
---- !u!114 &1305514373160092370
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8066646274999932712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 161d99733e7d15d4d967dfe7be61fa57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: 0
 --- !u!114 &8877108347619434550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,18 +148,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 9182219410805989827}
---- !u!114 &325195689
+--- !u!114 &1305514373160092370
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8701305011238946483}
+  m_GameObject: {fileID: 8066646274999932712}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95c715fc50f7d174bb15e5224b81fc8f, type: 3}
+  m_Script: {fileID: 11500000, guid: 161d99733e7d15d4d967dfe7be61fa57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: 0
 --- !u!114 &1226465278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,6 +171,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3812ec17d8d78614b81c5d16466baa96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &325195689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8701305011238946483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95c715fc50f7d174bb15e5224b81fc8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1858017807990495039
@@ -436,6 +436,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329803522800864778, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329803522800864778, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1682121999, guid: c93e1212da9c82b4a8cb7c35b7f8fa63, type: 3}
       propertyPath: m_IsActive

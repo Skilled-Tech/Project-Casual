@@ -449,7 +449,7 @@ GameObject:
   - component: {fileID: 6322009733468325914}
   - component: {fileID: 7853960355336481279}
   m_Layer: 5
-  m_Name: Close On Click
+  m_Name: Relay On Click
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
