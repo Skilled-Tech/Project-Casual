@@ -38,11 +38,11 @@ namespace Game
             {
                 yield return Core.UI.Fader.To(1f, 0.2f);
 
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSecondsRealtime(0.2f);
 
                 SceneManager.LoadScene(name);
 
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSecondsRealtime(0.2f);
 
                 yield return Core.UI.Fader.To(0f, 0.2f);
             }

@@ -122,7 +122,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: d0760f16039ee444fac046f5cfeda771, type: 3}
     m_FontSize: 140
     m_FontStyle: 1
     m_BestFit: 0
@@ -304,6 +304,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+        type: 3}
       propertyPath: m_Text
       value: Resume
       objectReference: {fileID: 0}
@@ -315,18 +320,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1858017807990495039}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2352001621110276025 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4137396668871223430, guid: 776c08730b0960c44b5acfe865993a8a,
-    type: 3}
-  m_PrefabInstance: {fileID: 1858017807990495039}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8701305010040422553}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b5b8348c2e3e284e9997957b8a32396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1858017808394049928
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -498,11 +491,6 @@ PrefabInstance:
       propertyPath: m_EffectDistance.y
       value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 7959507937242637286, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
-        type: 3}
-      propertyPath: target
-      value: 
-      objectReference: {fileID: 2352001621110276025}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c93e1212da9c82b4a8cb7c35b7f8fa63, type: 3}
 --- !u!1 &8066646274999932712 stripped
@@ -648,6 +636,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+        type: 3}
       propertyPath: m_Text
       value: Options
       objectReference: {fileID: 0}
@@ -775,6 +768,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+        type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}

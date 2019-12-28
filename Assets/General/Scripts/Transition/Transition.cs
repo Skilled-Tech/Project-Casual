@@ -105,7 +105,7 @@ namespace Game
             {
                 Value = Mathf.MoveTowards(Value, target, speed * Time.unscaledDeltaTime);
 
-                yield return null;
+                yield return new WaitForEndOfFrame();
             }
 
             coroutine = null;

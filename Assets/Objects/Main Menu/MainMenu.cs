@@ -40,7 +40,7 @@ namespace Game
             if (error == null)
             {
                 PlayFab.Player.Statistics.Update.OnResponse += UpdatePlayerStatisticsCallback;
-                PlayFab.Player.Statistics.Update.Request("Score", 600);
+                PlayFab.Player.Statistics.Update.Request("Score", 400);
             }
             else
             {

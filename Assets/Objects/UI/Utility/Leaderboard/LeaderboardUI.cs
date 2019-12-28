@@ -39,7 +39,7 @@ namespace Game
             {
                 entries[i] = new PlayerLeaderboardEntry()
                 {
-                    DisplayName = GUID.Generate().ToString().Substring(0, 6),
+                    DisplayName = System.Guid.NewGuid().ToString().Substring(0, 6),
                     Position = i,
                     StatValue = Mathf.RoundToInt(entries.Length / 1f / (i + 1f) * 1000),
                 };
