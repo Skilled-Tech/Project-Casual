@@ -19,7 +19,7 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-    //[DisallowMultipleComponent]
+    [DisallowMultipleComponent]
 	public class UIElement : MonoBehaviour, IInitialize
     {
         public GameObject Target => gameObject;

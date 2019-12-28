@@ -20,8 +20,8 @@ using Random = UnityEngine.Random;
 namespace Game
 {
     [RequireComponent(typeof(Image))]
-	public class FaderUI : UIElement
-	{
+    public class FaderUI : MonoBehaviour, IInitialize
+    {
 		public Image Image { get; protected set; }
 
         public float Value
@@ -40,11 +40,17 @@ namespace Game
             }
         }
 
-        public override void Configure()
+        public virtual void Configure()
         {
-            base.Configure();
-
             Image = GetComponent<Image>();
+        }
+        public virtual void Init()
+        {
+            if(gameObject.activeSelf == false)
+            {
+                gameObject.SetActive(true);
+                Value = 0f;
+            }
         }
 
         public virtual Coroutine To(float target) => To(target, 0.4f);

@@ -19,7 +19,7 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class ReturnHook : MonoBehaviour
+	public class ReturnInputHook : MonoBehaviour
 	{
         [SerializeField]
         protected bool use = true;
@@ -29,7 +29,7 @@ namespace Game
         protected Relay relay;
         public Relay Relay { get { return relay; } }
 
-        public static List<ReturnHook> list = new List<ReturnHook>();
+        public static List<ReturnInputHook> list = new List<ReturnInputHook>();
 
         private void OnEnable()
         {

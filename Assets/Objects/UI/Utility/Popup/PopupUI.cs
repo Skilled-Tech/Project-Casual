@@ -19,7 +19,8 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-    public class PopupUI : UIElement
+    [RequireComponent(typeof(UIElement))]
+    public class PopupUI : MonoBehaviour, IInitialize
     {
         [SerializeField]
         protected Text label;
@@ -43,11 +44,17 @@ namespace Game
         protected UIElement loading;
         public UIElement Loading { get { return loading; } }
 
-        public override void Configure()
+        public UIElement Element { get; protected set; }
+
+        public virtual void Configure()
         {
-            base.Configure();
+            Element = GetComponent<UIElement>();
 
             button.onClick.AddListener(OnButton);
+        }
+        public virtual void Init()
+        {
+
         }
 
         public virtual void Show(string text)
@@ -73,8 +80,10 @@ namespace Game
                 this.instructions.text = instructions;
             }
 
-            base.Show();
+            Element.Show();
         }
+
+        public virtual void Hide() => Element.Hide();
 
         Action action;
         void OnButton()

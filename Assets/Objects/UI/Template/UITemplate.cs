@@ -19,8 +19,20 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public abstract class UITemplate<TReference> : UIElement
-	{
+    [RequireComponent(typeof(UIElement))]
+    public abstract class UITemplate<TReference> : MonoBehaviour, IInitialize
+    {
+        public UIElement Element { get; protected set; }
+
+        public virtual void Configure()
+        {
+            Element = GetComponent<UIElement>();
+        }
+        public virtual void Init()
+        {
+
+        }
+
         public TReference Reference { get; protected set; }
         public virtual void Set(TReference reference)
         {

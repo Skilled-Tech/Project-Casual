@@ -19,8 +19,9 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class ChoiceUI : UIElement
-	{
+    [RequireComponent(typeof(UIElement))]
+    public class ChoiceUI : MonoBehaviour, IInitialize
+    {
         [SerializeField]
         protected Text label;
         public Text Label { get { return label; } }
@@ -56,12 +57,18 @@ namespace Game
             }
         }
 
-        public override void Configure()
+        public UIElement Element { get; protected set; }
+
+        public virtual void Configure()
         {
-            base.Configure();
+            Element = GetComponent<UIElement>();
 
             controls.Confirm.Relay.OnInvoke += ConfirmCallback;
             controls.Deny.Relay.OnInvoke += DenyCallback;
+        }
+        public virtual void Init()
+        {
+
         }
 
         public virtual void Show(string text, ResultDelegate callback)
@@ -70,9 +77,12 @@ namespace Game
 
             this.callback = callback;
 
-            base.Show();
+            Element.Show();
         }
 
+        public virtual void Hide() => Element.Hide();
+
+        #region Callback
         private void DenyCallback() => Action(false);
         private void ConfirmCallback() => Action(true);
 
@@ -82,5 +92,6 @@ namespace Game
         {
             callback?.Invoke(result);
         }
+        #endregion
     }
 }

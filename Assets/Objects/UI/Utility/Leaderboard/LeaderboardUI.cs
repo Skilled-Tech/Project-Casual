@@ -21,8 +21,9 @@ using PlayFab.ClientModels;
 
 namespace Game
 {
-	public class LeaderboardUI : UIElement
-	{
+    [RequireComponent(typeof(UIElement))]
+    public class LeaderboardUI : MonoBehaviour, IInitialize
+    {
         [SerializeField]
         protected GameObject template;
         public GameObject Template { get { return template; } }
@@ -30,6 +31,17 @@ namespace Game
         [SerializeField]
         protected RectTransform panel;
         public RectTransform Panel { get { return panel; } }
+
+        public UIElement Element { get; protected set; }
+
+        public virtual void Configure()
+        {
+            Element = GetComponent<UIElement>();
+        }
+        public virtual void Init()
+        {
+
+        }
 
         private void Start()
         {

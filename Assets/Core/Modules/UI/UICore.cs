@@ -43,11 +43,10 @@ namespace Game
 
             if (optionsMenu.Visible) optionsMenu.Hide();
 
-            if (choice.Visible) choice.Hide();
+            if (choice.Element.Visible) choice.Element.Hide();
 
-            if(popup.Visible) popup.Hide();
+            if(popup.Element.Visible) popup.Element.Hide();
 
-            if(fader.Visible == false) fader.Show();
             fader.Value = 0f;
         }
     }

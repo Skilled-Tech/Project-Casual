@@ -19,7 +19,7 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class ReturnRelay : Relay
+	public class ReturnInputRelay : Relay
 	{
         protected virtual void Update()
         {

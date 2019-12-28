@@ -445,7 +445,7 @@ PrefabInstance:
     - target: {fileID: 6032520912302318426, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
       propertyPath: m_Name
-      value: Level End Menu
+      value: End Menu
       objectReference: {fileID: 0}
     - target: {fileID: 6032520912302318427, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
@@ -651,13 +651,7 @@ PrefabInstance:
       propertyPath: relay
       value: 
       objectReference: {fileID: 9054920882960835511}
-    - target: {fileID: 146066945490017193, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
-        type: 3}
-      propertyPath: target
-      value: 
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 6032520912302318431, guid: c93e1212da9c82b4a8cb7c35b7f8fa63, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c93e1212da9c82b4a8cb7c35b7f8fa63, type: 3}
 --- !u!1 &6955150381400845684 stripped
 GameObject:
