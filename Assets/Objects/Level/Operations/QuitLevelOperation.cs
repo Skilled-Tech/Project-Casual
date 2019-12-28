@@ -26,7 +26,7 @@ namespace Game
 
         public override void Execute()
         {
-            Core.UI.Choice.Show("Are You Sure You Wish To Quit The Level ?", ResultCallback);
+            Core.UI.Choice.Show("Are You Sure You Wish To Quit ?", ResultCallback);
 
             void ResultCallback(bool result)
             {

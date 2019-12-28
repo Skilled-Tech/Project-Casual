@@ -19,8 +19,17 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class LevelMenu : Level.Module
+	public class LevelEndMenu : UIElement
 	{
-		
-	}
+        [SerializeField]
+        protected Text score;
+        public Text Score { get { return score; } }
+
+        public virtual void Show(int points)
+        {
+            score.text = points.ToString("N0");
+
+            base.Show();
+        }
+    }
 }

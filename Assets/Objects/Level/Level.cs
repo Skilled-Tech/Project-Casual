@@ -64,6 +64,16 @@ namespace Game
             Core.Ads.Placements.Common.Video.Show();
         }
 
+        protected virtual void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.E)) End();
+        }
+
+        public virtual void End()
+        {
+            Menu.End.Show(40000);
+        }
+
         public virtual void Retry()
         {
             Core.Scenes.Load(gameObject.scene.name);
