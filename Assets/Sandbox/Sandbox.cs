@@ -21,14 +21,16 @@ namespace Game
 {
 	public class Sandbox : MonoBehaviour
 	{
-        private void OnEnable()
-        {
-            Debug.Log("On Enable");
-        }
+        public FaderUI fader1;
+        public FaderUI fader2;
 
-        private void OnDisable()
+        [Range(0f, 1f)]
+        public float rate = 0.5f;
+
+        private void Update()
         {
-            Debug.Log("On Disable");
+            fader1.Value = Mathf.Lerp(0f, 0.8f, rate);
+            fader2.Value = Mathf.Lerp(0.8f, 0f, rate);
         }
     }
 }

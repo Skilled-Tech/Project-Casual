@@ -76,11 +76,15 @@ namespace Game
 
         public virtual void Retry()
         {
+            if(Menu.End.Element.Visible) Menu.End.Element.Hide();
+
             Core.Scenes.Load(gameObject.scene.name);
         }
 
         public virtual void Quit()
         {
+            if (Menu.End.Element.Visible) Menu.End.Element.Hide();
+
             Core.Scenes.Load(Core.Scenes.MainMenu);
         }
     }
