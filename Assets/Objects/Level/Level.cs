@@ -27,6 +27,7 @@ namespace Game
 		public static Level Instance { get; protected set; }
 
         public LevelPause Pause { get; protected set; }
+        public LevelPhases Phases { get; protected set; }
         public LevelMenu Menu { get; protected set; }
 
         public class Module : MonoBehaviour, IReference<Level>
@@ -50,6 +51,7 @@ namespace Game
             Instance = this;
 
             Pause = this.GetDependancy<LevelPause>();
+            Phases = this.GetDependancy<LevelPhases>();
             Menu = FindObjectOfType<LevelMenu>();
 
             References.Configure(this);
@@ -60,18 +62,6 @@ namespace Game
         {
             References.Init(this);
             References.Init(this, Menu);
-
-            Core.Ads.Placements.Common.Video.Show();
-        }
-
-        protected virtual void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.E)) End();
-        }
-
-        public virtual void End()
-        {
-            Menu.End.Show(40000);
         }
 
         public virtual void Retry()
