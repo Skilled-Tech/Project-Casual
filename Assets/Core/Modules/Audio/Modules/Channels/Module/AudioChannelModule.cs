@@ -29,6 +29,8 @@ namespace Game
 
         public AudioMixer Mixer => mixerGroup.audioMixer;
 
+        public string VolumeID => mixerGroup.name + " " + "Volume";
+
         public float Volume
         {
             get
@@ -50,6 +52,8 @@ namespace Game
                 if(Mixer.SetFloat(VolumeID, GameTools.Audio.LinearToDecibel(value)))
                 {
                     PlayerPrefs.SetFloat(VolumeID, value);
+
+                    OnVolumeChange?.Invoke(value);
                 }
                 else
                 {
@@ -58,7 +62,8 @@ namespace Game
             }
         }
 
-        public string VolumeID => mixerGroup.name + " " + "Volume";
+        public delegate void VolumeChangeDelegate(float volume);
+        public event VolumeChangeDelegate OnVolumeChange;
 
         public override void Configure(AudioChannelsCore reference)
         {
@@ -66,7 +71,7 @@ namespace Game
 
             StartCoroutine(Procedure());
 
-            IEnumerator Procedure()
+            IEnumerator Procedure() //We need to wait one frame for the audio mixer system to kick in, great coding, Obama
             {
                 yield return new WaitForEndOfFrame();
 

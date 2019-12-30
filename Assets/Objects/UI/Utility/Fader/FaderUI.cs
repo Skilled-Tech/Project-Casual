@@ -56,6 +56,11 @@ namespace Game
         public virtual Coroutine To(float target) => To(target, 0.4f);
         public virtual Coroutine To(float target, float duration)
         {
+            if(duration == 0f)
+            {
+                Value = target;
+            }
+
             IEnumerator Procedure()
             {
                 var timer = duration;
