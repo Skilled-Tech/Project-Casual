@@ -27,8 +27,6 @@ namespace Game
         public virtual void Configure()
         {
             Element = GetComponent<UIElement>();
-
-            Debug.Log(Element);
         }
         public virtual void Init()
         {
@@ -37,7 +35,7 @@ namespace Game
 
         public static class Utility
         {
-            public static Coroutine ChainDisplay<TTemplate>(IList<TTemplate> list, MonoBehaviour behaviour)
+            public static IList<UIElement> ToElements<TTemplate>(IList<TTemplate> list)
             where TTemplate : UITemplate
             {
                 var elements = new UIElement[list.Count];
@@ -45,7 +43,19 @@ namespace Game
                 for (int i = 0; i < list.Count; i++)
                     elements[i] = list[i].Element;
 
-                return UIElement.Utility.ChainDisplay(elements, behaviour);
+                return elements;
+            }
+
+            public static Coroutine ChainShow<TTemplate>(IList<TTemplate> list, MonoBehaviour behaviour)
+                where TTemplate : UITemplate
+            {
+                return UIElement.Utility.ChainShow(ToElements(list), behaviour);
+            }
+
+            public static Coroutine ChainHide<TTemplate>(IList<TTemplate> list, MonoBehaviour behaviour)
+                where TTemplate : UITemplate
+            {
+                return UIElement.Utility.ChainHide(ToElements(list), behaviour);
             }
         }
     }

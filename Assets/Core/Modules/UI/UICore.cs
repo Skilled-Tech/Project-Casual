@@ -45,13 +45,13 @@ namespace Game
         {
             base.Init();
 
-            if (optionsMenu.Visible) optionsMenu.SetActive(false);
+            if (optionsMenu.IsOn) optionsMenu.SetActive(false);
 
-            if (leaderboards.Visible) leaderboards.SetActive(false);
+            if (leaderboards.IsOn) leaderboards.SetActive(false);
 
-            if (choice.Element.Visible) choice.Element.SetActive(false);
+            if (choice.Element.IsOn) choice.Element.SetActive(false);
 
-            if(popup.Element.Visible) popup.Element.SetActive(false);
+            if(popup.Element.IsOn) popup.Element.SetActive(false);
 
             fader.Value = 0f;
         }

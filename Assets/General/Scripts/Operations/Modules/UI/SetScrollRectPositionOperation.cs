@@ -19,19 +19,21 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class HideUIElementOperation : Operation
+	public class SetScrollRectPositionOperation : Operation
 	{
         [SerializeField]
-        protected UIElement target;
+        ScrollRect scroll;
+
+        public Vector3 position;
 
         protected virtual void Reset()
         {
-            target = Dependancy.Get<UIElement>(gameObject, Dependancy.Scope.CurrentToParents);
+            scroll = this.GetDependancy<ScrollRect>(Dependancy.Scope.CurrentToParents);
         }
 
         public override void Execute()
         {
-            target.Hide();
+            scroll.content.anchoredPosition3D = position;
         }
     }
 }

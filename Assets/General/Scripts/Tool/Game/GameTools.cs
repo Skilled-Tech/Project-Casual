@@ -88,6 +88,7 @@ namespace Game
                 return Calculate<Collider2D>(gameObject, Func);
             }
             public static UnityEngine.Bounds Calculate<TSource>(GameObject gameObject, Func<TSource, UnityEngine.Bounds> extractor)
+                where TSource : class
             {
                 var value = new UnityEngine.Bounds(gameObject.transform.position, Vector3.zero);
 

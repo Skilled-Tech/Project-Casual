@@ -19,19 +19,18 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class HideUIElementOperation : Operation
+	public class OnEnableRelay : Relay
 	{
-        [SerializeField]
-        protected UIElement target;
-
-        protected virtual void Reset()
+        protected virtual void OnEnable()
         {
-            target = Dependancy.Get<UIElement>(gameObject, Dependancy.Scope.CurrentToParents);
-        }
+            StartCoroutine(Procedure());
 
-        public override void Execute()
-        {
-            target.Hide();
+            IEnumerator Procedure()
+            {
+                yield return new WaitForEndOfFrame();
+
+                Invoke();
+            }
         }
-    }
+	}
 }

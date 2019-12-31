@@ -60,23 +60,38 @@ namespace Game
 
             Leaderboard.OnUpdate += UpdateCallback;
         }
-
-        private void OnEnable()
-        {
-            if(Element || Element.Visible)
-                UITemplate.Utility.ChainDisplay(Entries, this);
-        }
-
         public virtual void Init()
         {
             
         }
 
-        private void UpdateCallback(LeaderboardModule result)
+        protected virtual void OnEnable()
         {
-            UpdateState();
+            StartCoroutine(Procedure());
+
+            IEnumerator Procedure()
+            {
+                yield return new WaitForEndOfFrame();
+
+                for (int i = 0; i < Entries.Count; i++) Entries[i].Element.SetActive(false);
+
+                yield return new WaitForSeconds(0.2f);
+
+                yield return ChainShow();
+            }
         }
 
+        Coroutine ChainShowCoroutine;
+        Coroutine ChainShow()
+        {
+            if (ChainShowCoroutine != null) StopCoroutine(ChainShowCoroutine);
+
+            ChainShowCoroutine = UITemplate.Utility.ChainShow(Entries, this);
+
+            return ChainShowCoroutine;
+        }
+
+        private void UpdateCallback(LeaderboardModule result) => UpdateState();
         protected virtual void UpdateState()
         {
             Clear();
@@ -87,15 +102,17 @@ namespace Game
         protected virtual void Create()
         {
             Entries = LeaderboardUITemplate.Create(Leaderboard.List, template, panel);
-
-            for (int i = 0; i < Entries.Count; i++)
-            {
-
-            }
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
 
             if (Element.Visible)
             {
-                UITemplate.Utility.ChainDisplay(Entries, this);
+                ChainShow();
             }
         }
 

@@ -31,7 +31,7 @@ namespace Game
             Element.OnShow += ShowCallback;
             Element.OnHide += HideCallback;
 
-            Value = Element.Visible ? 1f : 0f;
+            Value = Element.IsOn ? 1f : 0f;
 
             base.Configure();
         }

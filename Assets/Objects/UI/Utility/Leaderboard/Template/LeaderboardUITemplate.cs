@@ -39,9 +39,9 @@ namespace Game
         {
             base.UpdateState(reference);
 
-            gameObject.name = reference.DisplayName;
+            displayName.text = string.IsNullOrEmpty(reference.DisplayName) ? "Anonymous Player" : reference.DisplayName;
 
-            displayName.text = reference.DisplayName;
+            gameObject.name = displayName.text;
 
             position.text = (reference.Position + 1).ToString("N0") + GameTools.Text.GetOrdinalIndicator(reference.Position + 1);
 

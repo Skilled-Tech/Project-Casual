@@ -22,26 +22,45 @@ namespace Game
 	public static class Dependancy
 	{
         public static TComponent Get<TComponent>(GameObject target)
+            where TComponent : class
         {
-            return Get<TComponent>(target, Scope.RecursiveToChildern);
+            return Get<TComponent>(target, Scope.CurrentToChildern);
         }
         public static TComponent Get<TComponent>(GameObject target, Scope scope)
+            where TComponent : class
         {
             TComponent component;
 
-            component = target.GetComponent<TComponent>();
+            if(scope == Scope.Childern)
+            {
+                component = null;
+
+                scope = Scope.CurrentToChildern;
+            }
+            else if(scope == Scope.Parents)
+            {
+                component = null;
+
+                scope = Scope.CurrentToParents;
+            }
+            else
+            {
+                component = target.GetComponent<TComponent>();
+            }
 
             if (IsNull(component))
             {
-                if (scope == Scope.RecursiveToChildern)
+                if (scope == Scope.CurrentToChildern)
+                {
                     for (int i = 0; i < target.transform.childCount; i++)
                     {
                         component = Get<TComponent>(target.transform.GetChild(i).gameObject, scope);
 
                         if (!IsNull(component)) break;
                     }
+                }
 
-                if (scope == Scope.RecursiveToParents && target.transform.parent != null)
+                if (scope == Scope.CurrentToParents && target.transform.parent != null)
                     component = Get<TComponent>(target.transform.parent.gameObject, scope);
             }
 
@@ -49,20 +68,22 @@ namespace Game
         }
         
         public static List<TComponent> GetAll<TComponent>(GameObject target)
+            where TComponent : class
         {
-            return GetAll<TComponent>(target, Scope.RecursiveToChildern);
+            return GetAll<TComponent>(target, Scope.CurrentToChildern);
         }
 		public static List<TComponent> GetAll<TComponent>(GameObject target, Scope scope)
+            where TComponent : class
         {
             var list = new List<TComponent>();
 
             list.AddRange(target.GetComponents<TComponent>());
 
-            if (scope == Scope.RecursiveToChildern)
+            if (scope == Scope.CurrentToChildern)
                 for (int i = 0; i < target.transform.childCount; i++)
                     list.AddRange(GetAll<TComponent>(target.transform.GetChild(i).gameObject, scope));
 
-            if (scope == Scope.RecursiveToParents)
+            if (scope == Scope.CurrentToParents)
                 if (target.transform.parent != null)
                     list.AddRange(GetAll<TComponent>(target.transform.parent.gameObject, scope));
 
@@ -71,7 +92,7 @@ namespace Game
 
         public enum Scope
         {
-            Local, RecursiveToChildern, RecursiveToParents
+            Local, Childern, CurrentToChildern, CurrentToParents, Parents
         }
 
         public static NullReferenceException FormatException(string dependancy, object dependant)
@@ -110,19 +131,23 @@ namespace Game
     public static class DependancyExtensions
     {
         public static TComponent GetDependancy<TComponent>(this Component target)
+            where TComponent : class
         {
             return Dependancy.Get<TComponent>(target.gameObject);
         }
         public static TComponent GetDependancy<TComponent>(this Component target, Dependancy.Scope scope)
+            where TComponent : class
         {
             return Dependancy.Get<TComponent>(target.gameObject, scope);
         }
 
         public static List<TComponent> GetAllDependancies<TComponent>(this Component target)
+            where TComponent : class
         {
             return Dependancy.GetAll<TComponent>(target.gameObject);
         }
         public static List<TComponent> GetAllDependancies<TComponent>(this Component target, Dependancy.Scope scope)
+            where TComponent : class
         {
             return Dependancy.GetAll<TComponent>(target.gameObject, scope);
         }

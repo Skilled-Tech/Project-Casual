@@ -22,7 +22,18 @@ namespace Game
     public class Transition : MonoBehaviour, IInitialize
     {
         [SerializeField]
-        float speed = 4f;
+        protected float speed = 4f;
+        public float Speed
+        {
+            get
+            {
+                return speed;
+            }
+            set
+            {
+                speed = value;
+            }
+        }
 
         protected float _value = 0f;
         public float Value

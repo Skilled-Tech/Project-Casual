@@ -19,19 +19,11 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class HideUIElementOperation : Operation
+	public class SetAsLastSibling : MonoBehaviour
 	{
-        [SerializeField]
-        protected UIElement target;
-
-        protected virtual void Reset()
+        private void Start()
         {
-            target = Dependancy.Get<UIElement>(gameObject, Dependancy.Scope.CurrentToParents);
-        }
-
-        public override void Execute()
-        {
-            target.Hide();
+            transform.SetAsLastSibling();
         }
     }
 }
