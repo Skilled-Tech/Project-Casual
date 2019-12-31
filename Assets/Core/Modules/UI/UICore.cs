@@ -26,6 +26,10 @@ namespace Game
         public UIElement OptionsMenu { get { return optionsMenu; } }
 
         [SerializeField]
+        protected UIElement leaderboards;
+        public UIElement Leaderboards { get { return leaderboards; } }
+
+        [SerializeField]
         protected ChoiceUI choice;
         public ChoiceUI Choice { get { return choice; } }
 
@@ -41,11 +45,13 @@ namespace Game
         {
             base.Init();
 
-            if (optionsMenu.Visible) optionsMenu.Hide();
+            if (optionsMenu.Visible) optionsMenu.SetActive(false);
 
-            if (choice.Element.Visible) choice.Element.Hide();
+            if (leaderboards.Visible) leaderboards.SetActive(false);
 
-            if(popup.Element.Visible) popup.Element.Hide();
+            if (choice.Element.Visible) choice.Element.SetActive(false);
+
+            if(popup.Element.Visible) popup.Element.SetActive(false);
 
             fader.Value = 0f;
         }

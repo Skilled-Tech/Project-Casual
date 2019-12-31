@@ -52,11 +52,21 @@ namespace Game
             References.Init(this);
         }
 
+        public virtual void SetActive(bool value)
+        {
+            Target.SetActive(value);
+
+            if(Transition != null)
+            {
+                Transition.Value = value ? 1f : 0f;
+            }
+        }
+
         public event Action OnShow;
         public virtual void Show()
         {
             if (Transition == null)
-                Target.SetActive(true);
+                SetActive(true);
 
             OnShow?.Invoke();
         }
@@ -65,7 +75,7 @@ namespace Game
         public virtual void Hide()
         {
             if (Transition == null)
-                Target.SetActive(false);
+                SetActive(false);
 
             OnHide?.Invoke();
         }
@@ -73,6 +83,31 @@ namespace Game
         public virtual void Toggle()
         {
             Visible = !Visible;
+        }
+
+        public static class Utility
+        {
+            public static Coroutine ChainDisplay<TElement>(IList<TElement> list, MonoBehaviour behaviour)
+            where TElement : UIElement
+            {
+                return behaviour.StartCoroutine(Procedure());
+
+                IEnumerator Procedure()
+                {
+                    for (int i = 0; i < list.Count; i++)
+                        if (list[i].Visible)
+                            list[i].SetActive(false);
+
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        list[i].Show();
+
+                        bool IsReady() => list[i].Transition == null ? true : Mathf.Approximately(list[i].Transition.Value, 1f);
+
+                        yield return new WaitUntil(IsReady);
+                    }
+                }
+            }
         }
     }
 }

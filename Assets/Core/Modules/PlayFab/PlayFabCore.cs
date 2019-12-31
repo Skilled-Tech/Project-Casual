@@ -265,4 +265,13 @@ namespace Game
             Register(this, player);
         }
     }
+
+    public class RestDelegates
+    {
+        public delegate void ResultCallback<TResult>(TResult result);
+
+        public delegate void ErrorCallback<TError>(TError error);
+
+        public delegate void ResponseCallback<TResult, TError>(TResult result, TError error);
+    }
 }

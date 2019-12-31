@@ -21,7 +21,7 @@ using PlayFab.ClientModels;
 
 namespace Game
 {
-	public class LeaderboardUITemplate : UITemplate<PlayerLeaderboardEntry, LeaderboardUITemplate>
+	public class LeaderboardUITemplate : UITemplate<LeaderboardElement, LeaderboardUITemplate>
 	{
         [SerializeField]
         protected Text displayName;
@@ -35,7 +35,7 @@ namespace Game
         protected Text value;
         public Text Value { get { return value; } }
 
-        protected override void UpdateState(PlayerLeaderboardEntry reference)
+        protected override void UpdateState(LeaderboardElement reference)
         {
             base.UpdateState(reference);
 
@@ -45,7 +45,7 @@ namespace Game
 
             position.text = (reference.Position + 1).ToString("N0") + GameTools.Text.GetOrdinalIndicator(reference.Position + 1);
 
-            value.text = reference.StatValue.ToString("N0");
+            value.text = reference.Value.ToString("N0");
         }
     }
 }

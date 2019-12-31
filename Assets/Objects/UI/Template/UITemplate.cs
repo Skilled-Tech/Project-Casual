@@ -20,19 +20,38 @@ using Random = UnityEngine.Random;
 namespace Game
 {
     [RequireComponent(typeof(UIElement))]
-    public abstract class UITemplate<TReference> : MonoBehaviour, IInitialize
+    public class UITemplate : MonoBehaviour, IInitialize
     {
         public UIElement Element { get; protected set; }
 
         public virtual void Configure()
         {
             Element = GetComponent<UIElement>();
+
+            Debug.Log(Element);
         }
         public virtual void Init()
         {
 
         }
 
+        public static class Utility
+        {
+            public static Coroutine ChainDisplay<TTemplate>(IList<TTemplate> list, MonoBehaviour behaviour)
+            where TTemplate : UITemplate
+            {
+                var elements = new UIElement[list.Count];
+
+                for (int i = 0; i < list.Count; i++)
+                    elements[i] = list[i].Element;
+
+                return UIElement.Utility.ChainDisplay(elements, behaviour);
+            }
+        }
+    }
+
+    public abstract class UITemplate<TReference> : UITemplate
+    {
         public TReference Reference { get; protected set; }
         public virtual void Set(TReference reference)
         {

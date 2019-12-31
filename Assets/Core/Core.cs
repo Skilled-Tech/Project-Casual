@@ -49,10 +49,13 @@ namespace Game
         public UICore UI { get; protected set; }
         public AdsCore Ads { get; protected set; }
         public PlayFabCore PlayFab { get; protected set; }
+        public LeaderboardsCore Leaderboards { get; protected set; }
 
         #region Modules
         public class Module<TModule> : MonoBehaviour, IReference<TModule>
         {
+            public Core Core => Core.Instance;
+
             public TModule Reference { get; protected set; }
 
             public virtual void Register<TReference>(TReference reference, IReference<TReference> module)
@@ -82,7 +85,7 @@ namespace Game
         }
         public class Module : Module<Core>
         {
-            public Core Core => Reference;
+
         }
         #endregion
 
@@ -90,6 +93,8 @@ namespace Game
         [Serializable]
         public class Property<TModule> : IReference<TModule>
         {
+            public Core Core => Core.Instance;
+
             public TModule Reference { get; protected set; }
 
             public virtual void Register<TReference>(TReference reference, IReference<TReference> module)
@@ -120,7 +125,7 @@ namespace Game
         [Serializable]
         public class Property : Module<Core>
         {
-            public Core Core => Reference;
+
         }
         #endregion
 
@@ -144,6 +149,7 @@ namespace Game
             Scenes = this.GetDependancy<ScenesCore>();
             UI = this.GetDependancy<UICore>();
             Ads = this.GetDependancy<AdsCore>();
+            Leaderboards = this.GetDependancy<LeaderboardsCore>();
             PlayFab = this.GetDependancy<PlayFabCore>();
 
             Application.targetFrameRate = 60;

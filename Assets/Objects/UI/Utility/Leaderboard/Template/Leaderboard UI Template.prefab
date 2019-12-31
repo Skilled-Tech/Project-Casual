@@ -232,8 +232,12 @@ GameObject:
   - component: {fileID: 2360560951429876788}
   - component: {fileID: 2360560951429876787}
   - component: {fileID: 2360560951429876786}
+  - component: {fileID: 7872070950350760178}
   - component: {fileID: 2360560951429876784}
+  - component: {fileID: 3286793110754055558}
   - component: {fileID: 2360560951429876785}
+  - component: {fileID: 510178827421391071}
+  - component: {fileID: 203807926732499503}
   m_Layer: 5
   m_Name: Leaderboard UI Template
   m_TagString: Untagged
@@ -301,6 +305,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7872070950350760178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2360560951429876791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 2, y: 2}
+  m_UseGraphicAlpha: 1
 --- !u!114 &2360560951429876784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,6 +345,18 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!114 &3286793110754055558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2360560951429876791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e3f9e46089f15246ac4ae6fdd43eab4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2360560951429876785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -341,6 +372,68 @@ MonoBehaviour:
   displayName: {fileID: 2360560951423685535}
   position: {fileID: 2360560951607742196}
   value: {fileID: 2360560951327098900}
+--- !u!114 &510178827421391071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2360560951429876791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4bd9849a76469047a2c7c0960b7527c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 6
+--- !u!114 &203807926732499503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2360560951429876791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eee4e0fd354984419d084dd53c29c6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.41871434
+      value: 1.043231
+      inSlope: 1.0664922
+      outSlope: 1.0664922
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.11517534
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  axisConstraints:
+    x: 0
+    y: 1
+    z: 0
 --- !u!1 &2360560951524268561
 GameObject:
   m_ObjectHideFlags: 0

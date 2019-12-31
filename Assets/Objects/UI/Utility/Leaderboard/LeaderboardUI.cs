@@ -25,6 +25,10 @@ namespace Game
     public class LeaderboardUI : MonoBehaviour, IInitialize
     {
         [SerializeField]
+        protected string _ID;
+        public string ID { get { return _ID; } }
+
+        [SerializeField]
         protected GameObject template;
         public GameObject Template { get { return template; } }
 
@@ -32,32 +36,82 @@ namespace Game
         protected RectTransform panel;
         public RectTransform Panel { get { return panel; } }
 
+        public List<LeaderboardUITemplate> Entries { get; protected set; }
+
+        public LeaderboardModule Leaderboard { get; protected set; }
+
         public UIElement Element { get; protected set; }
+
+        public Core Core => Core.Instance;
 
         public virtual void Configure()
         {
             Element = GetComponent<UIElement>();
-        }
-        public virtual void Init()
-        {
 
-        }
-
-        private void Start()
-        {
-            var entries = new PlayerLeaderboardEntry[20];
-
-            for (int i = 0; i < entries.Length; i++)
+            Leaderboard = Core.Leaderboards.Find(ID);
+            if(Leaderboard == null)
             {
-                entries[i] = new PlayerLeaderboardEntry()
-                {
-                    DisplayName = System.Guid.NewGuid().ToString().Substring(0, 6),
-                    Position = i,
-                    StatValue = Mathf.RoundToInt(entries.Length / 1f / (i + 1f) * 1000),
-                };
+                Debug.LogError("No Leaderboard defined with ID: " + ID, gameObject);
+                enabled = false;
+                return;
             }
 
-            var elements = LeaderboardUITemplate.Create(entries, template, panel);
+            Entries = new List<LeaderboardUITemplate>();
+
+            Leaderboard.OnUpdate += UpdateCallback;
+        }
+
+        private void OnEnable()
+        {
+            if(Element || Element.Visible)
+                UITemplate.Utility.ChainDisplay(Entries, this);
+        }
+
+        public virtual void Init()
+        {
+            
+        }
+
+        private void UpdateCallback(LeaderboardModule result)
+        {
+            UpdateState();
+        }
+
+        protected virtual void UpdateState()
+        {
+            Clear();
+
+            Create();
+        }
+
+        protected virtual void Create()
+        {
+            Entries = LeaderboardUITemplate.Create(Leaderboard.List, template, panel);
+
+            for (int i = 0; i < Entries.Count; i++)
+            {
+
+            }
+
+            if (Element.Visible)
+            {
+                UITemplate.Utility.ChainDisplay(Entries, this);
+            }
+        }
+
+        protected virtual void Clear()
+        {
+            for (int i = 0; i < Entries.Count; i++)
+            {
+                Destroy(Entries[i].gameObject);
+            }
+
+            Entries.Clear();
+        }
+
+        protected virtual void OnDestroy()
+        {
+            Leaderboard.OnUpdate -= UpdateCallback;
         }
     }
 }
