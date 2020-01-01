@@ -29,43 +29,7 @@ namespace Game
 
         private void Start()
         {
-            PlayFab.Login.OnResponse += LoginCallback;
-            PlayFab.Login.CustomID.Request();
-        }
-
-        void LoginCallback(LoginResult result, PlayFabError error)
-        {
-            PlayFab.Login.OnResponse -= LoginCallback;
-
-            if (error == null)
-            {
-                Debug.Log(JsonUtility.ToJson(result, true));
-
-                Debug.Log(result.InfoResultPayload.PlayerProfile.DisplayName);
-
-                PlayFab.Player.Statistics.Update.OnResponse += UpdatePlayerStatisticsCallback;
-                PlayFab.Player.Statistics.Update.Request("Score", 450);
-            }
-            else
-            {
-                Debug.LogError(error.GenerateErrorReport());
-            }
-        }
-
-        private void UpdatePlayerStatisticsCallback(UpdatePlayerStatisticsResult result, PlayFabError error)
-        {
-            PlayFab.Player.Statistics.Update.OnResponse -= UpdatePlayerStatisticsCallback;
-
-            if (error == null)
-            {
-                Debug.Log("Posted new statistic");
-
-                Core.Leaderboards[0].Request();
-            }
-            else
-            {
-                Debug.LogError(error.GenerateErrorReport());
-            }
+            
         }
     }
 }

@@ -30,6 +30,7 @@ namespace Game
         public int Count => List.Count;
 
         public LeaderboardModule this[int index] => List[index];
+        public LeaderboardModule this[string ID] => Find(ID);
 
         public virtual LeaderboardModule Find(string ID)
         {

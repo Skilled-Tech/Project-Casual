@@ -42,7 +42,14 @@ namespace Game
 
             List = new List<LeaderboardElement>();
 
+            PlayFab.Login.OnResult += LoginResultCallback;
+
             PlayFab.Title.Leaderboards.Get.OnResponse += ResponseCallback;
+        }
+
+        private void LoginResultCallback(LoginResult result)
+        {
+            Request();
         }
 
         public virtual void Request()

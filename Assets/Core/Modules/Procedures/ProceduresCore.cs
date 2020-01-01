@@ -44,6 +44,7 @@ namespace Game
                 base.Start();
 
                 PlayFab.Login.OnResponse += ResponseCallback;
+                PlayFab.Login.CustomID.Request();
             }
 
             private void ResponseCallback(LoginResult result, PlayFabError error)
@@ -99,11 +100,19 @@ namespace Game
             public ProceduresCore Procedures => Reference;
         }
 
+        public PlayFabCore PlayFab => Core.PlayFab;
+
         public override void Init()
         {
             base.Init();
 
+            PlayFab.Login.OnResponse += LoginResponseCallback;
             login.Start();
+        }
+
+        private void LoginResponseCallback(LoginResult result, PlayFabError error)
+        {
+            
         }
     }
 }

@@ -40,6 +40,10 @@ namespace Game
         protected UIElement emptyIndicator;
         public UIElement EmptyIndicator { get { return emptyIndicator; } }
 
+        [SerializeField]
+        protected RelayPanelUI submit;
+        public RelayPanelUI Submit { get { return submit; } }
+
         #region Entries
         public List<LeaderboardUITemplate> Entries { get; protected set; }
 
