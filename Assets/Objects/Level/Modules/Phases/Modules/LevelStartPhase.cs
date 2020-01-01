@@ -30,7 +30,7 @@ namespace Game
         {
             if(IsProcessing)
             {
-                if (Input.GetKeyDown(KeyCode.E) || Input.touchCount > 1)
+                if (Input.GetKeyDown(KeyCode.E) || Input.touchCount > 1 || (Input.GetMouseButton(0) && Input.GetMouseButton(1)))
                     End();
             }
         }

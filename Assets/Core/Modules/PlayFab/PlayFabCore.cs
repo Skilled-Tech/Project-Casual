@@ -190,11 +190,41 @@ namespace Game
                 }
             }
 
+            [SerializeField]
+            protected InfoProperty info;
+            public InfoProperty Info { get { return info; } }
+            [Serializable]
+            public class InfoProperty : Property
+            {
+                public UpdateDisplayNameRequest UpdateDisplayName { get; protected set; }
+                public class UpdateDisplayNameRequest : Request<UpdateUserTitleDisplayNameRequest, UpdateUserTitleDisplayNameResult>
+                {
+                    public override MethodDelegate Method => PlayFabClientAPI.UpdateUserTitleDisplayName;
+
+                    public virtual void Request(string desiredName)
+                    {
+                        var request = GenerateRequest();
+
+                        request.DisplayName = desiredName;
+
+                        Send(request);
+                    }
+                }
+
+                public override void Configure(PlayFabCore reference)
+                {
+                    base.Configure(reference);
+
+                    UpdateDisplayName = new UpdateDisplayNameRequest();
+                }
+            }
+
             public override void Configure(PlayFabCore reference)
             {
                 base.Configure(reference);
 
                 Register(PlayFab, statistics);
+                Register(PlayFab, info);
             }
         }
 

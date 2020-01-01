@@ -33,10 +33,31 @@ namespace Game
         public GameObject Template { get { return template; } }
 
         [SerializeField]
-        protected RectTransform panel;
-        public RectTransform Panel { get { return panel; } }
+        protected ScrollRect scoll;
+        public ScrollRect Scroll { get { return scoll; } }
 
+        [SerializeField]
+        protected UIElement emptyIndicator;
+        public UIElement EmptyIndicator { get { return emptyIndicator; } }
+
+        #region Entries
         public List<LeaderboardUITemplate> Entries { get; protected set; }
+
+        public bool HasEntries => Entries.Count > 0;
+
+        protected virtual void ForAllEntries(Action<LeaderboardUITemplate, int> action)
+        {
+            for (int i = 0; i < Entries.Count; i++)
+                action(Entries[i], i);
+        }
+
+        protected virtual void HideAllEntries()
+        {
+            ForAllEntries(Action);
+
+            void Action(LeaderboardUITemplate template, int index) => template.Element.SetActive(false);
+        }
+        #endregion
 
         public LeaderboardModule Leaderboard { get; protected set; }
 
@@ -65,17 +86,21 @@ namespace Game
             
         }
 
-        protected virtual void OnEnable()
+        public virtual void Show()
         {
+            Element.Show();
+
+            UpdateState();
+
             StartCoroutine(Procedure());
 
             IEnumerator Procedure()
             {
-                yield return new WaitForEndOfFrame();
+                HideAllEntries();
 
-                for (int i = 0; i < Entries.Count; i++) Entries[i].Element.SetActive(false);
+                bool IsTransitionComplete() => Element.Transition == null ? true : Element.Transition.Value == 1f;
 
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitUntil(IsTransitionComplete);
 
                 yield return ChainShow();
             }
@@ -91,24 +116,32 @@ namespace Game
             return ChainShowCoroutine;
         }
 
-        private void UpdateCallback(LeaderboardModule result) => UpdateState();
         protected virtual void UpdateState()
         {
-            Clear();
+            emptyIndicator.IsOn = !HasEntries;
 
-            Create();
+            Scroll.gameObject.SetActive(HasEntries);
         }
+
+        private void UpdateCallback(LeaderboardModule result) => Create();
 
         protected virtual void Create()
         {
-            Entries = LeaderboardUITemplate.Create(Leaderboard.List, template, panel);
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, panel));
+            Clear();
+
+            Entries = LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content);
+
+            /*
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
+            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
+            */
+
+            UpdateState();
 
             if (Element.Visible)
             {

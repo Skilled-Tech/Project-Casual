@@ -24,6 +24,16 @@ namespace Game
     {
         public UIElement Element { get; protected set; }
 
+        public override float Value
+        {
+            set
+            {
+                base.Value = value;
+
+                if (Mathf.Approximately(Value, 0f)) Element.Target.SetActive(false);
+            }
+        }
+
         public override void Configure()
         {
             Element = GetComponent<UIElement>();
@@ -44,13 +54,6 @@ namespace Game
             if (target > 0f) Element.Target.SetActive(true);
 
             base.Perform(target);
-        }
-
-        protected override IEnumerator Procedure(float target)
-        {
-            yield return base.Procedure(target);
-
-            if (Mathf.Approximately(Value, 0f)) Element.Target.SetActive(false);
         }
 
         protected virtual void OnDestroy()

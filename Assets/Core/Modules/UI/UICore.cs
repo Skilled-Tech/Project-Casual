@@ -26,8 +26,22 @@ namespace Game
         public UIElement OptionsMenu { get { return optionsMenu; } }
 
         [SerializeField]
-        protected UIElement leaderboards;
-        public UIElement Leaderboards { get { return leaderboards; } }
+        protected LeaderboardProperty leaderboards;
+        public LeaderboardProperty Leaderboards { get { return leaderboards; } }
+        [Serializable]
+        public class LeaderboardProperty : Property
+        {
+            [SerializeField]
+            protected LeaderboardUI score;
+            public LeaderboardUI Score { get { return score; } }
+
+            public override void Init()
+            {
+                base.Init();
+
+                score.Element.SetActive(false);
+            }
+        }
 
         [SerializeField]
         protected ChoiceUI choice;
@@ -41,17 +55,28 @@ namespace Game
         protected FaderUI fader;
         public FaderUI Fader { get { return fader; } }
 
+        [Serializable]
+        public class Property : Core.Property<UICore>
+        {
+
+        }
+
+        public override void Configure(Core reference)
+        {
+            base.Configure(reference);
+
+            Register(this, leaderboards);
+        }
+
         public override void Init()
         {
             base.Init();
 
-            if (optionsMenu.IsOn) optionsMenu.SetActive(false);
+            optionsMenu.SetActive(false);
 
-            if (leaderboards.IsOn) leaderboards.SetActive(false);
+            choice.Element.SetActive(false);
 
-            if (choice.Element.IsOn) choice.Element.SetActive(false);
-
-            if(popup.Element.IsOn) popup.Element.SetActive(false);
+            popup.Element.SetActive(false);
 
             fader.Value = 0f;
         }

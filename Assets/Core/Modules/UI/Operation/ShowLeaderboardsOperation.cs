@@ -25,7 +25,7 @@ namespace Game
 
         public override void Execute()
         {
-            Core.UI.Leaderboards.Show();
+            Core.UI.Leaderboards.Score.Show();
         }
     }
 }

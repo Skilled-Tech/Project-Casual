@@ -36,7 +36,7 @@ namespace Game
         }
 
         protected float _value = 0f;
-        public float Value
+        public virtual float Value
         {
             get
             {
@@ -101,15 +101,16 @@ namespace Game
 
         public virtual void Perform(float target)
         {
-            if (Value == target)
-            {
-                Debug.LogWarning("Trying to transition from " + Value + " ---> " + target + " on: " + name + ", you cannot transition to the current value, ignoring", gameObject);
-                return;
-            }
-
             if (coroutine != null) StopCoroutine(coroutine);
 
-            coroutine = StartCoroutine(Procedure(target));
+            if(gameObject.activeInHierarchy)
+            {
+                coroutine = StartCoroutine(Procedure(target));
+            }
+            else
+            {
+                Value = target;
+            }
 
             OnPerform?.Invoke(target);
         }

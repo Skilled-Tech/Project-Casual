@@ -50,6 +50,7 @@ namespace Game
         public AdsCore Ads { get; protected set; }
         public PlayFabCore PlayFab { get; protected set; }
         public LeaderboardsCore Leaderboards { get; protected set; }
+        public ProceduresCore Procedures { get; protected set; }
 
         #region Modules
         public class Module<TModule> : MonoBehaviour, IReference<TModule>
@@ -77,7 +78,7 @@ namespace Game
                 this.Reference = reference;
             }
 
-            public event Action OnInit;
+            protected event Action OnInit;
             public virtual void Init()
             {
                 OnInit?.Invoke();
@@ -116,7 +117,7 @@ namespace Game
                 this.Reference = reference;
             }
 
-            public event Action OnInit;
+            protected event Action OnInit;
             public virtual void Init()
             {
                 OnInit?.Invoke();
@@ -151,6 +152,7 @@ namespace Game
             Ads = this.GetDependancy<AdsCore>();
             Leaderboards = this.GetDependancy<LeaderboardsCore>();
             PlayFab = this.GetDependancy<PlayFabCore>();
+            Procedures = this.GetDependancy<ProceduresCore>();
 
             Application.targetFrameRate = 60;
 
