@@ -58,7 +58,7 @@ namespace Game
 
             public TModule Reference { get; protected set; }
 
-            public virtual void Register<TReference>(TReference reference, IReference<TReference> module)
+            protected virtual void Register<TReference>(TReference reference, IReference<TReference> module)
             {
                 References.Configure(reference, module);
 
@@ -97,7 +97,7 @@ namespace Game
 
             public TModule Reference { get; protected set; }
 
-            public virtual void Register<TReference>(TReference reference, IReference<TReference> module)
+            protected virtual void Register<TReference>(TReference reference, IReference<TReference> module)
             {
                 References.Configure(reference, module);
 

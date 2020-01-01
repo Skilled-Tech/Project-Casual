@@ -36,14 +36,14 @@ namespace Game
             base.Configure();
         }
 
-        protected virtual void ShowCallback() => To(1f);
-        protected virtual void HideCallback() => To(0f);
+        protected virtual void ShowCallback() => Perform(1f);
+        protected virtual void HideCallback() => Perform(0f);
 
-        public override void To(float target)
+        public override void Perform(float target)
         {
             if (target > 0f) Element.Target.SetActive(true);
 
-            base.To(target);
+            base.Perform(target);
         }
 
         protected override IEnumerator Procedure(float target)

@@ -96,7 +96,10 @@ namespace Game
         protected Coroutine coroutine;
         public bool InProcess => coroutine != null;
 
-        public virtual void To(float target)
+        public delegate void PerformDelegate(float target);
+        public event PerformDelegate OnPerform;
+
+        public virtual void Perform(float target)
         {
             if (Value == target)
             {
@@ -104,12 +107,12 @@ namespace Game
                 return;
             }
 
-            if (coroutine != null)
-                StopCoroutine(coroutine);
+            if (coroutine != null) StopCoroutine(coroutine);
 
             coroutine = StartCoroutine(Procedure(target));
+
+            OnPerform?.Invoke(target);
         }
-        
         protected virtual IEnumerator Procedure(float target)
         {
             while (Value != target)

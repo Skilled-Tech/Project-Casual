@@ -56,27 +56,7 @@ namespace Game
             {
                 Debug.Log("Posted new statistic");
 
-                PlayFab.Title.Leaderboards.Get.OnResponse += GetLeaderboardCallback;
-                PlayFab.Title.Leaderboards.Get.Request("Score");
-            }
-            else
-            {
-                Debug.LogError(error.GenerateErrorReport());
-            }
-        }
-
-        private void GetLeaderboardCallback(GetLeaderboardResult result, PlayFabError error)
-        {
-            PlayFab.Title.Leaderboards.Get.OnResponse -= GetLeaderboardCallback;
-
-            if (error == null)
-            {
-                foreach (var entry in result.Leaderboard)
-                {
-                    Debug.Log(entry.Position + " | " + entry.DisplayName + " | " + entry.PlayFabId + " | " +  entry.StatValue);
-                    Debug.Log(JsonUtility.ToJson(entry, true));
-                    Debug.Log("----------------------------------------------------");
-                }
+                Core.Leaderboards[0].Request();
             }
             else
             {
