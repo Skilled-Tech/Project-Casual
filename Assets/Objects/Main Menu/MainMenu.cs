@@ -39,8 +39,12 @@ namespace Game
 
             if (error == null)
             {
+                Debug.Log(JsonUtility.ToJson(result, true));
+
+                Debug.Log(result.InfoResultPayload.PlayerProfile.DisplayName);
+
                 PlayFab.Player.Statistics.Update.OnResponse += UpdatePlayerStatisticsCallback;
-                PlayFab.Player.Statistics.Update.Request("Score", 400);
+                PlayFab.Player.Statistics.Update.Request("Score", 450);
             }
             else
             {

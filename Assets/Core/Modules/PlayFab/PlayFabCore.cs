@@ -35,6 +35,15 @@ namespace Game
             {
                 public override MethodDelegate Method => PlayFabClientAPI.LoginWithCustomID;
 
+                public override LoginWithCustomIDRequest GenerateRequest()
+                {
+                    var request = base.GenerateRequest();
+
+                    request.InfoRequestParameters = DefaultInfoRequestParameters;
+
+                    return request;
+                }
+
                 public virtual void Request() => Request(SystemInfo.deviceUniqueIdentifier);
                 public virtual void Request(string ID)
                 {
@@ -49,10 +58,17 @@ namespace Game
                 }
             }
 
+            public static readonly GetPlayerCombinedInfoRequestParams DefaultInfoRequestParameters = new GetPlayerCombinedInfoRequestParams()
+            {
+                GetUserAccountInfo = true,
+                GetPlayerProfile = true,
+                GetPlayerStatistics = true,
+            };
+
             public abstract class Request<TRequest> : Request<TRequest, LoginResult>
                 where TRequest : class, new()
             {
-
+                
             }
 
             public override void Configure(PlayFabCore reference)
@@ -251,7 +267,7 @@ namespace Game
                 void ErrorCallback(PlayFabError error) => callback(null, error);
             }
 
-            public TRequest GenerateRequest() => new TRequest();
+            public virtual TRequest GenerateRequest() => new TRequest();
 
             protected virtual void Send(TRequest request)
             {
