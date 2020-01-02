@@ -106,6 +106,7 @@ namespace Game
         {
             base.Init();
 
+            //return;
             PlayFab.Login.OnResponse += LoginResponseCallback;
             login.Start();
         }

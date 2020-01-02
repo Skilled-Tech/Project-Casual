@@ -28,6 +28,8 @@ namespace Game
 
         public PlayFabCore PlayFab => Core.PlayFab;
 
+        public string ID;
+
         public string displayName;
 
         public int score;
@@ -35,7 +37,7 @@ namespace Game
         private void Start()
         {
             PlayFab.Login.OnResponse += LoginCallback;
-            PlayFab.Login.CustomID.Request(Guid.NewGuid().ToString());
+            PlayFab.Login.CustomID.Request(ID);
         }
 
         private void LoginCallback(LoginResult result, PlayFabError error)
@@ -46,8 +48,16 @@ namespace Game
             {
                 Debug.Log("Login Successfull");
 
-                PlayFab.Player.Info.UpdateDisplayName.OnResponse += UpdateDisplayNameCallback;
-                PlayFab.Player.Info.UpdateDisplayName.Request(displayName);
+                if(result.InfoResultPayload?.PlayerProfile?.DisplayName == displayName)
+                {
+                    PlayFab.Player.Statistics.Update.OnResponse += UpdateStatisticCallback;
+                    PlayFab.Player.Statistics.Update.Request("Score", score);
+                }
+                else
+                {
+                    PlayFab.Player.Info.UpdateDisplayName.OnResponse += UpdateDisplayNameCallback;
+                    PlayFab.Player.Info.UpdateDisplayName.Request(displayName);
+                }
             }
             else
             {
@@ -78,12 +88,24 @@ namespace Game
 
             if (error == null)
             {
-                Debug.Log("Complete");
+                Debug.Log("Update Statistics Complete");
+
+                PlayFabClientAPI.GetLeaderboardAroundPlayer(new GetLeaderboardAroundPlayerRequest
+                {
+                    MaxResultsCount = 1,
+                    StatisticName = "Score",
+                }, GetLeaderboardAroundPlayerCallback, ErrorCallback);
             }
             else
             {
                 ErrorCallback(error);
             }
+        }
+
+        private void GetLeaderboardAroundPlayerCallback(GetLeaderboardAroundPlayerResult result)
+        {
+            Debug.Log(result.Leaderboard[0].Position);
+            Debug.Log(JsonUtility.ToJson(result, true));
         }
 
         private void ErrorCallback(PlayFabError error)

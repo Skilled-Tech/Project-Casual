@@ -30,6 +30,8 @@ namespace Game
         [Serializable]
         public class LoginProperty : Property
         {
+            public LoginResult Result { get; protected set; }
+
             public CustomIDRequest CustomID { get; protected set; }
             public class CustomIDRequest : Request<LoginWithCustomIDRequest>
             {
@@ -99,6 +101,8 @@ namespace Game
             public event CustomIDRequest.ResultDelegate OnResult;
             void ResultCallback(LoginResult result)
             {
+                Debug.Log(result?.InfoResultPayload?.PlayerProfile?.DisplayName + " Logged In");
+
                 OnResult?.Invoke(result);
             }
 
@@ -127,32 +131,64 @@ namespace Game
                 {
                     public override MethodDelegate Method => PlayFabClientAPI.GetLeaderboard;
 
-                    public virtual void Request(string name)
+                    public override GetLeaderboardRequest GenerateRequest()
+                    {
+                        var request = base.GenerateRequest();
+
+                        request.ProfileConstraints = DefaultPlayerProfileConstraints;
+
+                        return request;
+                    }
+
+                    public virtual void Request(string statistic) => Request(statistic, 5);
+                    public virtual void Request(string statistic, int count)
                     {
                         var request = GenerateRequest();
 
-                        request.ProfileConstraints = new PlayerProfileViewConstraints()
-                        {
-                            ShowDisplayName = true,
-                            ShowLocations = true,
-                        };
-
-                        request.StatisticName = name;
+                        request.StatisticName = statistic;
+                        request.MaxResultsCount = count;
 
                         Send(request);
                     }
+                }
 
-                    public override void ResultCallback(GetLeaderboardResult result)
+                public GetAroundPlayerRequest GetAroundPlayer { get; protected set; }
+                public class GetAroundPlayerRequest : Request<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult>
+                {
+                    public override MethodDelegate Method => PlayFabClientAPI.GetLeaderboardAroundPlayer;
+
+                    public override GetLeaderboardAroundPlayerRequest GenerateRequest()
                     {
-                        base.ResultCallback(result);
+                        var request = base.GenerateRequest();
+
+                        request.ProfileConstraints = DefaultPlayerProfileConstraints;
+
+                        return request;
+                    }
+
+                    public virtual void Request(string statistic, int count)
+                    {
+                        var request = GenerateRequest();
+
+                        request.StatisticName = statistic;
+                        request.MaxResultsCount = count;
+
+                        Send(request);
                     }
                 }
+
+                public static readonly PlayerProfileViewConstraints DefaultPlayerProfileConstraints = new PlayerProfileViewConstraints()
+                {
+                    ShowDisplayName = true,
+                    ShowLocations = true,
+                };
 
                 public override void Configure(PlayFabCore reference)
                 {
                     base.Configure(reference);
 
                     Get = new GetRequest();
+                    GetAroundPlayer = new GetAroundPlayerRequest();
                 }
             }
 
@@ -170,6 +206,31 @@ namespace Game
         [Serializable]
         public class PlayerProperty : Property
         {
+            [SerializeField]
+            protected ProfileProperty profile;
+            public ProfileProperty Profile { get { return profile; } }
+            [Serializable]
+            public class ProfileProperty : Property
+            {
+                public string ID { get; protected set; }
+
+                public string DisplayName { get; protected set; }
+
+                public override void Configure(PlayFabCore reference)
+                {
+                    base.Configure(reference);
+
+                    PlayFab.Login.OnResult += LoginResultCallback;
+                }
+
+                private void LoginResultCallback(LoginResult result)
+                {
+                    ID = result.PlayFabId;
+
+                    DisplayName = result?.InfoResultPayload?.PlayerProfile?.DisplayName;
+                }
+            }
+
             [SerializeField]
             protected StatisticsProperty statistics;
             public StatisticsProperty Statistics { get { return statistics; } }
@@ -239,6 +300,7 @@ namespace Game
             {
                 base.Configure(reference);
 
+                Register(PlayFab, Profile);
                 Register(PlayFab, statistics);
                 Register(PlayFab, info);
             }

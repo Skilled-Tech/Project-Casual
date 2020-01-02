@@ -690,7 +690,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7068502711429405825}
   - component: {fileID: 4499960502267342026}
-  - component: {fileID: 8095126281495778610}
   - component: {fileID: 1466034394913670897}
   - component: {fileID: 5009430748270697426}
   - component: {fileID: 4216567320957091539}
@@ -729,36 +728,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9094745407612294658}
   m_CullTransparentMesh: 0
---- !u!114 &8095126281495778610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9094745407612294658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &1466034394913670897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -953,15 +922,15 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
-        type: 3}
-      propertyPath: m_Text
-      value: Submit Score
-      objectReference: {fileID: 0}
     - target: {fileID: 6991908327359174557, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
       propertyPath: m_MinWidth
       value: 700
+      objectReference: {fileID: 0}
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+        type: 3}
+      propertyPath: m_Text
+      value: Submit Score
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 776c08730b0960c44b5acfe865993a8a, type: 3}
@@ -1130,10 +1099,25 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: -200
       objectReference: {fileID: 0}
-    - target: {fileID: 1105428337082564940, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+    - target: {fileID: 3940540869102728328, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
-      propertyPath: m_Enabled
+      propertyPath: m_HorizontalFit
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3940540869102728328, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: m_VerticalFit
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3053397389621303178, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: axisConstraints.X
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3053397389621303178, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: axisConstraints.Y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1785174761993430826, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
@@ -1150,37 +1134,22 @@ PrefabInstance:
       propertyPath: m_Padding.m_Top
       value: 50
       objectReference: {fileID: 0}
-    - target: {fileID: 3053397389621303178, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+    - target: {fileID: 1105428337082564940, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
-      propertyPath: axisConstraints.X
+      propertyPath: m_Enabled
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3053397389621303178, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
-        type: 3}
-      propertyPath: axisConstraints.Y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3940540869102728328, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
-        type: 3}
-      propertyPath: m_HorizontalFit
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3940540869102728328, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
-        type: 3}
-      propertyPath: m_VerticalFit
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c93e1212da9c82b4a8cb7c35b7f8fa63, type: 3}
---- !u!224 &8060166059056314673 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 1329803522800864778, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
-    type: 3}
-  m_PrefabInstance: {fileID: 9056491535036446523}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3321632184586523745 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6032520912302318426, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+    type: 3}
+  m_PrefabInstance: {fileID: 9056491535036446523}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &8060166059056314673 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1329803522800864778, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
     type: 3}
   m_PrefabInstance: {fileID: 9056491535036446523}
   m_PrefabAsset: {fileID: 0}

@@ -577,5 +577,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2333c3c87a6254d469f94aa8f2f72024, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayName: Naked MOB
-  score: 250
+  ID: ccab999edd13d0954d98caa0180c045876598839
+  displayName: MOB
+  score: 500
