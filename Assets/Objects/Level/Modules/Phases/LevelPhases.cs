@@ -51,12 +51,10 @@ namespace Game
                 Index = reference.List.IndexOf(this);
             }
 
-            public delegate void ReferenceDelegate(Element element);
-
-            public event ReferenceDelegate OnBegin;
+            public event Action OnBegin;
             public virtual void Begin()
             {
-                OnBegin?.Invoke(this);
+                OnBegin?.Invoke();
             }
 
             public virtual void Stop()
@@ -64,10 +62,10 @@ namespace Game
                 End();
             }
 
-            public event ReferenceDelegate OnEnd;
+            public event Action OnEnd;
             protected virtual void End()
             {
-                OnEnd?.Invoke(this);
+                OnEnd?.Invoke();
             }
         }
 
@@ -82,6 +80,8 @@ namespace Game
             }
 
             public Level Level => Phases.Level;
+
+            public Core Core => Core.Instance;
 
             public virtual void Init()
             {
@@ -99,8 +99,10 @@ namespace Game
 
             for (int i = 0; i < Count; i++)
             {
-                this[i].OnBegin += ElementBeginCallback;
-                this[i].OnEnd += ElementEndCallback;
+                var element = this[i];
+
+                this[i].OnBegin += () => ElementBeginCallback(element);
+                this[i].OnEnd += () => ElementEndCallback(element);
             }
         }
 

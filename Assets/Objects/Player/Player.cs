@@ -31,6 +31,8 @@ namespace Game
                 this.Player = reference;
             }
 
+            public static Core Core => Core.Instance;
+
             public virtual void Init()
             {
                 

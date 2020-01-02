@@ -41,13 +41,11 @@ namespace Game
 
             displayName.text = string.IsNullOrEmpty(reference.DisplayName) ? "Anonymous Player" : reference.DisplayName;
 
-            gameObject.name = displayName.text;
-
             position.text = (reference.Position + 1).ToString("N0") + GameTools.Text.GetOrdinalIndicator(reference.Position + 1);
 
             value.text = reference.Value.ToString("N0");
 
-            if(reference.ID == Core.PlayFab.Player.Profile.ID)
+            if (reference.ID == Core.PlayFab.Player.Profile.ID)
             {
                 DisplayName.text += " (You)";
             }
@@ -55,6 +53,8 @@ namespace Game
             {
 
             }
+
+            gameObject.name = displayName.text;
         }
     }
 }

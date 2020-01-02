@@ -24,14 +24,15 @@ namespace Game
 {
 	public class PlayFabCore : Core.Module
 	{
+        #region Login
+        public bool IsLoggedIn => PlayFabClientAPI.IsClientLoggedIn();
+
         [SerializeField]
         protected LoginProperty login;
         public LoginProperty Login { get { return login; } }
         [Serializable]
         public class LoginProperty : Property
         {
-            public LoginResult Result { get; protected set; }
-
             public CustomIDRequest CustomID { get; protected set; }
             public class CustomIDRequest : Request<LoginWithCustomIDRequest>
             {
@@ -113,7 +114,16 @@ namespace Game
             }
             #endregion
         }
-        
+
+        public event Action OnLogout;
+        public virtual void Logout()
+        {
+            PlayFabAuthenticationAPI.ForgetAllCredentials();
+
+            OnLogout?.Invoke();
+        }
+        #endregion
+
         [SerializeField]
         protected TitleProperty title;
         public TitleProperty Title { get { return title; } }
@@ -221,6 +231,8 @@ namespace Game
                     base.Configure(reference);
 
                     PlayFab.Login.OnResult += LoginResultCallback;
+
+                    PlayFab.OnLogout += LogoutCallback;
                 }
 
                 private void LoginResultCallback(LoginResult result)
@@ -228,6 +240,13 @@ namespace Game
                     ID = result.PlayFabId;
 
                     DisplayName = result?.InfoResultPayload?.PlayerProfile?.DisplayName;
+                }
+
+                private void LogoutCallback()
+                {
+                    ID = null;
+
+                    DisplayName = null;
                 }
             }
 
@@ -256,6 +275,11 @@ namespace Game
                         };
 
                         Send(request);
+                    }
+
+                    public override void ResultCallback(UpdatePlayerStatisticsResult result)
+                    {
+                        base.ResultCallback(result);
                     }
                 }
 

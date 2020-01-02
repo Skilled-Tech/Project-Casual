@@ -20,19 +20,17 @@ using Random = UnityEngine.Random;
 namespace Game
 {
     [RequireComponent(typeof(Toggle))]
-	public class ToggleRelay : Relay
+	public class ToggleRelay : SelectableRelay<Toggle>
 	{
         [SerializeField]
         protected bool ignoreOff = true;
-        public bool IgnoreOff { get { return ignoreOff; } } 
+        public bool IgnoreOff { get { return ignoreOff; } }
 
-        Toggle toggle;
-
-        void Start()
+        public override void Configure()
         {
-            toggle = GetComponent<Toggle>();
+            base.Configure();
 
-            toggle.onValueChanged.AddListener(OnChange);
+            Component.onValueChanged.AddListener(OnChange);
         }
 
         void OnChange(bool newValue)

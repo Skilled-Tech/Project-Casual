@@ -20,16 +20,13 @@ using Random = UnityEngine.Random;
 namespace Game
 {
     [RequireComponent(typeof(Button))]
-	public class ButtonRelay : Relay
-	{
-        Button button;
-
+	public class ButtonRelay : SelectableRelay<Button>
+    {
         public override void Configure()
         {
             base.Configure();
 
-            button = GetComponent<Button>();
-            button.onClick.AddListener(Invoke);
+            Component.onClick.AddListener(Invoke);
         }
     }
 }

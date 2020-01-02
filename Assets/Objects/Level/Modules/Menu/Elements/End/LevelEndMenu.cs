@@ -30,10 +30,15 @@ namespace Game
         protected Relay leaderboard;
         public Relay Leaderboard { get { return leaderboard; } }
 
+        [SerializeField]
+        protected SelectableRelay ad;
+        public SelectableRelay Ad { get { return ad; } }
+
         public UIElement Element { get; protected set; }
 
-        public Core Core => Core.Instance;
         public Level Level => Level.Instance;
+
+        public Core Core => Core.Instance;
 
         public virtual void Configure()
         {
@@ -42,8 +47,29 @@ namespace Game
         public virtual void Init()
         {
             leaderboard.OnInvoke += LeaderboardAction;
+            ad.OnInvoke += AdAction;
         }
 
+        protected virtual void OnEnable()
+        {
+            Level.Player.Instance.Score.OnValueChange += PlayerScoreChangeCallback;
+
+            UpdateState();
+        }
+
+        private void PlayerScoreChangeCallback(int value) => UpdateState();
+
+        private void AdAction()
+        {
+            if(Core.Ads.Placements.Common.RewardedVideo.IsReady)
+            {
+                Core.Ads.Placements.Common.RewardedVideo.Show();
+            }
+            else
+            {
+                Core.UI.Popup.Show("No Ad Available, Please Try Again Later", "Ok");
+            }
+        }
         private void LeaderboardAction()
         {
             var leaderboard = Core.UI.Leaderboards.Score;
@@ -54,9 +80,17 @@ namespace Game
 
         public virtual void Show()
         {
-            score.text = Level.Player.Instance.Score.Value.ToString("N0");
-
             Element.Show();
+        }
+
+        protected virtual void UpdateState()
+        {
+            score.text = Level.Player.Instance.Score.Value.ToString("N0");
+        }
+
+        protected virtual void OnDisable()
+        {
+            Level.Player.Instance.Score.OnValueChange -= PlayerScoreChangeCallback;
         }
     }
 }

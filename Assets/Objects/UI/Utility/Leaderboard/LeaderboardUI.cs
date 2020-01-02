@@ -187,6 +187,8 @@ namespace Game
             {
                 var instance = Instantiate(prefabs.Seperator, Scroll.content);
 
+                instance.name = prefabs.Seperator.name;
+
                 Initializer.Perform(instance);
 
                 var element = instance.GetComponent<UIElement>();

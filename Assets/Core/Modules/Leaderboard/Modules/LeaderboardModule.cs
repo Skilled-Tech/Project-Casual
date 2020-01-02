@@ -201,6 +201,32 @@ namespace Game
             Register(AroundPlayer);
 
             PlayFab.Login.OnResult += LoginResultCallback;
+
+            PlayFab.Player.Statistics.Update.OnResult += PlayerUpdateStatisticCallback;
+        }
+
+        Coroutine PlayerUpdateStatisticCoroutine;
+        void PlayerUpdateStatisticCallback(UpdatePlayerStatisticsResult result)
+        {
+            var request = result.Request as UpdatePlayerStatisticsRequest;
+
+            bool HasID(StatisticUpdate update) => update.StatisticName == ID;
+
+            if (request.Statistics.Any(HasID))
+            {
+                if (PlayerUpdateStatisticCoroutine != null) StopCoroutine(PlayerUpdateStatisticCoroutine);
+
+                PlayerUpdateStatisticCoroutine = StartCoroutine(Procedure());
+
+                IEnumerator Procedure()
+                {
+                    yield return new WaitForSecondsRealtime(1f); //Just to make sure that the playfab server has updated the leaderboard
+
+                    Request();
+
+                    PlayerUpdateStatisticCoroutine = null;
+                }
+            }
         }
 
         public virtual void Register(Element element)

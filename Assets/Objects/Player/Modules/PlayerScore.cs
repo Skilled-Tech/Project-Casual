@@ -42,11 +42,25 @@ namespace Game
         public delegate void ValueChangeDelegate(int value);
         public event ValueChangeDelegate OnValueChange;
 
+        public const string ID = "Score";
+
         public override void Configure(Player reference)
         {
             base.Configure(reference);
 
-            Value += 2000;
+            Value = 20;
+        }
+
+        public virtual void UpdateStatistic()
+        {
+            if(Core.PlayFab.IsLoggedIn)
+            {
+                Core.PlayFab.Player.Statistics.Update.Request(ID, Value);
+            }
+            else
+            {
+
+            }
         }
     }
 }
