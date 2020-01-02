@@ -46,6 +46,15 @@ namespace Game
             position.text = (reference.Position + 1).ToString("N0") + GameTools.Text.GetOrdinalIndicator(reference.Position + 1);
 
             value.text = reference.Value.ToString("N0");
+
+            if(reference.ID == Core.PlayFab.Player.Profile.ID)
+            {
+                DisplayName.text += " (You)";
+            }
+            else
+            {
+
+            }
         }
     }
 }

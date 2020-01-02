@@ -24,6 +24,8 @@ namespace Game
     {
         public UIElement Element { get; protected set; }
 
+        public Core Core => Core.Instance;
+
         public virtual void Configure()
         {
             Element = GetComponent<UIElement>();

@@ -43,29 +43,9 @@ namespace Game
         }
         #endregion
 
-        public AroundPlayerProperty AroundPlayer { get; protected set; }
-        public class AroundPlayerProperty : Element<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult>
-        {
-            public override PlayFabCore.Request<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult> Requester
-                => PlayFab.Title.Leaderboards.GetAroundPlayer;
-
-            public override IList<PlayerLeaderboardEntry> ExtractEntries(GetLeaderboardAroundPlayerResult result)
-                => result.Leaderboard;
-            public override GetLeaderboardAroundPlayerRequest ExtractRequest(GetLeaderboardAroundPlayerResult result)
-                => result.Request as GetLeaderboardAroundPlayerRequest;
-            public override string GetStatisitcName(GetLeaderboardAroundPlayerRequest request)
-                => request.StatisticName;
-
-            public override void Request()
-            {
-                base.Request();
-
-                PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, 1);
-            }
-        }
-
-        public GlobalProperty Global { get; protected set; }
-        public class GlobalProperty : Element<GetLeaderboardRequest, GetLeaderboardResult>
+        #region Element
+        public TopElement Top { get; protected set; }
+        public class TopElement : Element<GetLeaderboardRequest, GetLeaderboardResult>
         {
             public override PlayFabCore.Request<GetLeaderboardRequest, GetLeaderboardResult> Requester
                 => PlayFab.Title.Leaderboards.Get;
@@ -82,6 +62,27 @@ namespace Game
                 base.Request();
 
                 PlayFab.Title.Leaderboards.Get.Request(Leaderboard.ID);
+            }
+        }
+
+        public AroundPlayerElement AroundPlayer { get; protected set; }
+        public class AroundPlayerElement : Element<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult>
+        {
+            public override PlayFabCore.Request<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult> Requester
+                => PlayFab.Title.Leaderboards.GetAroundPlayer;
+
+            public override IList<PlayerLeaderboardEntry> ExtractEntries(GetLeaderboardAroundPlayerResult result)
+                => result.Leaderboard;
+            public override GetLeaderboardAroundPlayerRequest ExtractRequest(GetLeaderboardAroundPlayerResult result)
+                => result.Request as GetLeaderboardAroundPlayerRequest;
+            public override string GetStatisitcName(GetLeaderboardAroundPlayerRequest request)
+                => request.StatisticName;
+
+            public override void Request()
+            {
+                base.Request();
+
+                PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, 1);
             }
         }
 
@@ -168,6 +169,7 @@ namespace Game
             }
             #endregion
         }
+        #endregion
 
         public class Property : IReference<LeaderboardModule>
         {
@@ -196,13 +198,13 @@ namespace Game
 
             List = new List<LeaderboardElement>();
 
-            PlayFab.Login.OnResult += LoginResultCallback;
+            Top = new TopElement();
+            Register(Top);
 
-            Global = new GlobalProperty();
-            Register(Global);
-
-            AroundPlayer = new AroundPlayerProperty();
+            AroundPlayer = new AroundPlayerElement();
             Register(AroundPlayer);
+
+            PlayFab.Login.OnResult += LoginResultCallback;
         }
 
         public virtual void Register(Element element)
@@ -211,21 +213,29 @@ namespace Game
 
             element.OnUpdate += (IList<LeaderboardElement> result) => ElementUpdateCallback(element, result);
         }
-
-        private void LoginResultCallback(LoginResult result) => Request();
-
+        
         public virtual void Request()
         {
             List.Clear();
 
-            Global.Request();
+            Top.Request();
             AroundPlayer.Request();
         }
+
+        #region Callbacks
+        private void LoginResultCallback(LoginResult result) => Request();
 
         private void ElementUpdateCallback(Element element, IList<LeaderboardElement> list)
         {
             UpdateAction(list);
         }
+
+        public event RestDelegates.ErrorCallback<PlayFabError> OnError;
+        protected virtual void ErrorCallback(PlayFabError error)
+        {
+            OnError?.Invoke(error);
+        }
+        #endregion
 
         public event RestDelegates.ResultCallback<LeaderboardModule> OnUpdate;
         protected virtual void UpdateAction(IList<LeaderboardElement> elements)
@@ -240,12 +250,6 @@ namespace Game
             }
 
             OnUpdate?.Invoke(this);
-        }
-
-        public event RestDelegates.ErrorCallback<PlayFabError> OnError;
-        protected virtual void ErrorCallback(PlayFabError error)
-        {
-            OnError?.Invoke(error);
         }
     }
 
