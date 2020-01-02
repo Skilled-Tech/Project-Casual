@@ -75,7 +75,7 @@ namespace Game
             var leaderboard = Core.UI.Leaderboards.Score;
 
             Core.UI.Leaderboards.Score.Show();
-            Core.UI.Leaderboards.Score.Submit.Element.Show();
+            Core.UI.Leaderboards.Score.Submit.Element.IsOn = Level.Phases.Common.End.Score.RequireManualSubmit;
         }
 
         public virtual void Show()

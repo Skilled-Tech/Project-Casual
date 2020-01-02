@@ -28,6 +28,21 @@ namespace Game
         public Element this[int index] => List[index];
         #endregion
 
+        [SerializeField]
+        protected CommonData common;
+        public CommonData Common { get { return common; } }
+        [Serializable]
+        public class CommonData
+        {
+            [SerializeField]
+            protected LevelStartPhase start;
+            public LevelStartPhase Start { get { return start; } }
+
+            [SerializeField]
+            protected LevelEndPhase end;
+            public LevelEndPhase End { get { return end; } }
+        }
+
         public Element Current { get; protected set; }
 
         public class Element : Module

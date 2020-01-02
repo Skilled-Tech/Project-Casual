@@ -64,8 +64,8 @@ namespace Game
             }
         }
 
-        public AroundPlayerElement AroundPlayer { get; protected set; }
-        public class AroundPlayerElement : Element<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult>
+        public PersonalElement Personal { get; protected set; }
+        public class PersonalElement : Element<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult>
         {
             public override PlayFabCore.Request<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult> PlayFabRequest
                 => PlayFab.Title.Leaderboards.GetAroundPlayer;
@@ -80,6 +80,17 @@ namespace Game
                 base.Request();
 
                 PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, 1);
+            }
+
+            protected override void Update(IList<PlayerLeaderboardEntry> results)
+            {
+                if(results != null && results.Count > 0)
+                {
+                    if (results[0].StatValue == 0 && string.IsNullOrEmpty(results[0].DisplayName))
+                        results.RemoveAt(0);
+                }
+
+                base.Update(results);
             }
         }
 
@@ -96,16 +107,19 @@ namespace Game
             public event RestDelegates.ResultCallback<IList<LeaderboardElement>> OnUpdate;
             protected virtual void Update(IList<PlayerLeaderboardEntry> results)
             {
-                for (int i = 0; i < results.Count; i++)
+                if(results != null && results.Count > 0)
                 {
-                    var element = new LeaderboardElement(results[i]);
+                    for (int i = 0; i < results.Count; i++)
+                    {
+                        var element = new LeaderboardElement(results[i]);
 
-                    List.Add(element);
+                        List.Add(element);
+                    }
+
+                    List.Sort(LeaderboardElement.Comparisons.Position.Instance); //Just incase ¯\_(ツ)_/¯ ?
+
+                    OnUpdate?.Invoke(List);
                 }
-
-                List.Sort(LeaderboardElement.Comparisons.Position.Instance); //Just incase ¯\_(ツ)_/¯ ?
-
-                OnUpdate?.Invoke(List);
             }
 
             public event RestDelegates.ErrorCallback<PlayFabError> OnError;
@@ -197,8 +211,8 @@ namespace Game
             Top = new TopElement();
             Register(Top);
 
-            AroundPlayer = new AroundPlayerElement();
-            Register(AroundPlayer);
+            Personal = new PersonalElement();
+            Register(Personal);
 
             PlayFab.Login.OnResult += LoginResultCallback;
 
@@ -241,7 +255,7 @@ namespace Game
             List.Clear();
 
             Top.Request();
-            AroundPlayer.Request();
+            Personal.Request();
         }
 
         #region Callbacks

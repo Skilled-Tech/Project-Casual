@@ -113,6 +113,11 @@ namespace Game
                 OnError?.Invoke(error);
             }
             #endregion
+
+            public virtual void ShowRequirementPopup()
+            {
+                Core.UI.Popup.Show("You need to be logged in to perform this operation");
+            }
         }
 
         public event Action OnLogout;
@@ -225,12 +230,15 @@ namespace Game
                 public string ID { get; protected set; }
 
                 public string DisplayName { get; protected set; }
+                public bool HasDisplayName => String.IsNullOrEmpty(DisplayName) == false;
 
-                public override void Configure(PlayFabCore reference)
+                public override void Init()
                 {
-                    base.Configure(reference);
+                    base.Init();
 
                     PlayFab.Login.OnResult += LoginResultCallback;
+
+                    PlayFab.Player.Info.UpdateDisplayName.OnResult += UpdateDisplayNameResultCallback;
 
                     PlayFab.OnLogout += LogoutCallback;
                 }
@@ -240,6 +248,11 @@ namespace Game
                     ID = result.PlayFabId;
 
                     DisplayName = result?.InfoResultPayload?.PlayerProfile?.DisplayName;
+                }
+
+                private void UpdateDisplayNameResultCallback(UpdateUserTitleDisplayNameResult result)
+                {
+                    DisplayName = result.DisplayName;
                 }
 
                 private void LogoutCallback()

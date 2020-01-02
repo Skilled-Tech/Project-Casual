@@ -28,18 +28,13 @@ namespace Game
         protected LoginProcedure login;
         public LoginProcedure Login { get { return login; } }
         [Serializable]
-        public class LoginProcedure : Element
+        public class LoginProcedure : SingularElement
         {
             [SerializeField]
             protected StringToggleValue _IDOverride;
             public StringToggleValue IDOverride { get { return _IDOverride; } }
 
-            public override bool Complete => PlayFabClientAPI.IsClientLoggedIn();
-
-            public override IEnumerator<Element> Requirements()
-            {
-                yield break;
-            }
+            public override bool IsComplete => PlayFab.IsLoggedIn;
 
             public PlayFabCore PlayFab => Core.PlayFab;
 
@@ -71,14 +66,98 @@ namespace Game
             }
         }
 
+        [SerializeField]
+        protected UpdateDisplayNameProcedure updateDisplayName;
+        public UpdateDisplayNameProcedure UpdateDisplayName { get { return updateDisplayName; } }
+        [Serializable]
+        public class UpdateDisplayNameProcedure : Element
+        {
+            public PlayFabCore PlayFab => Core.PlayFab;
+
+            public PopupUI Popup => Core.UI.Popup;
+            public TextInputUI TextInput => Core.UI.TextInput;
+
+            public override void Start()
+            {
+                base.Start();
+
+                if (Procedures.Login.IsComplete)
+                    DisplayTextInput();
+                else
+                {
+                    Popup.Show("Loggin In");
+
+                    RelyOn(Procedures.Login, LoginResponse);
+                }
+            }
+
+            protected virtual void LoginResponse(string error)
+            {
+                if(error == null)
+                {
+                    Popup.Hide();
+
+                    DisplayTextInput();
+                }
+                else
+                {
+                    InvokeError(error);
+                }
+            }
+
+            protected virtual void DisplayTextInput()
+            {
+                TextInput.Show("Enter Display Name", TextInputCallback);
+            }
+
+            protected virtual void TextInputCallback(string text)
+            {
+                if(string.IsNullOrEmpty(text))
+                {
+                    InvokeError("Canceled");
+                }
+                else
+                {
+                    Popup.Show("Updating Profile Info");
+
+                    PlayFab.Player.Info.UpdateDisplayName.OnResponse += UpdateDisplayNameResponseCallback;
+                    PlayFab.Player.Info.UpdateDisplayName.Request(text);
+                }
+            }
+
+            private void UpdateDisplayNameResponseCallback(UpdateUserTitleDisplayNameResult result, PlayFabError error)
+            {
+                PlayFab.Player.Info.UpdateDisplayName.OnResponse -= UpdateDisplayNameResponseCallback;
+
+                if(error == null)
+                {
+                    Popup.Hide();
+
+                    End();
+                }
+                else
+                {
+                    InvokeError(error.ErrorMessage);
+                }
+            }
+
+            public override void InvokeError(string error)
+            {
+                base.InvokeError(error);
+
+                Core.UI.Popup.Show(error, "Okay");
+            }
+        }
+
+        [Serializable]
+        public abstract class SingularElement : Element
+        {
+            public abstract bool IsComplete { get; }
+        }
         [Serializable]
         public abstract class Element : Property
         {
-            public abstract bool Complete { get; }
-
             public bool IsProcessing { get; protected set; }
-
-            public abstract IEnumerator<Element> Requirements();
 
             public event Action OnStart;
             public virtual void Start()
@@ -88,12 +167,35 @@ namespace Game
                 OnStart?.Invoke();
             }
 
+            public virtual void RelyOn(Element element, ResponseDelegate callback)
+            {
+                element.OnResponse += RelayCallback;
+
+                if (element.IsProcessing)
+                {
+                    //Just simply wait for that requirement to finish
+                }
+                else
+                {
+                    element.Start();
+                }
+
+                void RelayCallback(string error)
+                {
+                    element.OnResponse -= callback;
+
+                    callback(error);
+                }
+            }
+
             public event RestDelegates.ErrorCallback<string> OnError;
             public virtual void InvokeError(string error)
             {
                 IsProcessing = false;
 
                 OnError?.Invoke(error);
+
+                Respond(error);
             }
 
             public event Action OnEnd;
@@ -102,6 +204,15 @@ namespace Game
                 IsProcessing = false;
 
                 OnEnd?.Invoke();
+
+                Respond(null);
+            }
+
+            public delegate void ResponseDelegate(string error);
+            public event ResponseDelegate OnResponse;
+            protected virtual void Respond(string error)
+            {
+                OnResponse?.Invoke(error);
             }
         }
 
@@ -113,18 +224,19 @@ namespace Game
 
         public PlayFabCore PlayFab => Core.PlayFab;
 
+        public override void Configure(Core reference)
+        {
+            base.Configure(reference);
+
+            Register(this, login);
+            Register(this, updateDisplayName);
+        }
+
         public override void Init()
         {
             base.Init();
 
-            //return;
-            PlayFab.Login.OnResponse += LoginResponseCallback;
             login.Start();
-        }
-
-        private void LoginResponseCallback(LoginResult result, PlayFabError error)
-        {
-            
         }
     }
 }
