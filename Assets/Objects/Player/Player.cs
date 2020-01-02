@@ -21,6 +21,8 @@ namespace Game
 {
     public class Player : MonoBehaviour, IInitialize
     {
+        public PlayerScore Score { get; protected set; }
+
         public class Module : MonoBehaviour, IReference<Player>
         {
             public Player Player { get; protected set; }
@@ -37,12 +39,14 @@ namespace Game
 
         public virtual void Configure()
         {
-            
+            Score = this.GetDependancy<PlayerScore>();
+
+            References.Configure(this);
         }
 
         public virtual void Init()
         {
-            
+            References.Init(this);
         }
     }
 }

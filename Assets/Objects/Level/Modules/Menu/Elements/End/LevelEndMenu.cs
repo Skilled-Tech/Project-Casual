@@ -26,7 +26,14 @@ namespace Game
         protected Text score;
         public Text Score { get { return score; } }
 
+        [SerializeField]
+        protected Relay leaderboard;
+        public Relay Leaderboard { get { return leaderboard; } }
+
         public UIElement Element { get; protected set; }
+
+        public Core Core => Core.Instance;
+        public Level Level => Level.Instance;
 
         public virtual void Configure()
         {
@@ -34,12 +41,20 @@ namespace Game
         }
         public virtual void Init()
         {
-            
+            leaderboard.OnInvoke += LeaderboardAction;
         }
 
-        public virtual void Show(int points)
+        private void LeaderboardAction()
         {
-            score.text = points.ToString("N0");
+            var leaderboard = Core.UI.Leaderboards.Score;
+
+            Core.UI.Leaderboards.Score.Show();
+            Core.UI.Leaderboards.Score.Submit.Element.Show();
+        }
+
+        public virtual void Show()
+        {
+            score.text = Level.Player.Instance.Score.Value.ToString("N0");
 
             Element.Show();
         }

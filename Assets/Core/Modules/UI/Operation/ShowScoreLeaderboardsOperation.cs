@@ -23,9 +23,13 @@ namespace Game
     {
         public Core Core => Core.Instance;
 
+        public LeaderboardUI Leaderboard => Core.UI.Leaderboards.Score;
+
         public override void Execute()
         {
-            Core.UI.Leaderboards.Score.Show();
+            Leaderboard.Show();
+
+            Leaderboard.Submit.Element.Hide();
         }
     }
 }

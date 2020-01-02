@@ -50,7 +50,7 @@ namespace Game
         {
             Element = GetComponent<UIElement>();
 
-            button.onClick.AddListener(OnButton);
+            button.onClick.AddListener(Action);
         }
         public virtual void Init()
         {
@@ -61,10 +61,19 @@ namespace Game
         {
             Show(text, null, null);
         }
+        public virtual void Show(string text, string instructions)
+        {
+            Show(text, Callback, instructions);
+
+            void Callback()
+            {
+
+            }
+        }
         public virtual void Show(string text, Action action, string instructions)
         {
             label.text = text;
-            this.action = action;
+            this.callback = action;
 
             button.gameObject.SetActive(action != null);
             if(controls != null) controls.IsOn = action != null;
@@ -85,10 +94,12 @@ namespace Game
 
         public virtual void Hide() => Element.Hide();
 
-        Action action;
-        void OnButton()
+        Action callback;
+        void Action()
         {
-            if (action != null) action();
+            Hide();
+
+            if (callback != null) callback();
         }
     }
 }

@@ -19,8 +19,34 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerScore : MonoBehaviour
+	public class PlayerScore : Player.Module
 	{
-		
-	}
+		[SerializeField]
+        protected int _value;
+        public int Value
+        {
+            get
+            {
+                return _value;
+            }
+            set
+            {
+                if (value < 0) value = 0;
+
+                this._value = value;
+
+                OnValueChange?.Invoke(Value);
+            }
+        }
+
+        public delegate void ValueChangeDelegate(int value);
+        public event ValueChangeDelegate OnValueChange;
+
+        public override void Configure(Player reference)
+        {
+            base.Configure(reference);
+
+            Value += 2000;
+        }
+    }
 }

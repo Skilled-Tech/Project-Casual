@@ -29,7 +29,19 @@ namespace Game
 
         private void Start()
         {
-            
+            Core.UI.TextInput.Show("Enter Username", ResponseCallback);
+
+            void ResponseCallback(string input)
+            {
+                if (input == null)
+                {
+                    Debug.Log("Canceled");
+                }
+                else
+                {
+                    Debug.Log(input);
+                }
+            }
         }
     }
 }

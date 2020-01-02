@@ -25,7 +25,7 @@ namespace Game
         {
             base.Begin();
 
-            Level.Menu.End.Show(40000);
+            Level.Menu.End.Show();
         }
     }
 }

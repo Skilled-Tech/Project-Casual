@@ -32,20 +32,11 @@ namespace Game
             {
                 if (result)
                 {
-                    Core.UI.Popup.Show("Ok Boomer", PopupCallback, "Ok");
-
-                    void PopupCallback()
-                    {
-                        Core.UI.Popup.Hide();
-
-                        Core.UI.Choice.Hide();
-
-                        Level.Quit();
-                    }
+                    Level.Quit();
                 }
                 else
                 {
-                    Core.UI.Choice.Hide();
+                    
                 }
             }
         }

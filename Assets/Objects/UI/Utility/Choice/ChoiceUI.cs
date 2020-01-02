@@ -55,6 +55,18 @@ namespace Game
 
                 public string Text { get { return label.text; } set { label.text = value; } }
             }
+
+            public void Register(Action confirmCallback, Action denyCallback)
+            {
+                confirm.Relay.OnInvoke += confirmCallback;
+                deny.Relay.OnInvoke += denyCallback;
+            }
+
+            public void UnRegister(Action confirmCallback, Action denyCallback)
+            {
+                confirm.Relay.OnInvoke -= confirmCallback;
+                deny.Relay.OnInvoke -= denyCallback;
+            }
         }
 
         public UIElement Element { get; protected set; }
@@ -62,13 +74,10 @@ namespace Game
         public virtual void Configure()
         {
             Element = GetComponent<UIElement>();
-
-            controls.Confirm.Relay.OnInvoke += ConfirmCallback;
-            controls.Deny.Relay.OnInvoke += DenyCallback;
         }
         public virtual void Init()
         {
-
+            controls.Register(ConfirmCallback, DenyCallback);
         }
 
         public virtual void Show(string text, ResultDelegate callback)
@@ -79,7 +88,6 @@ namespace Game
 
             Element.Show();
         }
-
         public virtual void Hide() => Element.Hide();
 
         #region Callback
@@ -90,6 +98,8 @@ namespace Game
         ResultDelegate callback;
         void Action(bool result)
         {
+            Hide();
+
             callback?.Invoke(result);
         }
         #endregion

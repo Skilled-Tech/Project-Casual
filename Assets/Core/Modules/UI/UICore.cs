@@ -44,6 +44,10 @@ namespace Game
         }
 
         [SerializeField]
+        protected TextInputUI textInput;
+        public TextInputUI TextInput { get { return textInput; } }
+
+        [SerializeField]
         protected ChoiceUI choice;
         public ChoiceUI Choice { get { return choice; } }
 
@@ -73,6 +77,8 @@ namespace Game
             base.Init();
 
             optionsMenu.SetActive(false);
+
+            textInput.Element.SetActive(false);
 
             choice.Element.SetActive(false);
 
