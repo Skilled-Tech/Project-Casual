@@ -27,6 +27,7 @@ namespace Game
 		public static Level Instance { get; protected set; }
 
         public LevelPause Pause { get; protected set; }
+        public LevelPlayer Player { get; protected set; }
         public LevelPhases Phases { get; protected set; }
         public LevelMenu Menu { get; protected set; }
 
@@ -51,6 +52,7 @@ namespace Game
             Instance = this;
 
             Pause = this.GetDependancy<LevelPause>();
+            Player = this.GetDependancy<LevelPlayer>();
             Phases = this.GetDependancy<LevelPhases>();
             Menu = FindObjectOfType<LevelMenu>();
 

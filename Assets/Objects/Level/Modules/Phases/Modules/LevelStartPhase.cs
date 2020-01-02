@@ -24,6 +24,8 @@ namespace Game
         public override void Begin()
         {
             base.Begin();
+
+            Level.Player.Spawn();
         }
 
         private void Update()
