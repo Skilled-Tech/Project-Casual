@@ -17,19 +17,20 @@ using UnityEditorInternal;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
-using PlayFab;
-using PlayFab.ClientModels;
-
 namespace Game
 {
-	public class MainMenu : MonoBehaviour
+	public class OnEnableRelay : Relay
 	{
-        public Core Core => Core.Instance;
-        public PlayFabCore PlayFab => Core.PlayFab;
-
-        private void Start()
+        protected virtual void OnEnable()
         {
-            
+            StartCoroutine(Procedure());
+
+            IEnumerator Procedure()
+            {
+                yield return new WaitForEndOfFrame();
+
+                Invoke();
+            }
         }
-    }
+	}
 }

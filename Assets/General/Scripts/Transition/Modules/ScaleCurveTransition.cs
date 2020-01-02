@@ -25,27 +25,8 @@ namespace Game
         AnimationCurve curve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f));
 
         [SerializeField]
-        AxisConstraintsData axisConstraints = new AxisConstraintsData();
-        [Serializable]
-        public class AxisConstraintsData
-        {
-            [SerializeField]
-            protected bool x;
-            public bool X { get { return x; } }
-
-            [SerializeField]
-            protected bool y;
-            public bool Y { get { return y; } }
-
-            [SerializeField]
-            protected bool z;
-            public bool Z { get { return z; } }
-
-            public AxisConstraintsData()
-            {
-                x = y = z = true;
-            }
-        }
+        AxisConstraintsProperty axisConstraints = new AxisConstraintsProperty();
+        public AxisConstraintsProperty AxisConstrains => axisConstraints;
 
         protected override void UpdateState(float value)
         {
@@ -60,6 +41,34 @@ namespace Game
             if (axisConstraints.Z) scale.z = eval;
 
             transform.localScale = scale;
+        }
+    }
+
+    [Serializable]
+    public class AxisConstraintsProperty
+    {
+        [SerializeField]
+        public bool X;
+
+        [SerializeField]
+        public bool Y;
+
+        [SerializeField]
+        public bool Z;
+
+        public AxisConstraintsProperty() : this(true)
+        {
+
+        }
+        public AxisConstraintsProperty(bool value) : this(value, value, value)
+        {
+
+        }
+        public AxisConstraintsProperty(bool x, bool y, bool z)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
         }
     }
 }

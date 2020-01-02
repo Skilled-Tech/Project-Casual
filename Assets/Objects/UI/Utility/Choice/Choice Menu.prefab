@@ -463,14 +463,14 @@ PrefabInstance:
       propertyPath: axisConstraints.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3053397389621303178, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: axisConstraints.X
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3940540869102728328, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
       propertyPath: m_HorizontalFit
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6638576892830863999, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
-        type: 3}
-      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6209326534810251602, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
@@ -478,6 +478,11 @@ PrefabInstance:
       propertyPath: relay
       value: 
       objectReference: {fileID: 7914829629264652789}
+    - target: {fileID: 6638576892830863999, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c93e1212da9c82b4a8cb7c35b7f8fa63, type: 3}
 --- !u!1 &8141168240756401974 stripped

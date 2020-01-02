@@ -29,7 +29,7 @@ namespace Game
 
         protected virtual void Reset()
         {
-            current = Dependancy.Get<UIElement>(gameObject, Dependancy.Scope.RecursiveToParents);
+            current = Dependancy.Get<UIElement>(gameObject, Dependancy.Scope.CurrentToParents);
         }
 
         public override void Execute()

@@ -22,10 +22,21 @@ namespace Game
     public class Transition : MonoBehaviour, IInitialize
     {
         [SerializeField]
-        float speed = 4f;
+        protected float speed = 4f;
+        public float Speed
+        {
+            get
+            {
+                return speed;
+            }
+            set
+            {
+                speed = value;
+            }
+        }
 
         protected float _value = 0f;
-        public float Value
+        public virtual float Value
         {
             get
             {
@@ -85,20 +96,24 @@ namespace Game
         protected Coroutine coroutine;
         public bool InProcess => coroutine != null;
 
-        public virtual void To(float target)
+        public delegate void PerformDelegate(float target);
+        public event PerformDelegate OnPerform;
+
+        public virtual void Perform(float target)
         {
-            if (Value == target)
+            if (coroutine != null) StopCoroutine(coroutine);
+
+            if(gameObject.activeInHierarchy)
             {
-                Debug.LogWarning("Trying to transition from " + Value + " ---> " + target + " on: " + name + ", you cannot transition to the current value, ignoring", gameObject);
-                return;
+                coroutine = StartCoroutine(Procedure(target));
+            }
+            else
+            {
+                Value = target;
             }
 
-            if (coroutine != null)
-                StopCoroutine(coroutine);
-
-            coroutine = StartCoroutine(Procedure(target));
+            OnPerform?.Invoke(target);
         }
-        
         protected virtual IEnumerator Procedure(float target)
         {
             while (Value != target)

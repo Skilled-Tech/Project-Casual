@@ -24,6 +24,16 @@ namespace Game
     {
         public UIElement Element { get; protected set; }
 
+        public override float Value
+        {
+            set
+            {
+                base.Value = value;
+
+                if (Mathf.Approximately(Value, 0f)) Element.Target.SetActive(false);
+            }
+        }
+
         public override void Configure()
         {
             Element = GetComponent<UIElement>();
@@ -31,26 +41,19 @@ namespace Game
             Element.OnShow += ShowCallback;
             Element.OnHide += HideCallback;
 
-            Value = Element.Visible ? 1f : 0f;
+            Value = Element.IsOn ? 1f : 0f;
 
             base.Configure();
         }
 
-        protected virtual void ShowCallback() => To(1f);
-        protected virtual void HideCallback() => To(0f);
+        protected virtual void ShowCallback() => Perform(1f);
+        protected virtual void HideCallback() => Perform(0f);
 
-        public override void To(float target)
+        public override void Perform(float target)
         {
             if (target > 0f) Element.Target.SetActive(true);
 
-            base.To(target);
-        }
-
-        protected override IEnumerator Procedure(float target)
-        {
-            yield return base.Procedure(target);
-
-            if (Mathf.Approximately(Value, 0f)) Element.Target.SetActive(false);
+            base.Perform(target);
         }
 
         protected virtual void OnDestroy()

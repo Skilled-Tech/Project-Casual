@@ -17,19 +17,15 @@ using UnityEditorInternal;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
-using PlayFab;
-using PlayFab.ClientModels;
-
 namespace Game
 {
-	public class MainMenu : MonoBehaviour
-	{
+    public class ShowScoreLeaderboardsOperation : Operation
+    {
         public Core Core => Core.Instance;
-        public PlayFabCore PlayFab => Core.PlayFab;
 
-        private void Start()
+        public override void Execute()
         {
-            
+            Core.UI.Leaderboards.Score.Show();
         }
     }
 }

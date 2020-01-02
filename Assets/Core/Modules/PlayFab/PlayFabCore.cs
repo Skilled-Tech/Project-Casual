@@ -35,6 +35,15 @@ namespace Game
             {
                 public override MethodDelegate Method => PlayFabClientAPI.LoginWithCustomID;
 
+                public override LoginWithCustomIDRequest GenerateRequest()
+                {
+                    var request = base.GenerateRequest();
+
+                    request.InfoRequestParameters = DefaultInfoRequestParameters;
+
+                    return request;
+                }
+
                 public virtual void Request() => Request(SystemInfo.deviceUniqueIdentifier);
                 public virtual void Request(string ID)
                 {
@@ -49,10 +58,17 @@ namespace Game
                 }
             }
 
+            public static readonly GetPlayerCombinedInfoRequestParams DefaultInfoRequestParameters = new GetPlayerCombinedInfoRequestParams()
+            {
+                GetUserAccountInfo = true,
+                GetPlayerProfile = true,
+                GetPlayerStatistics = true,
+            };
+
             public abstract class Request<TRequest> : Request<TRequest, LoginResult>
                 where TRequest : class, new()
             {
-
+                
             }
 
             public override void Configure(PlayFabCore reference)
@@ -190,11 +206,41 @@ namespace Game
                 }
             }
 
+            [SerializeField]
+            protected InfoProperty info;
+            public InfoProperty Info { get { return info; } }
+            [Serializable]
+            public class InfoProperty : Property
+            {
+                public UpdateDisplayNameRequest UpdateDisplayName { get; protected set; }
+                public class UpdateDisplayNameRequest : Request<UpdateUserTitleDisplayNameRequest, UpdateUserTitleDisplayNameResult>
+                {
+                    public override MethodDelegate Method => PlayFabClientAPI.UpdateUserTitleDisplayName;
+
+                    public virtual void Request(string desiredName)
+                    {
+                        var request = GenerateRequest();
+
+                        request.DisplayName = desiredName;
+
+                        Send(request);
+                    }
+                }
+
+                public override void Configure(PlayFabCore reference)
+                {
+                    base.Configure(reference);
+
+                    UpdateDisplayName = new UpdateDisplayNameRequest();
+                }
+            }
+
             public override void Configure(PlayFabCore reference)
             {
                 base.Configure(reference);
 
                 Register(PlayFab, statistics);
+                Register(PlayFab, info);
             }
         }
 
@@ -221,7 +267,7 @@ namespace Game
                 void ErrorCallback(PlayFabError error) => callback(null, error);
             }
 
-            public TRequest GenerateRequest() => new TRequest();
+            public virtual TRequest GenerateRequest() => new TRequest();
 
             protected virtual void Send(TRequest request)
             {
@@ -264,5 +310,14 @@ namespace Game
             Register(this, title);
             Register(this, player);
         }
+    }
+
+    public class RestDelegates
+    {
+        public delegate void ResultCallback<TResult>(TResult result);
+
+        public delegate void ErrorCallback<TError>(TError error);
+
+        public delegate void ResponseCallback<TResult, TError>(TResult result, TError error);
     }
 }

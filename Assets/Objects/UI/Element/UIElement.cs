@@ -24,7 +24,9 @@ namespace Game
     {
         public GameObject Target => gameObject;
 
-        public bool Visible
+        public bool Visible => gameObject.activeInHierarchy;
+
+        public bool IsOn
         {
             get
             {
@@ -41,9 +43,13 @@ namespace Game
 
         public UIElementTransition Transition { get; protected set; }
 
+        public UIElement Parent { get; protected set; }
+
         public virtual void Configure()
         {
             Transition = GetComponent<UIElementTransition>();
+
+            Parent = this.GetDependancy<UIElement>(Dependancy.Scope.Parents);
 
             References.Configure(this);
         }
@@ -52,11 +58,21 @@ namespace Game
             References.Init(this);
         }
 
+        public virtual void SetActive(bool value)
+        {
+            Target.SetActive(value);
+
+            if(Transition != null)
+            {
+                Transition.Value = value ? 1f : 0f;
+            }
+        }
+
         public event Action OnShow;
         public virtual void Show()
         {
             if (Transition == null)
-                Target.SetActive(true);
+                SetActive(true);
 
             OnShow?.Invoke();
         }
@@ -65,14 +81,57 @@ namespace Game
         public virtual void Hide()
         {
             if (Transition == null)
-                Target.SetActive(false);
+                SetActive(false);
 
             OnHide?.Invoke();
         }
 
         public virtual void Toggle()
         {
-            Visible = !Visible;
+            IsOn = !IsOn;
+        }
+
+        public static class Utility
+        {
+            public static Coroutine ChainShow<TElement>(IList<TElement> list, MonoBehaviour behaviour)
+            where TElement : UIElement
+            {
+                for (int i = 0; i < list.Count; i++)
+                    if (list[i].IsOn)
+                        list[i].SetActive(false);
+
+                return ChainAction(list, behaviour, Action, Predicate);
+
+                void Action(UIElement element) => element.Show();
+                bool Predicate(int index) => list[index].Transition == null ? true : Mathf.Approximately(list[index].Transition.Value, 1f);
+            }
+
+            public static Coroutine ChainHide<TElement>(IList<TElement> list, MonoBehaviour behaviour)
+            where TElement : UIElement
+            {
+                return ChainAction(list, behaviour, Action, Predicate);
+
+                void Action(UIElement element) => element.Hide();
+                bool Predicate(int index) => list[index].Transition == null ? true : Mathf.Approximately(list[index].Transition.Value, 0f);
+            }
+
+            public static Coroutine ChainAction<TElement>(IList<TElement> list, MonoBehaviour behaviour, Action<UIElement> action, Predicate<int> predicate)
+            where TElement : UIElement
+            {
+                return behaviour.StartCoroutine(Procedure());
+
+                IEnumerator Procedure()
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        action(list[i]);
+
+                        bool IsReady() => predicate(i);
+
+                        yield return new WaitUntil(IsReady);
+                    }
+                }
+            }
         }
     }
 }

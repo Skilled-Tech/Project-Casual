@@ -69,7 +69,7 @@ namespace Game
         {
             base.Configure();
 
-            UIElement = this.GetDependancy<UIElement>(Dependancy.Scope.RecursiveToParents);
+            UIElement = this.GetDependancy<UIElement>(Dependancy.Scope.CurrentToParents);
 
             InitialValue = Value;
         }

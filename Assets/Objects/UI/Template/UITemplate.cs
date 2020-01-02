@@ -20,7 +20,7 @@ using Random = UnityEngine.Random;
 namespace Game
 {
     [RequireComponent(typeof(UIElement))]
-    public abstract class UITemplate<TReference> : MonoBehaviour, IInitialize
+    public class UITemplate : MonoBehaviour, IInitialize
     {
         public UIElement Element { get; protected set; }
 
@@ -33,6 +33,35 @@ namespace Game
 
         }
 
+        public static class Utility
+        {
+            public static IList<UIElement> ToElements<TTemplate>(IList<TTemplate> list)
+            where TTemplate : UITemplate
+            {
+                var elements = new UIElement[list.Count];
+
+                for (int i = 0; i < list.Count; i++)
+                    elements[i] = list[i].Element;
+
+                return elements;
+            }
+
+            public static Coroutine ChainShow<TTemplate>(IList<TTemplate> list, MonoBehaviour behaviour)
+                where TTemplate : UITemplate
+            {
+                return UIElement.Utility.ChainShow(ToElements(list), behaviour);
+            }
+
+            public static Coroutine ChainHide<TTemplate>(IList<TTemplate> list, MonoBehaviour behaviour)
+                where TTemplate : UITemplate
+            {
+                return UIElement.Utility.ChainHide(ToElements(list), behaviour);
+            }
+        }
+    }
+
+    public abstract class UITemplate<TReference> : UITemplate
+    {
         public TReference Reference { get; protected set; }
         public virtual void Set(TReference reference)
         {

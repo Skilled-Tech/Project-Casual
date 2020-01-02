@@ -17,19 +17,23 @@ using UnityEditorInternal;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
-using PlayFab;
-using PlayFab.ClientModels;
-
 namespace Game
 {
-	public class MainMenu : MonoBehaviour
+	public class SetScrollRectPositionOperation : Operation
 	{
-        public Core Core => Core.Instance;
-        public PlayFabCore PlayFab => Core.PlayFab;
+        [SerializeField]
+        ScrollRect scroll;
 
-        private void Start()
+        public Vector3 position;
+
+        protected virtual void Reset()
         {
-            
+            scroll = this.GetDependancy<ScrollRect>(Dependancy.Scope.CurrentToParents);
+        }
+
+        public override void Execute()
+        {
+            scroll.content.anchoredPosition3D = position;
         }
     }
 }

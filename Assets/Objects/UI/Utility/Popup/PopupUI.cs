@@ -67,9 +67,9 @@ namespace Game
             this.action = action;
 
             button.gameObject.SetActive(action != null);
-            if(controls != null) controls.Visible = action != null;
+            if(controls != null) controls.IsOn = action != null;
 
-            if(loading != null) loading.Visible = action == null;
+            if(loading != null) loading.IsOn = action == null;
 
             if (action == null)
             {
