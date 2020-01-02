@@ -29,8 +29,19 @@ namespace Game
         public string ID { get { return _ID; } }
 
         [SerializeField]
-        protected GameObject template;
-        public GameObject Template { get { return template; } }
+        protected PrefabsData prefabs;
+        public PrefabsData Prefabs { get { return prefabs; } }
+        [Serializable]
+        public class PrefabsData
+        {
+            [SerializeField]
+            protected GameObject template;
+            public GameObject Template { get { return template; } }
+
+            [SerializeField]
+            protected GameObject seperator;
+            public GameObject Seperator { get { return seperator; } }
+        }
 
         [SerializeField]
         protected ScrollRect scoll;
@@ -63,6 +74,23 @@ namespace Game
         }
         #endregion
 
+        #region Elements
+        public List<UIElement> Elements { get; protected set; }
+
+        protected virtual void ForAllElements(Action<UIElement, int> action)
+        {
+            for (int i = 0; i < Elements.Count; i++)
+                action(Elements[i], i);
+        }
+
+        protected virtual void HideAllElements()
+        {
+            ForAllElements(Action);
+
+            void Action(UIElement template, int index) => template.SetActive(false);
+        }
+        #endregion
+
         public LeaderboardModule Leaderboard { get; protected set; }
 
         public UIElement Element { get; protected set; }
@@ -71,8 +99,6 @@ namespace Game
 
         public virtual void Configure()
         {
-            Element = GetComponent<UIElement>();
-
             Leaderboard = Core.Leaderboards.Find(ID);
             if(Leaderboard == null)
             {
@@ -81,7 +107,11 @@ namespace Game
                 return;
             }
 
+            Element = GetComponent<UIElement>();
+
             Entries = new List<LeaderboardUITemplate>();
+
+            Elements = new List<UIElement>();
 
             Leaderboard.OnUpdate += UpdateCallback;
         }
@@ -100,7 +130,7 @@ namespace Game
 
             IEnumerator Procedure()
             {
-                HideAllEntries();
+                HideAllElements();
 
                 bool IsTransitionComplete() => Element.Transition == null ? true : Element.Transition.Value == 1f;
 
@@ -115,7 +145,7 @@ namespace Game
         {
             if (ChainShowCoroutine != null) StopCoroutine(ChainShowCoroutine);
 
-            ChainShowCoroutine = UITemplate.Utility.ChainShow(Entries, this);
+            ChainShowCoroutine = UIElement.Utility.ChainShow(Elements, this);
 
             return ChainShowCoroutine;
         }
@@ -133,17 +163,18 @@ namespace Game
         {
             Clear();
 
-            Entries = LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content);
+            for (int i = 0; i < Leaderboard.Count; i++)
+            {
+                if(i != 0 && Leaderboard[i].Position > Leaderboard[i - 1].Position + 1)
+                {
+                    Elements.Add(Seperator());
+                }
 
-            /*
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
-            Entries.AddRange(LeaderboardUITemplate.Create(Leaderboard.List, template, scoll.content));
-            */
+                var instance = LeaderboardUITemplate.Create(Leaderboard[i], prefabs.Template, Scroll.content);
+
+                Entries.Add(instance);
+                Elements.Add(instance.Element);
+            }
 
             UpdateState();
 
@@ -151,15 +182,25 @@ namespace Game
             {
                 ChainShow();
             }
+
+            UIElement Seperator()
+            {
+                var instance = Instantiate(prefabs.Seperator, Scroll.content);
+
+                Initializer.Perform(instance);
+
+                var element = instance.GetComponent<UIElement>();
+
+                return element;
+            }
         }
 
         protected virtual void Clear()
         {
-            for (int i = 0; i < Entries.Count; i++)
-            {
-                Destroy(Entries[i].gameObject);
-            }
+            for (int i = 0; i < Elements.Count; i++)
+                Destroy(Elements[i].gameObject);
 
+            Elements.Clear();
             Entries.Clear();
         }
 

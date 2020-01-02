@@ -19,6 +19,7 @@ using Random = UnityEngine.Random;
 
 using PlayFab;
 using PlayFab.ClientModels;
+using PlayFab.SharedModels;
 
 namespace Game
 {
@@ -47,14 +48,12 @@ namespace Game
         public TopElement Top { get; protected set; }
         public class TopElement : Element<GetLeaderboardRequest, GetLeaderboardResult>
         {
-            public override PlayFabCore.Request<GetLeaderboardRequest, GetLeaderboardResult> Requester
+            public override PlayFabCore.Request<GetLeaderboardRequest, GetLeaderboardResult> PlayFabRequest
                 => PlayFab.Title.Leaderboards.Get;
 
             public override IList<PlayerLeaderboardEntry> ExtractEntries(GetLeaderboardResult result)
                 => result.Leaderboard;
-            public override GetLeaderboardRequest ExtractRequest(GetLeaderboardResult result)
-                => result.Request as GetLeaderboardRequest;
-            public override string GetStatisitcName(GetLeaderboardRequest request)
+            public override string ExtractStatisitcName(GetLeaderboardRequest request)
                 => request.StatisticName;
 
             public override void Request()
@@ -68,14 +67,12 @@ namespace Game
         public AroundPlayerElement AroundPlayer { get; protected set; }
         public class AroundPlayerElement : Element<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult>
         {
-            public override PlayFabCore.Request<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult> Requester
+            public override PlayFabCore.Request<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult> PlayFabRequest
                 => PlayFab.Title.Leaderboards.GetAroundPlayer;
 
             public override IList<PlayerLeaderboardEntry> ExtractEntries(GetLeaderboardAroundPlayerResult result)
                 => result.Leaderboard;
-            public override GetLeaderboardAroundPlayerRequest ExtractRequest(GetLeaderboardAroundPlayerResult result)
-                => result.Request as GetLeaderboardAroundPlayerRequest;
-            public override string GetStatisitcName(GetLeaderboardAroundPlayerRequest request)
+            public override string ExtractStatisitcName(GetLeaderboardAroundPlayerRequest request)
                 => request.StatisticName;
 
             public override void Request()
@@ -118,14 +115,13 @@ namespace Game
             }
         }
         public abstract class Element<TRequest, TResult> : Element
-            where TRequest : class, new()
-            where TResult : class
+            where TRequest :  PlayFabRequestCommon, new()
+            where TResult :  PlayFabResultCommon
         {
-            public abstract string GetStatisitcName(TRequest request);
+            public abstract string ExtractStatisitcName(TRequest request);
             public abstract IList<PlayerLeaderboardEntry> ExtractEntries(TResult result);
-            public abstract TRequest ExtractRequest(TResult result);
 
-            public abstract PlayFabCore.Request<TRequest, TResult> Requester { get; }
+            public abstract PlayFabCore.Request<TRequest, TResult> PlayFabRequest { get; }
 
             public override void Configure(LeaderboardModule reference)
             {
@@ -133,7 +129,7 @@ namespace Game
 
                 List = new List<LeaderboardElement>();
 
-                Requester.OnResponse += ResponseCallback;
+                PlayFabRequest.OnResponse += ResponseCallback;
             }
 
             public virtual void Request()
@@ -144,9 +140,9 @@ namespace Game
             #region Events
             private void ResponseCallback(TResult result, PlayFabError error)
             {
-                var request = ExtractRequest(result);
+                var request = result.Request as TRequest;
 
-                if (GetStatisitcName(request) == Leaderboard.ID)
+                if (ExtractStatisitcName(request) == Leaderboard.ID)
                     ResponseAction(request, result, error);
             }
 
@@ -240,14 +236,14 @@ namespace Game
         public event RestDelegates.ResultCallback<LeaderboardModule> OnUpdate;
         protected virtual void UpdateAction(IList<LeaderboardElement> elements)
         {
-            Debug.Log(elements.Count);
-
             for (int i = 0; i < elements.Count; i++)
             {
                 if (ContainsID(elements[i].ID)) continue;
 
                 List.Add(elements[i]);
             }
+
+            List.Sort(LeaderboardElement.Comparisons.Position.Instance);
 
             OnUpdate?.Invoke(this);
         }

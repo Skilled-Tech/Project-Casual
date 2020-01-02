@@ -30,6 +30,10 @@ namespace Game
         [Serializable]
         public class LoginProcedure : Element
         {
+            [SerializeField]
+            protected StringToggleValue _IDOverride;
+            public StringToggleValue IDOverride { get { return _IDOverride; } }
+
             public override bool Complete => PlayFabClientAPI.IsClientLoggedIn();
 
             public override IEnumerator<Element> Requirements()
@@ -44,7 +48,14 @@ namespace Game
                 base.Start();
 
                 PlayFab.Login.OnResponse += ResponseCallback;
-                PlayFab.Login.CustomID.Request();
+
+                var ID = SystemInfo.deviceUniqueIdentifier;
+
+#if UNITY_EDITOR
+                ID = IDOverride.Evaluate(ID);
+#endif
+
+                PlayFab.Login.CustomID.Request(ID);
             }
 
             private void ResponseCallback(LoginResult result, PlayFabError error)
