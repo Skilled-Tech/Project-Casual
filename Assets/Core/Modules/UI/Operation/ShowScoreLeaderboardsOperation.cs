@@ -29,7 +29,7 @@ namespace Game
         {
             Leaderboard.Show();
 
-            Leaderboard.Submit.Element.Hide();
+            Leaderboard.Submit.Element.SetActive(false);
         }
     }
 }

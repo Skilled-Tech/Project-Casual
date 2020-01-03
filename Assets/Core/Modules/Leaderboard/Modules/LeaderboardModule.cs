@@ -104,7 +104,6 @@ namespace Game
             public LeaderboardElement this[int index] => List[index];
             #endregion
 
-            public event RestDelegates.ResultCallback<IList<LeaderboardElement>> OnUpdate;
             protected virtual void Update(IList<PlayerLeaderboardEntry> results)
             {
                 if(results != null && results.Count > 0)
@@ -118,8 +117,21 @@ namespace Game
 
                     List.Sort(LeaderboardElement.Comparisons.Position.Instance); //Just incase ¯\_(ツ)_/¯ ?
 
-                    OnUpdate?.Invoke(List);
+                    InvokeUpdate();
                 }
+            }
+
+            public virtual void Clear()
+            {
+                List.Clear();
+
+                InvokeUpdate();
+            }
+
+            public event RestDelegates.ResultCallback<IList<LeaderboardElement>> OnUpdate;
+            protected virtual void InvokeUpdate()
+            {
+                OnUpdate?.Invoke(List);
             }
 
             public event RestDelegates.ErrorCallback<PlayFabError> OnError;
@@ -202,6 +214,13 @@ namespace Game
 
         public PlayFabCore PlayFab => Core.PlayFab;
 
+        public virtual void Register(Element element)
+        {
+            base.Register(this, element);
+
+            element.OnUpdate += (IList<LeaderboardElement> result) => ElementUpdateCallback(element, result);
+        }
+
         public override void Configure(LeaderboardsCore reference)
         {
             base.Configure(reference);
@@ -216,8 +235,36 @@ namespace Game
 
             PlayFab.Login.OnResult += LoginResultCallback;
 
+            PlayFab.OnLogout += LogoutCallback;
+
             PlayFab.Player.Statistics.Update.OnResult += PlayerUpdateStatisticCallback;
         }
+        
+        public virtual void Request()
+        {
+            if(PlayFab.IsLoggedIn == false)
+            {
+                Debug.LogWarning("Can't request leaderboard " + ID + " when the player isn't logged in, ignoring");
+                return;
+            }
+
+            List.Clear();
+
+            Top.Request();
+            Personal.Request();
+        }
+
+        public virtual void Clear()
+        {
+            List.Clear();
+
+            InvokeUpdate();
+        }
+
+        #region Callbacks
+        private void LoginResultCallback(LoginResult result) => Request();
+
+        private void LogoutCallback() => InvokeUpdate();
 
         Coroutine PlayerUpdateStatisticCoroutine;
         void PlayerUpdateStatisticCallback(UpdatePlayerStatisticsResult result)
@@ -236,30 +283,12 @@ namespace Game
                 {
                     yield return new WaitForSecondsRealtime(1f); //Just to make sure that the playfab server has updated the leaderboard
 
-                    Request();
+                    if(PlayFab.IsLoggedIn) Request();
 
                     PlayerUpdateStatisticCoroutine = null;
                 }
             }
         }
-
-        public virtual void Register(Element element)
-        {
-            base.Register(this, element);
-
-            element.OnUpdate += (IList<LeaderboardElement> result) => ElementUpdateCallback(element, result);
-        }
-        
-        public virtual void Request()
-        {
-            List.Clear();
-
-            Top.Request();
-            Personal.Request();
-        }
-
-        #region Callbacks
-        private void LoginResultCallback(LoginResult result) => Request();
 
         private void ElementUpdateCallback(Element element, IList<LeaderboardElement> list)
         {
@@ -272,8 +301,7 @@ namespace Game
             OnError?.Invoke(error);
         }
         #endregion
-
-        public event RestDelegates.ResultCallback<LeaderboardModule> OnUpdate;
+        
         protected virtual void UpdateAction(IList<LeaderboardElement> elements)
         {
             for (int i = 0; i < elements.Count; i++)
@@ -285,6 +313,12 @@ namespace Game
 
             List.Sort(LeaderboardElement.Comparisons.Position.Instance);
 
+            InvokeUpdate();
+        }
+
+        public event RestDelegates.ResultCallback<LeaderboardModule> OnUpdate;
+        protected virtual void InvokeUpdate()
+        {
             OnUpdate?.Invoke(this);
         }
     }

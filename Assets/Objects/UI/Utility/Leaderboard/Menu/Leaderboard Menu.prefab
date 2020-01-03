@@ -1201,6 +1201,16 @@ PrefabInstance:
       propertyPath: m_Padding.m_Top
       value: 50
       objectReference: {fileID: 0}
+    - target: {fileID: 1785174761993430826, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: m_ChildScaleWidth
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1785174761993430826, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: m_ChildScaleHeight
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1105428337082564940, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
       propertyPath: m_Enabled

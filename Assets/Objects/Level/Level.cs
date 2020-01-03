@@ -70,6 +70,8 @@ namespace Game
         {
             if(Menu.End.Element.IsOn) Menu.End.Element.Hide();
 
+            End();
+
             Core.Scenes.Load(gameObject.scene.name);
         }
 
@@ -77,7 +79,17 @@ namespace Game
         {
             if (Menu.End.Element.IsOn) Menu.End.Element.Hide();
 
+            End();
+
             Core.Scenes.Load(Core.Scenes.MainMenu);
+        }
+
+        public event Action OnEnd;
+        protected virtual void End()
+        {
+            Core.PlayFab.Logout();
+
+            OnEnd?.Invoke();
         }
     }
 }

@@ -102,7 +102,7 @@ namespace Game
             public event CustomIDRequest.ResultDelegate OnResult;
             void ResultCallback(LoginResult result)
             {
-                Debug.Log(result?.InfoResultPayload?.PlayerProfile?.DisplayName + " Logged In");
+                PlayFab.Player.Profile.Update(result);
 
                 OnResult?.Invoke(result);
             }
@@ -124,6 +124,8 @@ namespace Game
         public virtual void Logout()
         {
             PlayFabAuthenticationAPI.ForgetAllCredentials();
+
+            Player.Profile.Clear();
 
             OnLogout?.Invoke();
         }
@@ -232,30 +234,28 @@ namespace Game
                 public string DisplayName { get; protected set; }
                 public bool HasDisplayName => String.IsNullOrEmpty(DisplayName) == false;
 
-                public override void Init()
+                public virtual void Update(UpdateUserTitleDisplayNameResult result)
                 {
-                    base.Init();
+                    DisplayName = result.DisplayName;
 
-                    PlayFab.Login.OnResult += LoginResultCallback;
-
-                    PlayFab.Player.Info.UpdateDisplayName.OnResult += UpdateDisplayNameResultCallback;
-
-                    PlayFab.OnLogout += LogoutCallback;
+                    Update();
                 }
-
-                private void LoginResultCallback(LoginResult result)
+                public virtual void Update(LoginResult result)
                 {
                     ID = result.PlayFabId;
 
                     DisplayName = result?.InfoResultPayload?.PlayerProfile?.DisplayName;
+
+                    Update();
                 }
 
-                private void UpdateDisplayNameResultCallback(UpdateUserTitleDisplayNameResult result)
+                public event Action OnUpdate;
+                protected virtual void Update()
                 {
-                    DisplayName = result.DisplayName;
+                    OnUpdate?.Invoke();
                 }
 
-                private void LogoutCallback()
+                public virtual void Clear()
                 {
                     ID = null;
 
@@ -330,6 +330,7 @@ namespace Game
                     base.Configure(reference);
 
                     UpdateDisplayName = new UpdateDisplayNameRequest();
+                    UpdateDisplayName.OnResult += PlayFab.Player.Profile.Update;
                 }
             }
 
@@ -378,23 +379,23 @@ namespace Game
             public event ResultDelegate OnResult;
             public virtual void ResultCallback(TResult result)
             {
-                Response(result, null);
-
                 if (OnResult != null) OnResult(result);
+
+                Respond(result, null);
             }
 
             public delegate void ErrorDelegate(PlayFabError error);
             public event ErrorDelegate OnError;
             public virtual void ErrorCallback(PlayFabError error)
             {
-                Response(null, error);
-
                 if (OnError != null) OnError(error);
+
+                Respond(null, error);
             }
 
             public delegate void ResponseDelegate(TResult result, PlayFabError error);
             public event ResponseDelegate OnResponse;
-            public virtual void Response(TResult result, PlayFabError error)
+            public virtual void Respond(TResult result, PlayFabError error)
             {
                 if (OnResponse != null) OnResponse(result, error);
             }

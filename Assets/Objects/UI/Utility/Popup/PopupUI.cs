@@ -89,7 +89,7 @@ namespace Game
                 this.instructions.text = instructions;
             }
 
-            Element.Show();
+            if(Element.IsOn == false) Element.Show();
         }
 
         public virtual void Hide() => Element.Hide();

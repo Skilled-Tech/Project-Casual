@@ -51,7 +51,7 @@ namespace Game
             public int Index { get; protected set; }
 
             public bool IsFirst => Index == 0;
-            public bool IsLast => Index + 1 > Phases.Count;
+            public bool IsLast => Index + 1 >= Phases.Count;
 
             public virtual Element Previous => IsFirst ? null : Phases[Index - 1];
             public virtual Element Next => IsLast ? null : Phases[Index + 1];
@@ -127,22 +127,19 @@ namespace Game
 
             References.Init(this);
 
-            if (List.Count > 0)
-            {
-                Initiate(this[0]);
-            }
+            if (List.Count > 0) Initiate(this[0]);
         }
 
         protected virtual void Initiate(Element element)
         {
+            Current = element;
+
             element.Begin();
         }
 
         public event ElementDelegate OnBegin;
         private void ElementBeginCallback(Element element)
         {
-            Current = element;
-
             OnBegin?.Invoke(element);
         }
 

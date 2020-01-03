@@ -25,15 +25,9 @@ namespace Game
         protected int adMultiplier = 2;
         public int AdMultiplier { get { return adMultiplier; } }
 
-        public bool RequireManualSubmit
-        {
-            get
-            {
-                if (Core.PlayFab.Player.Profile.HasDisplayName == false) return true;
+        public PopupUI Popup => Core.UI.Popup;
 
-                return false;
-            }
-        }
+        public bool RequireManualSubmit => ProcessManualSubmit(false);
 
         public override void Configure(LevelEndPhase reference)
         {
@@ -41,8 +35,6 @@ namespace Game
 
             Phase.OnBegin += BeginCallback;
             Phase.OnEnd += EndCallback;
-
-            Core.UI.Leaderboards.Score.Submit.OnInvoke += LeaderboardSubmitCallback;
         }
 
         void BeginCallback()
@@ -50,7 +42,16 @@ namespace Game
             if(RequireManualSubmit == false) Submit();
 
             Core.Ads.Placements.Common.RewardedVideo.OnFinish += RewardedVideoAdFinishCallback;
+
+            Core.PlayFab.Player.Profile.OnUpdate += PlayerProfileUpdateCallback;
+
+            Core.UI.Leaderboards.Score.Submit.OnInvoke += LeaderboardSubmitCallback;
+
+            UpdateSubmitState();
         }
+
+        #region Callbacks
+        private void PlayerProfileUpdateCallback() => UpdateSubmitState();
 
         private void RewardedVideoAdFinishCallback(UnityEngine.Advertisements.ShowResult result)
         {
@@ -63,35 +64,79 @@ namespace Game
                 if (RequireManualSubmit == false) Submit();
             }
         }
+
         private void LeaderboardSubmitCallback()
         {
-            if(RequireManualSubmit)
-            {
-                Core.Procedures.UpdateDisplayName.Start();
-
-                Core.Procedures.UpdateDisplayName.OnResponse += UpdateUserNameProcedureCallback;
-            }
-            else
-            {
-                Submit();
-            }
+            ProcessManualSubmit();
         }
+        #endregion
 
-        private void UpdateUserNameProcedureCallback(string error)
+        #region Manual Submit
+        protected virtual void ProcessManualSubmit() => ProcessManualSubmit(true);
+        protected virtual bool ProcessManualSubmit(bool execute)
         {
-            Core.Procedures.UpdateDisplayName.OnResponse -= UpdateUserNameProcedureCallback;
-
-            if (error == null)
+            if (Core.PlayFab.IsLoggedIn == false)
             {
-                Core.UI.Leaderboards.Score.Submit.Element.Hide();
+                if(execute) RequireLogin();
 
-                Submit();
+                return true;
+            }
+            else if (Core.PlayFab.Player.Profile.HasDisplayName == false)
+            {
+                if(execute) RequestDisplayNameUpdate();
+
+                return true;
             }
             else
             {
-                
+                if(execute)
+                {
+                    Submit();
+
+                    UpdateSubmitState();
+                }
+
+                return false;
             }
         }
+
+        private void RequireLogin()
+        {
+            Core.Procedures.Login.OnResponse += ResponseCallback;
+            Core.Procedures.Login.Require();
+
+            void ResponseCallback(string error)
+            {
+                Core.Procedures.Login.OnResponse -= ResponseCallback;
+
+                if(error == null)
+                {
+                    ProcessManualSubmit();
+                }
+            }
+        }
+
+        private void RequestDisplayNameUpdate()
+        {
+            Core.Procedures.UpdateDisplayName.Request();
+            Core.Procedures.UpdateDisplayName.OnResponse += ResponseCallback;
+
+            void ResponseCallback(string error)
+            {
+                Core.Procedures.UpdateDisplayName.OnResponse -= ResponseCallback;
+
+                if (error == null)
+                {
+                    ProcessManualSubmit();
+                }
+            }
+        }
+
+        protected virtual void UpdateSubmitState()
+        {
+            Core.UI.Leaderboards.Score.Submit.Element.IsOn = RequireManualSubmit;
+        }
+        #endregion
 
         public virtual void Submit()
         {
@@ -109,7 +154,7 @@ namespace Game
 
             Core.UI.Leaderboards.Score.Submit.OnInvoke -= LeaderboardSubmitCallback;
 
-            Core.Procedures.UpdateDisplayName.OnResponse -= UpdateUserNameProcedureCallback;
+            Core.PlayFab.Player.Profile.OnUpdate -= PlayerProfileUpdateCallback;
         }
 
         protected virtual void OnDestroy()

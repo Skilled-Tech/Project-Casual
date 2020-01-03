@@ -31,6 +31,10 @@ namespace Game
         public class LoginProcedure : SingularElement
         {
             [SerializeField]
+            protected bool auto;
+            public bool Auto { get { return auto; } }
+
+            [SerializeField]
             protected StringToggleValue _IDOverride;
             public StringToggleValue IDOverride { get { return _IDOverride; } }
 
@@ -42,20 +46,43 @@ namespace Game
             {
                 base.Start();
 
-                PlayFab.Login.OnResponse += ResponseCallback;
-
                 var ID = SystemInfo.deviceUniqueIdentifier;
 
 #if UNITY_EDITOR
                 ID = IDOverride.Evaluate(ID);
 #endif
 
+                PlayFab.Login.OnResponse += ResponseCallback;
                 PlayFab.Login.CustomID.Request(ID);
+            }
+
+            public virtual void Require()
+            {
+                Core.UI.Popup.Show("Loggin In");
+
+                OnResponse += Callback;
+                Request();
+
+                void Callback(string error)
+                {
+                    OnResponse -= Callback;
+
+                    if (error == null)
+                    {
+                        Core.UI.Popup.Hide();
+                    }
+                    else
+                    {
+                        Core.UI.Popup.Show(error, "Okay");
+                    }
+                }
             }
 
             private void ResponseCallback(LoginResult result, PlayFabError error)
             {
-                if(error == null)
+                PlayFab.Login.OnResponse -= ResponseCallback;
+
+                if (error == null)
                 {
                     End();
                 }
@@ -131,19 +158,23 @@ namespace Game
 
                 if(error == null)
                 {
+                    TextInput.Hide();
+
                     Popup.Hide();
 
                     End();
                 }
                 else
                 {
-                    InvokeError(error.ErrorMessage);
+                    Popup.Show(error.ErrorMessage, "Okay");
                 }
             }
 
             public override void InvokeError(string error)
             {
                 base.InvokeError(error);
+
+                TextInput.Hide();
 
                 Core.UI.Popup.Show(error, "Okay");
             }
@@ -159,6 +190,18 @@ namespace Game
         {
             public bool IsProcessing { get; protected set; }
 
+            public virtual void Request()
+            {
+                if(IsProcessing)
+                {
+
+                }
+                else
+                {
+                    Start();
+                }
+            }
+
             public event Action OnStart;
             public virtual void Start()
             {
@@ -166,7 +209,7 @@ namespace Game
 
                 OnStart?.Invoke();
             }
-
+            
             public virtual void RelyOn(Element element, ResponseDelegate callback)
             {
                 element.OnResponse += RelayCallback;
@@ -182,7 +225,7 @@ namespace Game
 
                 void RelayCallback(string error)
                 {
-                    element.OnResponse -= callback;
+                    element.OnResponse -= RelayCallback;
 
                     callback(error);
                 }
@@ -236,7 +279,7 @@ namespace Game
         {
             base.Init();
 
-            login.Start();
+            if(login.Auto) login.Start();
         }
     }
 }

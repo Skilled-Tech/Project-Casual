@@ -66,7 +66,7 @@ namespace Game
 
             this.callback = callback;
 
-            Element.Show();
+            if (Element.IsOn == false) Element.Show();
         }
         public virtual void Hide() => Element.Hide();
 
@@ -88,8 +88,6 @@ namespace Game
         ResultDelegate callback;
         void Action(string result)
         {
-            Hide();
-
             callback?.Invoke(result);
         }
         #endregion
