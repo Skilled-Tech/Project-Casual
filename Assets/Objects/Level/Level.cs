@@ -87,8 +87,6 @@ namespace Game
         public event Action OnEnd;
         protected virtual void End()
         {
-            Core.PlayFab.Logout();
-
             OnEnd?.Invoke();
         }
     }
