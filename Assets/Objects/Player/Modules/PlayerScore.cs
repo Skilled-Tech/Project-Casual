@@ -22,7 +22,7 @@ namespace Game
 	public class PlayerScore : Player.Module
 	{
 		[SerializeField]
-        protected int _value;
+        protected int _value = 50;
         public int Value
         {
             get
@@ -43,13 +43,6 @@ namespace Game
         public event ValueChangeDelegate OnValueChange;
 
         public const string ID = "Score";
-
-        public override void Configure(Player reference)
-        {
-            base.Configure(reference);
-
-            Value = 20;
-        }
 
         public virtual void UpdateStatistic()
         {
