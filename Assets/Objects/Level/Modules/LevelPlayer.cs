@@ -27,9 +27,11 @@ namespace Game
 
         public Player Instance { get; protected set; }
 
+        public Transform SpawnPoint => transform;
+
         public virtual void Spawn()
         {
-            var gameObject = Instantiate(prefab);
+            var gameObject = Instantiate(prefab, SpawnPoint.position, SpawnPoint.rotation);
 
             gameObject.name = prefab.name;
 

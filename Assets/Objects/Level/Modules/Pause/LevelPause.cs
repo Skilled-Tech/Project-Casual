@@ -53,7 +53,7 @@ namespace Game
 
         protected virtual void StateChangeCallback(LevelPauseState state)
         {
-            Time.timeScale = state == LevelPauseState.Hard ? 1f : 0f;
+            Time.timeScale = state == LevelPauseState.Hard ? 0f : 1f;
         }
 
         protected virtual void OnDestroy()

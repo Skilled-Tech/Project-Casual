@@ -44,7 +44,7 @@ namespace Game
             {
                 Player.Score.Value += value;
 
-                yield return new WaitForSeconds(delay);
+                yield return new WaitForSecondsRealtime(delay);
             }
         }
 

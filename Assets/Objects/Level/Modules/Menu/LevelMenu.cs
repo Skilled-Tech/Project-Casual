@@ -21,7 +21,11 @@ namespace Game
 {
 	public class LevelMenu : Level.Module
 	{
-		public LevelEndMenu End { get; protected set; }
+        [SerializeField]
+        protected HoldUI hold;
+        public HoldUI Hold { get { return hold; } }
+
+        public LevelEndMenu End { get; protected set; }
 
         public override void Configure(Level reference)
         {

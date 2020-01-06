@@ -19,19 +19,28 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
+#pragma warning disable CS0108
+    [RequireComponent(typeof(Rigidbody))]
     public class Player : MonoBehaviour, IInitialize
     {
+        public Rigidbody rigidbody { get; protected set; }
+
+        public Collider collider { get; protected set; }
+
         public PlayerScore Score { get; protected set; }
 
         public class Module : MonoBehaviour, IReference<Player>
         {
+            public Core Core => Core.Instance;
+            public Level Level => Level.Instance;
+
             public Player Player { get; protected set; }
             public virtual void Configure(Player reference)
             {
                 this.Player = reference;
             }
 
-            public static Core Core => Core.Instance;
+            public Rigidbody rigidbody => Player.rigidbody;
 
             public virtual void Init()
             {
@@ -39,8 +48,15 @@ namespace Game
             }
         }
 
+        public Core Core => Core.Instance;
+        public Level Level => Level.Instance;
+
         public virtual void Configure()
         {
+            rigidbody = GetComponent<Rigidbody>();
+
+            collider = GetComponent<Collider>();
+
             Score = this.GetDependancy<PlayerScore>();
 
             References.Configure(this);
@@ -49,6 +65,14 @@ namespace Game
         public virtual void Init()
         {
             References.Init(this);
+
+            Level.Menu.Hold.OnClick += ClickCallback;
+        }
+
+        private void ClickCallback()
+        {
+            Debug.Log("Click");
         }
     }
+#pragma warning restore CS0108
 }
