@@ -68,8 +68,6 @@ namespace Game
 
         public virtual void Retry()
         {
-            if(Menu.End.Element.IsOn) Menu.End.Element.Hide();
-
             End();
 
             Core.Scenes.Load(gameObject.scene.name);
@@ -77,8 +75,6 @@ namespace Game
 
         public virtual void Quit()
         {
-            if (Menu.End.Element.IsOn) Menu.End.Element.Hide();
-
             End();
 
             Core.Scenes.Load(Core.Scenes.MainMenu);
@@ -87,6 +83,8 @@ namespace Game
         public event Action OnEnd;
         protected virtual void End()
         {
+            if (Menu.End.Element.IsOn) Menu.End.Element.Hide();
+
             OnEnd?.Invoke();
         }
     }
