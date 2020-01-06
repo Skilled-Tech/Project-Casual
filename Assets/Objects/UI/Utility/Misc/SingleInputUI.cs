@@ -21,24 +21,32 @@ using UnityEngine.EventSystems;
 
 namespace Game
 {
-    public class HoldUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+    public class SingleInputUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
-        public bool IsDown { get; protected set; }
+        public int? PointerID { get; protected set; }
+
+        public bool IsDown => PointerID.HasValue;
 
         public event Action OnClick;
         public void OnPointerDown(PointerEventData eventData)
         {
-            IsDown = true;
+            if(PointerID == null)
+            {
+                PointerID = eventData.pointerId;
 
-            OnClick?.Invoke();
+                OnClick?.Invoke();
+            }
         }
 
         public event Action OnRelease;
         public void OnPointerUp(PointerEventData eventData)
         {
-            IsDown = false;
+            if(PointerID == eventData.pointerId)
+            {
+                PointerID = null;
 
-            OnRelease?.Invoke();
+                OnRelease?.Invoke();
+            }
         }
     }
 }

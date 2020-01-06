@@ -50,8 +50,6 @@ namespace Game
                 public virtual void Request() => Request(SystemInfo.deviceUniqueIdentifier);
                 public virtual void Request(string ID)
                 {
-                    Debug.Log("Custom ID Login: " + ID);
-
                     var request = GenerateRequest();
 
                     request.CreateAccount = true;

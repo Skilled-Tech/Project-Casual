@@ -55,7 +55,7 @@ namespace Game
         {
             References.Init(this);
 
-            Level.Menu.Hold.OnClick += ClickCallback;
+            Level.Menu.Input.OnClick += ClickCallback;
         }
 
         private void ClickCallback()

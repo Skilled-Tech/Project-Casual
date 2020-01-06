@@ -42,6 +42,13 @@ namespace Game
 
             public PlayFabCore PlayFab => Core.PlayFab;
 
+            public override void Init()
+            {
+                base.Init();
+
+                if (auto) Start();
+            }
+
             public override void Start()
             {
                 base.Start();
@@ -273,13 +280,6 @@ namespace Game
 
             Register(this, login);
             Register(this, updateDisplayName);
-        }
-
-        public override void Init()
-        {
-            base.Init();
-
-            if(login.Auto) login.Start();
         }
     }
 }

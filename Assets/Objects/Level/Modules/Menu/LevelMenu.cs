@@ -22,8 +22,8 @@ namespace Game
 	public class LevelMenu : Level.Module
 	{
         [SerializeField]
-        protected HoldUI hold;
-        public HoldUI Hold { get { return hold; } }
+        protected SingleInputUI input;
+        public SingleInputUI Input { get { return input; } }
 
         public LevelEndMenu End { get; protected set; }
 

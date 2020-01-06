@@ -240,7 +240,7 @@ namespace Game
             List.Clear();
 
             Top.Request();
-            Personal.Request();
+            if(PlayFab.Player.Profile.HasDisplayName) Personal.Request();
         }
 
         public virtual void Clear()

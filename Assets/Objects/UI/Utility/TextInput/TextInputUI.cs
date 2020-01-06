@@ -64,11 +64,18 @@ namespace Game
         {
             label.text = text;
 
+            Clear();
+
             this.callback = callback;
 
             if (Element.IsOn == false) Element.Show();
         }
         public virtual void Hide() => Element.Hide();
+
+        public virtual void Clear()
+        {
+            inputField.text = string.Empty;
+        }
 
         #region Callback
         private void DenyCallback() => Action(null);
