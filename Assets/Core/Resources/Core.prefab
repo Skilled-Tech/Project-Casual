@@ -711,7 +711,7 @@ MonoBehaviour:
     auto: 1
     _IDOverride:
       enabled: 0
-      value: 42069
+      value: TESTMOB1
 --- !u!1 &6478464170344696841
 GameObject:
   m_ObjectHideFlags: 0

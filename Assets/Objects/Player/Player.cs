@@ -20,13 +20,8 @@ using Random = UnityEngine.Random;
 namespace Game
 {
 #pragma warning disable CS0108
-    [RequireComponent(typeof(Rigidbody))]
     public class Player : MonoBehaviour, IInitialize
     {
-        public Rigidbody rigidbody { get; protected set; }
-
-        public Collider collider { get; protected set; }
-
         public PlayerScore Score { get; protected set; }
 
         public class Module : MonoBehaviour, IReference<Player>
@@ -40,8 +35,6 @@ namespace Game
                 this.Player = reference;
             }
 
-            public Rigidbody rigidbody => Player.rigidbody;
-
             public virtual void Init()
             {
                 
@@ -53,10 +46,6 @@ namespace Game
 
         public virtual void Configure()
         {
-            rigidbody = GetComponent<Rigidbody>();
-
-            collider = GetComponent<Collider>();
-
             Score = this.GetDependancy<PlayerScore>();
 
             References.Configure(this);

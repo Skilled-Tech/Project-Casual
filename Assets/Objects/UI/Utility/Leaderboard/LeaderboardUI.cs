@@ -165,6 +165,8 @@ namespace Game
 
             for (int i = 0; i < Leaderboard.Count; i++)
             {
+                if (Leaderboard[i].Value == 0 && String.IsNullOrEmpty(Leaderboard[i].DisplayName)) continue;
+
                 if(i != 0 && Leaderboard[i].Position > Leaderboard[i - 1].Position + 1)
                 {
                     Elements.Add(Seperator());

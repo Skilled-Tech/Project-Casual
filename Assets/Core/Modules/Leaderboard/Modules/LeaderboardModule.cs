@@ -79,18 +79,15 @@ namespace Game
             {
                 base.Request();
 
-                PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, 1);
+                PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, 3);
             }
 
-            protected override void Update(IList<PlayerLeaderboardEntry> results)
+            protected override void ResultAction(GetLeaderboardAroundPlayerRequest request, GetLeaderboardAroundPlayerResult result)
             {
-                if(results != null && results.Count > 0)
-                {
-                    if (results[0].StatValue == 0 && string.IsNullOrEmpty(results[0].DisplayName))
-                        results.RemoveAt(0);
-                }
+                base.ResultAction(request, result);
 
-                base.Update(results);
+                Debug.Log(result.Leaderboard.Count);
+                Debug.Log(request.MaxResultsCount);
             }
         }
 
