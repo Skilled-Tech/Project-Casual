@@ -81,14 +81,6 @@ namespace Game
 
                 PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, 3);
             }
-
-            protected override void ResultAction(GetLeaderboardAroundPlayerRequest request, GetLeaderboardAroundPlayerResult result)
-            {
-                base.ResultAction(request, result);
-
-                Debug.Log(result.Leaderboard.Count);
-                Debug.Log(request.MaxResultsCount);
-            }
         }
 
         public class Element : Property
