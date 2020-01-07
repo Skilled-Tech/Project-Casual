@@ -29,6 +29,8 @@ namespace Game
 
         public AudioChannelsCore Channels { get; protected set; }
 
+        public AudioPlayersCore Players { get; protected set; }
+
         public class Module : Core.Module<AudioCore>
         {
             public AudioCore Audio => Reference;
@@ -39,6 +41,8 @@ namespace Game
             base.Configure(reference);
 
             Channels = this.GetDependancy<AudioChannelsCore>();
+
+            Players = this.GetDependancy<AudioPlayersCore>();
 
             References.Configure(this);
         }

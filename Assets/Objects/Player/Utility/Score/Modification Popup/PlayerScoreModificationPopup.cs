@@ -42,8 +42,6 @@ namespace Game
         {
             if (Instance != null) Destroy(Instance.gameObject);
 
-            var sign = Math.Sign(change);
-
             Instance = PopupUITemplate.Create(prefab, transform);
 
             Instance.Set(GetSignText(change) + Mathf.Abs(change));
@@ -53,11 +51,9 @@ namespace Game
 
         public static string GetSignText(int value)
         {
-            if (value > 0)
-                return "+";
+            if (value > 0) return "+";
 
-            if (value < 0)
-                return "-";
+            if (value < 0) return "-";
 
             return "";
         }

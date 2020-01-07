@@ -21,8 +21,10 @@ namespace Game
 {
 	public class PlayerScore : Player.Module
 	{
-		[SerializeField]
-        protected int _value = 50;
+        public const string ID = "Score";
+
+        [SerializeField]
+        protected int _value;
         public int Value
         {
             get
@@ -48,7 +50,21 @@ namespace Game
         public delegate void ValueChangeDelegate(int value);
         public event ValueChangeDelegate OnValueChange;
 
-        public const string ID = "Score";
+        [SerializeField]
+        protected AudioClip sfx;
+        public AudioClip SFX { get { return sfx; } }
+
+        public override void Configure(Player reference)
+        {
+            base.Configure(reference);
+
+            OnValueModified += ValueModifiedCallback;
+        }
+
+        private void ValueModifiedCallback(int value, int change)
+        {
+            Core.Audio.Players.SFX.Play(sfx);
+        }
 
         public virtual void UpdateStatistic()
         {
