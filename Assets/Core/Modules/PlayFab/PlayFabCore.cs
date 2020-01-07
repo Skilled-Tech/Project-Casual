@@ -386,6 +386,8 @@ namespace Game
             public event ErrorDelegate OnError;
             public virtual void ErrorCallback(PlayFabError error)
             {
+                Debug.LogError(error.GenerateErrorReport());
+
                 if (OnError != null) OnError(error);
 
                 Respond(null, error);

@@ -40,7 +40,7 @@ namespace Game
         protected ChoiceUI.ControlsProperty controls;
         public ChoiceUI.ControlsProperty Controls { get { return controls; } }
 
-        public StringValidator Validator { get; protected set; }
+        public TextValidator Validator { get; protected set; }
 
         public UIElement Element { get; protected set; }
 
@@ -52,8 +52,8 @@ namespace Game
         {
             Element = GetComponent<UIElement>();
 
-            Validator = new StringValidator();
-            Validator.Add(StringValidator.Entries.NotEmpty);
+            Validator = new TextValidator();
+            Validator.Add(TextValidator.Defaults.NotEmpty);
         }
         public virtual void Init()
         {
@@ -98,41 +98,5 @@ namespace Game
             callback?.Invoke(result);
         }
         #endregion
-    }
-
-    [Serializable]
-    public class StringValidator
-    {
-        public delegate bool Delegate(string input);
-
-        public List<Delegate> List { get; protected set; }
-
-        public virtual void Add(Delegate validator)
-        {
-            List.Add(validator);
-        }
-        public virtual void Remove(Delegate validator)
-        {
-            List.Remove(validator);
-        }
-
-        public virtual bool Check(string input)
-        {
-            for (int i = 0; i < List.Count; i++)
-                if (List[i](input) == false)
-                    return false;
-
-            return true;
-        }
-
-        public static class Entries
-        {
-            public static bool NotEmpty(string input) => !string.IsNullOrEmpty(input);
-        }
-
-        public StringValidator()
-        {
-            List = new List<Delegate>();
-        }
     }
 }

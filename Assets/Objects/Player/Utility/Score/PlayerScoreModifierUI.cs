@@ -40,6 +40,9 @@ namespace Game
         Coroutine coroutine;
         IEnumerator Procedure()
         {
+            Player.Score.Value += value;
+            yield return new WaitForSecondsRealtime(delay * 4);
+
             while(true)
             {
                 Player.Score.Value += value;

@@ -20,9 +20,12 @@ using Random = UnityEngine.Random;
 namespace Game
 {
     [RequireComponent(typeof(UIElement))]
+#pragma warning disable CS0108
     public class UITemplate : MonoBehaviour, IInitialize
     {
         public UIElement Element { get; protected set; }
+
+        public RectTransform transform => Element.transform;
 
         public Core Core => Core.Instance;
 
@@ -61,6 +64,7 @@ namespace Game
             }
         }
     }
+#pragma warning restore CS0108
 
     public abstract class UITemplate<TReference> : UITemplate
     {
@@ -78,7 +82,7 @@ namespace Game
 
         }
 
-        public static TTemplate Create<TTemplate>(TReference reference, GameObject prefab, Transform parent)
+        public static TTemplate Create<TTemplate>(GameObject prefab, Transform parent)
             where TTemplate : UITemplate<TReference>
         {
             var instance = Instantiate(prefab, parent);
@@ -89,9 +93,16 @@ namespace Game
 
             var script = instance.GetComponent<TTemplate>();
 
-            script.Set(reference);
-
             return script;
+        }
+        public static TTemplate Create<TTemplate>(TReference reference, GameObject prefab, Transform parent)
+            where TTemplate : UITemplate<TReference>
+        {
+            var instance = Create<TTemplate>(prefab, parent);
+
+            instance.Set(reference);
+
+            return instance;
         }
         public static List<TTemplate> Create<TTemplate>(IList<TReference> references, GameObject prefab, Transform parent)
             where TTemplate : UITemplate<TReference>
@@ -112,6 +123,10 @@ namespace Game
     public abstract class UITemplate<TReference, TTemplate> : UITemplate<TReference>
         where TTemplate : UITemplate<TReference>
     {
+        public static TTemplate Create(GameObject prefab, Transform parent)
+        {
+            return Create<TTemplate>(prefab, parent);
+        }
         public static TTemplate Create(TReference reference, GameObject prefab, Transform parent)
         {
             return Create<TTemplate>(reference, prefab, parent);

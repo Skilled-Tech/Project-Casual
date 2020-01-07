@@ -24,6 +24,30 @@ namespace Game
 {
 	public class Sandbox : MonoBehaviour
 	{
-        
+        public TextInputUI TextInput => Core.Instance.UI.TextInput;
+
+        private void Start()
+        {
+            Show();
+        }
+
+        void Show()
+        {
+            TextInput.Show("Enter Word", ResultCallback);
+
+            void ResultCallback(string result)
+            {
+                if(result == null)
+                {
+                    Debug.Log("Canceled");
+                }
+                else
+                {
+                    Debug.Log("Accepted: " + result);
+                }
+
+                Show();
+            }
+        }
     }
 }

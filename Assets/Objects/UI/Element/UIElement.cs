@@ -20,8 +20,11 @@ using Random = UnityEngine.Random;
 namespace Game
 {
     [DisallowMultipleComponent]
-	public class UIElement : MonoBehaviour, IInitialize
+#pragma warning disable CS0108
+    public class UIElement : MonoBehaviour, IInitialize
     {
+        public RectTransform transform { get; protected set; }
+
         public GameObject Target => gameObject;
 
         public bool Visible => gameObject.activeInHierarchy;
@@ -47,6 +50,8 @@ namespace Game
 
         public virtual void Configure()
         {
+            transform = GetComponent<RectTransform>();
+
             Transition = GetComponent<UIElementTransition>();
 
             Parent = this.GetDependancy<UIElement>(Dependancy.Scope.Parents);
@@ -134,4 +139,5 @@ namespace Game
             }
         }
     }
+#pragma warning restore CS0108
 }

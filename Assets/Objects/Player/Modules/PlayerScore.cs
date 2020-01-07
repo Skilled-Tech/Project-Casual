@@ -33,11 +33,17 @@ namespace Game
             {
                 if (value < 0) value = 0;
 
+                var change = value - _value;
+
                 this._value = value;
 
                 OnValueChange?.Invoke(Value);
+                OnValueModified?.Invoke(Value, change);
             }
         }
+
+        public delegate void ValueModifiedDelegate(int value, int change);
+        public event ValueModifiedDelegate OnValueModified;
 
         public delegate void ValueChangeDelegate(int value);
         public event ValueChangeDelegate OnValueChange;

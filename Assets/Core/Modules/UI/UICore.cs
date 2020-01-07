@@ -79,6 +79,7 @@ namespace Game
             optionsMenu.SetActive(false);
 
             textInput.Element.SetActive(false);
+            textInput.Validator.Add(BadWordsFilter.IsClean);
 
             choice.Element.SetActive(false);
 
