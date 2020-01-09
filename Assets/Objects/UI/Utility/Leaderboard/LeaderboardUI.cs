@@ -60,34 +60,22 @@ namespace Game
 
         public bool HasEntries => Entries.Count > 0;
 
-        protected virtual void ForAllEntries(Action<LeaderboardUITemplate, int> action)
-        {
-            for (int i = 0; i < Entries.Count; i++)
-                action(Entries[i], i);
-        }
-
         protected virtual void HideAllEntries()
         {
-            ForAllEntries(Action);
+            Entries.ForEach(Action);
 
-            void Action(LeaderboardUITemplate template, int index) => template.Element.SetActive(false);
+            void Action(LeaderboardUITemplate template) => template.Element.SetActive(false);
         }
         #endregion
 
         #region Elements
         public List<UIElement> Elements { get; protected set; }
 
-        protected virtual void ForAllElements(Action<UIElement, int> action)
-        {
-            for (int i = 0; i < Elements.Count; i++)
-                action(Elements[i], i);
-        }
-
         protected virtual void HideAllElements()
         {
-            ForAllElements(Action);
+            Elements.ForEach(Action);
 
-            void Action(UIElement template, int index) => template.SetActive(false);
+            void Action(UIElement template) => template.SetActive(false);
         }
         #endregion
 
