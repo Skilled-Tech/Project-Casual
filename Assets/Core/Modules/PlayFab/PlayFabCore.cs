@@ -71,6 +71,8 @@ namespace Game
                     var request = GenerateRequest();
 
                     request.AccessToken = token;
+
+                    Send(request);
                 }
             }
 

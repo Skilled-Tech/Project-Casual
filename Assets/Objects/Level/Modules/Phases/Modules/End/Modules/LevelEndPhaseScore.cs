@@ -103,7 +103,7 @@ namespace Game
         private void RequireLogin()
         {
             Core.Procedures.Login.OnResponse += ResponseCallback;
-            Core.Procedures.Login.Require();
+            Core.Procedures.Login.Procedure.Require();
 
             void ResponseCallback(string error)
             {

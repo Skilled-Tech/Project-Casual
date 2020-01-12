@@ -24,9 +24,15 @@ namespace Game
 {
 	public class FacebookCore : Core.Module
 	{
+        public bool Active => FB.IsInitialized;
+
         public LoginProperty Login { get; protected set; }
         public class LoginProperty : Property
         {
+            public bool Active => FB.IsLoggedIn;
+
+            public AccessToken AccessToken => AccessToken.CurrentAccessToken;
+
             public static readonly List<string> Permissions = new List<string>()
             {
                 "public_profile"
@@ -40,11 +46,6 @@ namespace Game
             public event RestDelegates.ResultCallback<ILoginResult> OnResult;
             void ResultCallback(ILoginResult result)
             {
-                Debug.Log("Access Token: " + result.AccessToken.ToString());
-                Debug.Log("Access Token String: " + result.AccessToken.TokenString);
-
-                Debug.Log(result.RawResult);
-
                 OnResult?.Invoke(result);
             }
         }
@@ -63,20 +64,19 @@ namespace Game
             Register(this, Login);
         }
 
-        public override void Init()
+        public void Activate()
         {
-            base.Init();
-
             FB.Init(InitCallback, HideCallback);
         }
 
+        public event Action ActivateCallback;
         private void InitCallback()
         {
             Debug.Log("Facebook Initiliazed");
 
             FB.ActivateApp();
 
-            Login.Request();
+            ActivateCallback?.Invoke();
         }
 
         private void HideCallback(bool isUnityShown)
