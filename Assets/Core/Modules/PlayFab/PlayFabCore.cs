@@ -38,13 +38,10 @@ namespace Game
             {
                 public override MethodDelegate Method => PlayFabClientAPI.LoginWithCustomID;
 
-                public override LoginWithCustomIDRequest GenerateRequest()
+                public override void ApplyDefaults(ref LoginWithCustomIDRequest request)
                 {
-                    var request = base.GenerateRequest();
-
+                    request.CreateAccount = true;
                     request.InfoRequestParameters = DefaultInfoRequestParameters;
-
-                    return request;
                 }
 
                 public virtual void Request() => Request(SystemInfo.deviceUniqueIdentifier);
@@ -52,11 +49,44 @@ namespace Game
                 {
                     var request = GenerateRequest();
 
-                    request.CreateAccount = true;
                     request.CustomId = ID;
 
                     Send(request);
                 }
+            }
+
+            public FacebookRequest Facebook { get; protected set; }
+            public class FacebookRequest : Request<LoginWithFacebookRequest>
+            {
+                public override MethodDelegate Method => PlayFabClientAPI.LoginWithFacebook;
+
+                public override void ApplyDefaults(ref LoginWithFacebookRequest request)
+                {
+                    request.CreateAccount = true;
+                    request.InfoRequestParameters = DefaultInfoRequestParameters;
+                }
+
+                public virtual void Request(string token)
+                {
+                    var request = GenerateRequest();
+
+                    request.AccessToken = token;
+                }
+            }
+
+            public abstract class Request<TRequest> : Request<TRequest, LoginResult>
+                where TRequest : class, new()
+            {
+                public override TRequest GenerateRequest()
+                {
+                    var request = base.GenerateRequest();
+
+                    ApplyDefaults(ref request);
+
+                    return request;
+                }
+
+                public abstract void ApplyDefaults(ref TRequest request);
             }
 
             public static readonly GetPlayerCombinedInfoRequestParams DefaultInfoRequestParameters = new GetPlayerCombinedInfoRequestParams()
@@ -66,18 +96,15 @@ namespace Game
                 GetPlayerStatistics = true,
             };
 
-            public abstract class Request<TRequest> : Request<TRequest, LoginResult>
-                where TRequest : class, new()
-            {
-                
-            }
-
             public override void Configure(PlayFabCore reference)
             {
                 base.Configure(reference);
 
                 CustomID = new CustomIDRequest();
                 Register(CustomID);
+
+                Facebook = new FacebookRequest();
+                Register(Facebook);
             }
 
             protected virtual void Register<TRequest>(Request<TRequest> request)
