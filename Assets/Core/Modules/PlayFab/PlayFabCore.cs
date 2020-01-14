@@ -19,6 +19,7 @@ using Random = UnityEngine.Random;
 
 using PlayFab;
 using PlayFab.ClientModels;
+using PlayFab.SharedModels;
 
 namespace Game
 {
@@ -77,7 +78,7 @@ namespace Game
             }
 
             public abstract class Request<TRequest> : Request<TRequest, LoginResult>
-                where TRequest : class, new()
+                where TRequest : PlayFabRequestCommon, new()
             {
                 public override TRequest GenerateRequest()
                 {
@@ -109,14 +110,14 @@ namespace Game
                 Register(Facebook);
             }
 
-            protected virtual void Register<TRequest>(Request<TRequest> request)
-                where TRequest : class, new()
+            protected virtual void Register<TRequest>(Request<TRequest> element)
+                where TRequest : PlayFabRequestCommon, new()
             {
-                request.OnResponse += ResponseCallback;
+                element.OnResponse += ResponseCallback;
 
-                request.OnResult += ResultCallback;
+                element.OnResult += ResultCallback;
 
-                request.OnError += ErrorCallback;
+                element.OnError += ErrorCallback;
             }
 
             #region Events
@@ -361,13 +362,74 @@ namespace Game
                 }
             }
 
+            [SerializeField]
+            protected LinkProperty link;
+            public LinkProperty Link { get { return link; } }
+            [Serializable]
+            public class LinkProperty : Property
+            {
+                public FacebookRequest Facebook { get; protected set; }
+                public class FacebookRequest : Request<LinkFacebookAccountRequest, LinkFacebookAccountResult>
+                {
+                    public override MethodDelegate Method => PlayFabClientAPI.LinkFacebookAccount;
+
+                    public virtual void Request(string token)
+                    {
+                        var request = GenerateRequest();
+
+                        request.AccessToken = token;
+
+                        Send(request);
+                    }
+                }
+                public override void Configure(PlayFabCore reference)
+                {
+                    base.Configure(reference);
+
+                    Facebook = new FacebookRequest();
+                    Register(Facebook);
+                }
+
+                protected virtual void Register<TRequest, TResult>(Request<TRequest, TResult> element)
+                    where TRequest : PlayFabRequestCommon, new()
+                    where TResult : PlayFabResultCommon
+                {
+                    element.OnResponse += ResponseCallback;
+
+                    element.OnResult += ResultCallback;
+
+                    element.OnError += ErrorCallback;
+                }
+
+                #region Events
+                public event RestDelegates.Response<PlayFabResultCommon, PlayFabError> OnResponse;
+                void ResponseCallback(PlayFabResultCommon result, PlayFabError error)
+                {
+                    OnResponse?.Invoke(result, error);
+                }
+
+                public event RestDelegates.Result<PlayFabResultCommon> OnResult;
+                void ResultCallback(PlayFabResultCommon result)
+                {
+                    OnResult?.Invoke(result);
+                }
+
+                public event RestDelegates.Error<PlayFabError> OnError;
+                void ErrorCallback(PlayFabError error)
+                {
+                    OnError?.Invoke(error);
+                }
+                #endregion
+            }
+
             public override void Configure(PlayFabCore reference)
             {
                 base.Configure(reference);
 
-                Register(PlayFab, Profile);
+                Register(PlayFab, profile);
                 Register(PlayFab, statistics);
                 Register(PlayFab, info);
+                Register(PlayFab, link);
             }
         }
 
@@ -378,8 +440,8 @@ namespace Game
         }
 
         public abstract class Request<TRequest, TResult>
-            where TRequest : class, new()
-            where TResult : class
+            where TRequest : PlayFabRequestCommon, new()
+            where TResult : PlayFabResultCommon
         {
             public delegate void MethodDelegate(TRequest request, Action<TResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null);
 
@@ -443,10 +505,10 @@ namespace Game
 
     public class RestDelegates
     {
-        public delegate void ResultCallback<TResult>(TResult result);
+        public delegate void Result<TResult>(TResult result);
 
-        public delegate void ErrorCallback<TError>(TError error);
+        public delegate void Error<TError>(TError error);
 
-        public delegate void ResponseCallback<TResult, TError>(TResult result, TError error);
+        public delegate void Response<TResult, TError>(TResult result, TError error);
     }
 }

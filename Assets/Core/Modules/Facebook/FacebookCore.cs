@@ -43,7 +43,7 @@ namespace Game
                 FB.LogInWithReadPermissions(Permissions, ResultCallback);
             }
 
-            public event RestDelegates.ResultCallback<ILoginResult> OnResult;
+            public event RestDelegates.Result<ILoginResult> OnResult;
             void ResultCallback(ILoginResult result)
             {
                 OnResult?.Invoke(result);

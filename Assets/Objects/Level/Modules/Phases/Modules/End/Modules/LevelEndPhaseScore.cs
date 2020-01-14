@@ -105,7 +105,7 @@ namespace Game
             Core.Procedures.Login.OnResponse += ResponseCallback;
             Core.Procedures.Login.Procedure.Require();
 
-            void ResponseCallback(string error)
+            void ResponseCallback(ProceduresCore.LoginProperty.Element result, string error)
             {
                 Core.Procedures.Login.OnResponse -= ResponseCallback;
 

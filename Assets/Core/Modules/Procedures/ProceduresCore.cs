@@ -19,241 +19,19 @@ using Random = UnityEngine.Random;
 
 using PlayFab;
 using PlayFab.ClientModels;
+using PlayFab.SharedModels;
 
 namespace Game
 {
-	public class ProceduresCore : Core.Module
+	public partial class ProceduresCore : Core.Module
 	{
         [SerializeField]
         protected LoginProperty login;
         public LoginProperty Login { get { return login; } }
-        [Serializable]
-        public class LoginProperty : Property
-        {
-            [SerializeField]
-            protected bool auto;
-            public bool Auto { get { return auto; } }
 
-            public bool IsComplete => Core.PlayFab.IsLoggedIn;
-
-            [SerializeField]
-            protected CustomIDElement customID;
-            public CustomIDElement CustomID { get { return customID; } }
-            [Serializable]
-            public class CustomIDElement : Element
-            {
-                [SerializeField]
-                protected StringToggleValue _IDOverride;
-                public StringToggleValue IDOverride { get { return _IDOverride; } }
-
-                public override LoginMethod Method => LoginMethod.CustomID;
-
-                public override void Start()
-                {
-                    base.Start();
-
-                    var ID = SystemInfo.deviceUniqueIdentifier;
-
-#if UNITY_EDITOR
-                    ID = IDOverride.Evaluate(ID);
-#endif
-
-                    PlayFabLogin(ID);
-                }
-
-                void PlayFabLogin(string ID)
-                {
-                    PlayFab.Login.CustomID.OnResponse += Callback;
-                    PlayFab.Login.CustomID.Request(ID);
-
-                    void Callback(LoginResult result, PlayFabError error)
-                    {
-                        PlayFab.Login.CustomID.OnResponse -= Callback;
-
-                        if (error == null)
-                        {
-                            End();
-                        }
-                        else
-                        {
-                            InvokeError(error.ErrorMessage);
-                        }
-                    }
-                }
-            }
-
-            [SerializeField]
-            protected FacebookElement facebook;
-            public FacebookElement Facebook { get { return facebook; } }
-            [Serializable]
-            public class FacebookElement : Element
-            {
-                public override LoginMethod Method => LoginMethod.Facebook;
-
-                public override void Start()
-                {
-                    base.Start();
-
-                    if(Core.Facebook.Active == false)
-                    {
-                        FacebookActivation();
-                    }
-                    else if(Core.Facebook.Login.Active == false)
-                    {
-                        FacebookLogin();
-                    }
-                    else
-                    {
-                        PlayFabLogin(Core.Facebook.Login.AccessToken.TokenString);
-                    }
-                }
-
-                void FacebookActivation()
-                {
-                    Core.Facebook.ActivateCallback += Callback;
-                    Core.Facebook.Activate();
-
-                    void Callback()
-                    {
-                        FacebookLogin();
-                    }
-                }
-
-                void FacebookLogin()
-                {
-                    Core.Facebook.Login.OnResult += Callback;
-                    Core.Facebook.Login.Request();
-
-                    void Callback(Facebook.Unity.ILoginResult result)
-                    {
-                        Core.Facebook.Login.OnResult -= Callback;
-
-                        if (result == null) //No Response
-                            InvokeError("No Response Recieved");
-                        else if (result.Cancelled) //Canceled
-                            InvokeError("Login Canceled");
-                        else if (string.IsNullOrEmpty(result.Error) == false) //Error
-                            InvokeError(result.Error);
-                        else
-                            PlayFabLogin(result.AccessToken.TokenString);
-                    }
-                }
-
-                void PlayFabLogin(string token)
-                {
-                    PlayFab.Login.Facebook.OnResponse += PlayFabLoginCallback;
-                    PlayFab.Login.Facebook.Request(token);
-
-                    void PlayFabLoginCallback(LoginResult result, PlayFabError error)
-                    {
-                        PlayFab.Login.Facebook.OnResponse += PlayFabLoginCallback;
-
-                        if (error == null)
-                            End();
-                        else
-                            InvokeError(error.ErrorMessage);
-                    }
-                }
-            }
-
-            public Element Procedure => Find(Method);
-
-            public List<Element> List { get; protected set; }
-
-            public virtual Element Find(LoginMethod method)
-            {
-                for (int i = 0; i < List.Count; i++)
-                    if (List[i].Method == method)
-                        return List[i];
-
-                return null;
-            }
-
-            public LoginMethod Method
-            {
-                get
-                {
-                    return LoginMethod.Facebook;
-                }
-                set
-                {
-                    //TODO
-
-                    Debug.LogWarning("Setting Login Method: " + value + ", Please Implement");
-                }
-            }
-
-            public abstract class Element : ProceduresCore.Element
-            {
-                public LoginProperty Login => Procedures.Login;
-
-                public PlayFabCore PlayFab => Core.PlayFab;
-
-                public abstract LoginMethod Method { get; }
-
-                public virtual void Require()
-                {
-                    Core.UI.Popup.Show("Loggin In");
-
-                    OnResponse += Callback;
-                    Request();
-
-                    void Callback(string error)
-                    {
-                        OnResponse -= Callback;
-
-                        if (error == null)
-                        {
-                            Core.UI.Popup.Hide();
-                        }
-                        else
-                        {
-                            Core.UI.Popup.Show(error, "Okay");
-                        }
-                    }
-                }
-            }
-
-            public override void Configure(ProceduresCore reference)
-            {
-                base.Configure(reference);
-
-                List = new List<Element>();
-
-                List.Add(customID);
-                List.Add(facebook);
-
-                for (int i = 0; i < List.Count; i++)
-                    Register(List[i]);
-            }
-
-            public virtual void Register(Element element)
-            {
-                Register(Procedures, element);
-
-                element.OnResponse += (string error)=> ResponseCallback(element, error);
-            }
-
-            public override void Init()
-            {
-                base.Init();
-
-                if (auto) Procedure.Request();
-            }
-
-            #region Events
-            public RestDelegates.ErrorCallback<string> OnResponse;
-            private void ResponseCallback(Element element, string error)
-            {
-                if(error == null)
-                {
-                    Method = element.Method;
-                }
-
-                OnResponse?.Invoke(error);
-            }
-            #endregion
-        }
+        [SerializeField]
+        protected LinkProperty link;
+        public LinkProperty Link { get { return link; } }
 
         [SerializeField]
         protected UpdateDisplayNameProcedure updateDisplayName;
@@ -369,26 +147,18 @@ namespace Game
             
             public virtual void RelyOn(Element element, ResponseDelegate callback)
             {
-                element.OnResponse += RelayCallback;
+                element.OnResponse += Callback;
+                element.Request();
 
-                if (element.IsProcessing)
+                void Callback(string error)
                 {
-                    //Just simply wait for that requirement to finish
-                }
-                else
-                {
-                    element.Start();
-                }
-
-                void RelayCallback(string error)
-                {
-                    element.OnResponse -= RelayCallback;
+                    element.OnResponse -= Callback;
 
                     callback(error);
                 }
             }
 
-            public event RestDelegates.ErrorCallback<string> OnError;
+            public event RestDelegates.Error<string> OnError;
             public virtual void InvokeError(string error)
             {
                 IsProcessing = false;
@@ -431,12 +201,8 @@ namespace Game
             base.Configure(reference);
 
             Register(this, login);
+            Register(this, link);
             Register(this, updateDisplayName);
         }
-    }
-
-    public enum LoginMethod
-    {
-        CustomID, Facebook
     }
 }

@@ -117,13 +117,13 @@ namespace Game
                 InvokeUpdate();
             }
 
-            public event RestDelegates.ResultCallback<IList<LeaderboardElement>> OnUpdate;
+            public event RestDelegates.Result<IList<LeaderboardElement>> OnUpdate;
             protected virtual void InvokeUpdate()
             {
                 OnUpdate?.Invoke(List);
             }
 
-            public event RestDelegates.ErrorCallback<PlayFabError> OnError;
+            public event RestDelegates.Error<PlayFabError> OnError;
             protected virtual void ErrorCallback(PlayFabError error)
             {
                 OnError?.Invoke(error);
@@ -161,7 +161,7 @@ namespace Game
                     ResponseAction(request, result, error);
             }
 
-            public event RestDelegates.ResponseCallback<IList<LeaderboardElement>, PlayFabError> OnResponse;
+            public event RestDelegates.Response<IList<LeaderboardElement>, PlayFabError> OnResponse;
             protected virtual void ResponseAction(TRequest request, TResult result, PlayFabError error)
             {
                 if (error == null)
@@ -284,7 +284,7 @@ namespace Game
             UpdateAction(list);
         }
 
-        public event RestDelegates.ErrorCallback<PlayFabError> OnError;
+        public event RestDelegates.Error<PlayFabError> OnError;
         protected virtual void ErrorCallback(PlayFabError error)
         {
             OnError?.Invoke(error);
@@ -305,7 +305,7 @@ namespace Game
             InvokeUpdate();
         }
 
-        public event RestDelegates.ResultCallback<LeaderboardModule> OnUpdate;
+        public event RestDelegates.Result<LeaderboardModule> OnUpdate;
         protected virtual void InvokeUpdate()
         {
             OnUpdate?.Invoke(this);
