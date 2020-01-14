@@ -102,33 +102,25 @@ namespace Game
 
         private void RequireLogin()
         {
-            Core.Procedures.Login.OnResponse += ResponseCallback;
-            Core.Procedures.Login.Procedure.Require();
+            SingleSubscribe.Execute(Core.Procedures.Login.OnResponse, Callback);
+            Core.Procedures.Login.Require();
 
-            void ResponseCallback(ProceduresCore.LoginProperty.Element result, string error)
+            void Callback(ProceduresCore.LoginProperty.Element result, string error)
             {
-                Core.Procedures.Login.OnResponse -= ResponseCallback;
-
                 if(error == null)
-                {
                     ProcessManualSubmit();
-                }
             }
         }
 
         private void RequestDisplayNameUpdate()
         {
+            SingleSubscribe.Execute(Core.Procedures.UpdateDisplayName.OnResponse, Callback);
             Core.Procedures.UpdateDisplayName.Request();
-            Core.Procedures.UpdateDisplayName.OnResponse += ResponseCallback;
 
-            void ResponseCallback(string error)
+            void Callback(string error)
             {
-                Core.Procedures.UpdateDisplayName.OnResponse -= ResponseCallback;
-
                 if (error == null)
-                {
                     ProcessManualSubmit();
-                }
             }
         }
 

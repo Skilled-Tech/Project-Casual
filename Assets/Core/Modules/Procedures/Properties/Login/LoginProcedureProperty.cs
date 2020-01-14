@@ -21,6 +21,8 @@ using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.SharedModels;
 
+using UnityEngine.Events;
+
 namespace Game
 {
     public partial class ProceduresCore
@@ -61,21 +63,15 @@ namespace Game
 
                 void PlayFabLogin(string ID)
                 {
-                    PlayFab.Login.CustomID.OnResponse += Callback;
+                    SingleSubscribe.Execute(PlayFab.Login.CustomID.OnResponse, Callback);
                     PlayFab.Login.CustomID.Request(ID);
 
                     void Callback(LoginResult result, PlayFabError error)
                     {
-                        PlayFab.Login.CustomID.OnResponse -= Callback;
-
                         if (error == null)
-                        {
                             End();
-                        }
                         else
-                        {
                             InvokeError(error.ErrorMessage);
-                        }
                     }
                 }
             }
@@ -108,7 +104,7 @@ namespace Game
 
                 void FacebookActivation()
                 {
-                    Core.Facebook.ActivateCallback += Callback;
+                    SingleSubscribe.Execute(Core.Facebook.OnActivate, Callback);
                     Core.Facebook.Activate();
 
                     void Callback()
@@ -119,13 +115,11 @@ namespace Game
 
                 void FacebookLogin()
                 {
-                    Core.Facebook.Login.OnResult += Callback;
+                    SingleSubscribe.Execute(Core.Facebook.Login.OnResult, Callback);
                     Core.Facebook.Login.Request();
 
                     void Callback(Facebook.Unity.ILoginResult result)
                     {
-                        Core.Facebook.Login.OnResult -= Callback;
-
                         if (result == null) //No Response
                             InvokeError("No Response Recieved");
                         else if (result.Cancelled) //Canceled
@@ -139,13 +133,11 @@ namespace Game
 
                 void PlayFabLogin(string token)
                 {
-                    PlayFab.Login.Facebook.OnResponse += Callback;
+                    SingleSubscribe.Execute(PlayFab.Login.Facebook.OnResponse, Callback);
                     PlayFab.Login.Facebook.Request(token);
 
                     void Callback(LoginResult result, PlayFabError error)
                     {
-                        PlayFab.Login.Facebook.OnResponse += Callback;
-
                         if (error == null)
                             End();
                         else
@@ -194,21 +186,15 @@ namespace Game
                 {
                     Core.UI.Popup.Show("Loggin In");
 
-                    OnResponse += Callback;
+                    SingleSubscribe.Execute(OnResponse, Callback);
                     Request();
 
                     void Callback(string error)
                     {
-                        OnResponse -= Callback;
-
                         if (error == null)
-                        {
                             Core.UI.Popup.Hide();
-                        }
                         else
-                        {
                             Core.UI.Popup.Show(error, "Okay");
-                        }
                     }
                 }
             }
@@ -222,10 +208,10 @@ namespace Game
                 Register(customID);
                 Register(facebook);
 
-                Procedures.Link.OnEnd += LinkResultCallback;
+                Procedures.Link.OnEnd.AddListener(LinkResultCallback);
 
                 #if UNITY_EDITOR
-                Method = LoginMethod.CustomID;
+                Method = LoginMethod.CustomID; //TODO Remove
                 #endif
             }
 
@@ -235,9 +221,9 @@ namespace Game
 
                 Register(Procedures, element);
 
-                element.OnResponse += (string error) => ResponseCallback(element, error);
-                element.OnEnd += () => EndCallback(element);
-                element.OnError += ErrorCallback;
+                element.OnResponse.AddListener((string error) => ResponseCallback(element, error));
+                element.OnEnd.AddListener(() => EndCallback(element));
+                element.OnError.AddListener(ErrorCallback);
             }
 
             public override void Init()
@@ -246,35 +232,53 @@ namespace Game
 
                 Debug.Log("Login Method: " + Method);
 
-                if (auto) Procedure.Request();
+                if (auto) Request();
             }
 
+            public virtual void Request() => Procedure.Request();
+            public virtual void Require() => Procedure.Require();
+            public virtual void Start() => Procedure.Start();
+
+            #region Callbacks
             private void LinkResultCallback(LinkProperty.Element result)
             {
                 Method = result.Method;
             }
+            #endregion
 
-#region Events
-            public event RestDelegates.Response<Element, string> OnResponse;
+            #region Events
+            public class ResponseEvent : UnityEvent<Element, string> { }
+            public ResponseEvent OnResponse { get; protected set; }
             void ResponseCallback(Element element, string error)
             {
-                OnResponse?.Invoke(element, error);
+                OnResponse.Invoke(element, error);
             }
 
-            public event RestDelegates.Result<Element> OnEnd;
+            public class EndEvent : UnityEvent<Element> { }
+            public EndEvent OnEnd { get; protected set; }
             void EndCallback(Element element)
             {
                 Method = element.Method;
 
-                OnEnd?.Invoke(element);
+                OnEnd.Invoke(element);
             }
 
-            public event RestDelegates.Error<string> OnError;
+            public class ErrorEvent : UnityEvent<string> { }
+            public ErrorEvent OnError { get; protected set; }
             void ErrorCallback(string error)
             {
-                OnError?.Invoke(error);
+                OnError.Invoke(error);
             }
-#endregion
+            #endregion
+
+            public LoginProperty()
+            {
+                OnResponse = new ResponseEvent();
+
+                OnEnd = new EndEvent();
+
+                OnError = new ErrorEvent();
+            }
         }
     }
 

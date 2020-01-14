@@ -21,6 +21,8 @@ using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.SharedModels;
 
+using UnityEngine.Events;
+
 namespace Game
 {
 	public partial class ProceduresCore : Core.Module
@@ -48,66 +50,48 @@ namespace Game
             {
                 base.Start();
 
-                if (Procedures.Login.IsComplete)
-                    DisplayTextInput();
-                else
-                {
-                    Popup.Show("Loggin In");
+                DisplayTextInput();
+            }
 
-                    RelyOn(Procedures.Login.Procedure, LoginResponse);
+            void DisplayTextInput()
+            {
+                TextInput.Show("Enter Display Name", Callback);
+
+                void Callback(string text)
+                {
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        InvokeError("Canceled");
+                    }
+                    else
+                    {
+                        RequestNameChange(text);
+                    }
                 }
             }
 
-            protected virtual void LoginResponse(string error)
+            void RequestNameChange(string name)
             {
-                if(error == null)
-                {
-                    Popup.Hide();
+                Popup.Show("Updating Profile Info");
 
-                    DisplayTextInput();
-                }
-                else
+                SingleSubscribe.Execute(PlayFab.Player.Info.UpdateDisplayName.OnResponse, Callback);
+                PlayFab.Player.Info.UpdateDisplayName.Request(name);
+
+                void Callback(UpdateUserTitleDisplayNameResult result, PlayFabError error)
                 {
-                    InvokeError(error);
+                    if (error == null)
+                        End();
+                    else
+                        Popup.Show(error.ErrorMessage, "Okay");
                 }
             }
 
-            protected virtual void DisplayTextInput()
+            protected override void End()
             {
-                TextInput.Show("Enter Display Name", TextInputCallback);
-            }
+                base.End();
 
-            protected virtual void TextInputCallback(string text)
-            {
-                if(string.IsNullOrEmpty(text))
-                {
-                    InvokeError("Canceled");
-                }
-                else
-                {
-                    Popup.Show("Updating Profile Info");
-
-                    PlayFab.Player.Info.UpdateDisplayName.OnResponse += UpdateDisplayNameResponseCallback;
-                    PlayFab.Player.Info.UpdateDisplayName.Request(text);
-                }
-            }
-
-            private void UpdateDisplayNameResponseCallback(UpdateUserTitleDisplayNameResult result, PlayFabError error)
-            {
-                PlayFab.Player.Info.UpdateDisplayName.OnResponse -= UpdateDisplayNameResponseCallback;
-
-                if(error == null)
-                {
-                    TextInput.Hide();
-
-                    Popup.Hide();
-
-                    End();
-                }
-                else
-                {
-                    Popup.Show(error.ErrorMessage, "Okay");
-                }
+                TextInput.Hide();
+                Popup.Hide();
             }
 
             public override void InvokeError(string error)
@@ -145,46 +129,51 @@ namespace Game
                 OnStart?.Invoke();
             }
             
-            public virtual void RelyOn(Element element, ResponseDelegate callback)
+            public virtual void RelyOn(Element element, Action<string> callback)
             {
-                element.OnResponse += Callback;
+                SingleSubscribe.Execute(element.OnResponse, callback);
+
                 element.Request();
-
-                void Callback(string error)
-                {
-                    element.OnResponse -= Callback;
-
-                    callback(error);
-                }
             }
 
-            public event RestDelegates.Error<string> OnError;
+            public class ErrorEvent : UnityEvent<string> { }
+            public ErrorEvent OnError { get; protected set; }
             public virtual void InvokeError(string error)
             {
                 IsProcessing = false;
 
                 Debug.LogError(error);
 
-                OnError?.Invoke(error);
+                OnError.Invoke(error);
 
                 Respond(error);
             }
 
-            public event Action OnEnd;
+            public class EndEvent : UnityEvent { }
+            public EndEvent OnEnd { get; protected set; }
             protected virtual void End()
             {
                 IsProcessing = false;
 
-                OnEnd?.Invoke();
+                OnEnd.Invoke();
 
                 Respond(null);
             }
 
-            public delegate void ResponseDelegate(string error);
-            public event ResponseDelegate OnResponse;
+            public class ResponseEvent : UnityEvent<string> { }
+            public ResponseEvent OnResponse { get; protected set; }
             protected virtual void Respond(string error)
             {
-                OnResponse?.Invoke(error);
+                OnResponse.Invoke(error);
+            }
+
+            public Element()
+            {
+                OnError = new ErrorEvent();
+
+                OnEnd = new EndEvent();
+
+                OnResponse = new ResponseEvent();
             }
         }
 

@@ -21,6 +21,8 @@ using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.SharedModels;
 
+using UnityEngine.Events;
+
 namespace Game
 {
 	public class PlayFabCore : Core.Module
@@ -113,49 +115,62 @@ namespace Game
             protected virtual void Register<TRequest>(Request<TRequest> element)
                 where TRequest : PlayFabRequestCommon, new()
             {
-                element.OnResponse += ResponseCallback;
+                element.OnResponse.AddListener(ResponseCallback);
 
-                element.OnResult += ResultCallback;
+                element.OnResult.AddListener(ResultCallback);
 
-                element.OnError += ErrorCallback;
+                element.OnError.AddListener(ErrorCallback);
+            }
+
+            public virtual void ShowRequirementPopup()
+            {
+                Core.UI.Popup.Show("You need to be logged in to perform this operation");
             }
 
             #region Events
-            public event CustomIDRequest.ResponseDelegate OnResponse;
+            public ResponseEvent OnResponse { get; protected set; }
+            public class ResponseEvent : UnityEvent<LoginResult, PlayFabError> { }
             void ResponseCallback(LoginResult result, PlayFabError error)
             {
-                OnResponse?.Invoke(result, error);
+                OnResponse.Invoke(result, error);
             }
 
-            public event CustomIDRequest.ResultDelegate OnResult;
+            public ResultEvent OnResult { get; protected set; }
+            public class ResultEvent : UnityEvent<LoginResult> { }
             void ResultCallback(LoginResult result)
             {
                 PlayFab.Player.Profile.Update(result);
 
-                OnResult?.Invoke(result);
+                OnResult.Invoke(result);
             }
 
-            public event CustomIDRequest.ErrorDelegate OnError;
+            public ErrorEvent OnError { get; protected set; }
+            public class ErrorEvent : UnityEvent<PlayFabError> { }
             void ErrorCallback(PlayFabError error)
             {
                 OnError?.Invoke(error);
             }
             #endregion
 
-            public virtual void ShowRequirementPopup()
+            public LoginProperty()
             {
-                Core.UI.Popup.Show("You need to be logged in to perform this operation");
+                OnResponse = new ResponseEvent();
+
+                OnResult = new ResultEvent();
+
+                OnError = new ErrorEvent();
             }
         }
 
-        public event Action OnLogout;
+        public class LogoutEvent : UnityEvent { }
+        public LogoutEvent OnLogout { get; protected set; } = new LogoutEvent();
         public virtual void Logout()
         {
             PlayFabAuthenticationAPI.ForgetAllCredentials();
 
             Player.Profile.Clear();
 
-            OnLogout?.Invoke();
+            OnLogout.Invoke();
         }
         #endregion
 
@@ -358,7 +373,7 @@ namespace Game
                     base.Configure(reference);
 
                     UpdateDisplayName = new UpdateDisplayNameRequest();
-                    UpdateDisplayName.OnResult += PlayFab.Player.Profile.Update;
+                    UpdateDisplayName.OnResult.AddListener(PlayFab.Player.Profile.Update);
                 }
             }
 
@@ -394,32 +409,44 @@ namespace Game
                     where TRequest : PlayFabRequestCommon, new()
                     where TResult : PlayFabResultCommon
                 {
-                    element.OnResponse += ResponseCallback;
+                    element.OnResponse.AddListener(ResponseCallback);
 
-                    element.OnResult += ResultCallback;
+                    element.OnResult.AddListener(ResultCallback);
 
-                    element.OnError += ErrorCallback;
+                    element.OnError.AddListener(ErrorCallback);
                 }
 
                 #region Events
-                public event RestDelegates.Response<PlayFabResultCommon, PlayFabError> OnResponse;
+                public ResponseEvent OnResponse { get; protected set; }
+                public class ResponseEvent : UnityEvent<PlayFabResultCommon, PlayFabError> { }
                 void ResponseCallback(PlayFabResultCommon result, PlayFabError error)
                 {
                     OnResponse?.Invoke(result, error);
                 }
 
-                public event RestDelegates.Result<PlayFabResultCommon> OnResult;
+                public ResultEvent OnResult { get; protected set; }
+                public class ResultEvent : UnityEvent<PlayFabResultCommon> { }
                 void ResultCallback(PlayFabResultCommon result)
                 {
-                    OnResult?.Invoke(result);
+                    OnResult.Invoke(result);
                 }
 
-                public event RestDelegates.Error<PlayFabError> OnError;
+                public ErrorEvent OnError { get; protected set; }
+                public class ErrorEvent : UnityEvent<PlayFabError> { }
                 void ErrorCallback(PlayFabError error)
                 {
-                    OnError?.Invoke(error);
+                    OnError.Invoke(error);
                 }
                 #endregion
+
+                public LinkProperty()
+                {
+                    OnResponse = new ResponseEvent();
+
+                    OnResult = new ResultEvent();
+
+                    OnError = new ErrorEvent();
+                }
             }
 
             public override void Configure(PlayFabCore reference)
@@ -447,7 +474,7 @@ namespace Game
 
             public abstract MethodDelegate Method { get; }
 
-            public static void Send(MethodDelegate method, TRequest request, ResponseDelegate callback)
+            public static void Send(MethodDelegate method, TRequest request, RestDelegates.Response<TResult, PlayFabError> callback)
             {
                 method.Invoke(request, ResultCallback, ErrorCallback);
 
@@ -464,33 +491,42 @@ namespace Game
             }
 
             #region Events
-            public delegate void ResultDelegate(TResult result);
-            public event ResultDelegate OnResult;
+            public ResultEvent OnResult { get; protected set; }
+            public class ResultEvent : UnityEvent<TResult> { }
             public virtual void ResultCallback(TResult result)
             {
-                if (OnResult != null) OnResult(result);
+                OnResult.Invoke(result);
 
                 Respond(result, null);
             }
 
-            public delegate void ErrorDelegate(PlayFabError error);
-            public event ErrorDelegate OnError;
+            public ErrorEvent OnError { get; protected set; }
+            public class ErrorEvent : UnityEvent<PlayFabError> { }
             public virtual void ErrorCallback(PlayFabError error)
             {
                 Debug.LogError(error.GenerateErrorReport());
 
-                if (OnError != null) OnError(error);
+                OnError.Invoke(error);
 
                 Respond(null, error);
             }
 
-            public delegate void ResponseDelegate(TResult result, PlayFabError error);
-            public event ResponseDelegate OnResponse;
+            public ResponseEvent OnResponse { get; protected set; }
+            public class ResponseEvent : UnityEvent<TResult, PlayFabError> { }
             public virtual void Respond(TResult result, PlayFabError error)
             {
-                if (OnResponse != null) OnResponse(result, error);
+                OnResponse.Invoke(result, error);
             }
             #endregion
+
+            public Request()
+            {
+                OnResult = new ResultEvent();
+
+                OnError = new ErrorEvent();
+
+                OnResponse = new ResponseEvent();
+            }
         }
 
         public override void Configure(Core reference)

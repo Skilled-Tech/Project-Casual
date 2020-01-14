@@ -21,6 +21,8 @@ using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.SharedModels;
 
+using UnityEngine.Events;
+
 namespace Game
 {
     public partial class ProceduresCore
@@ -56,7 +58,7 @@ namespace Game
 
                 void FacebookActivation()
                 {
-                    Core.Facebook.ActivateCallback += Callback;
+                    SingleSubscribe.Execute(Core.Facebook.OnActivate, Callback);
                     Core.Facebook.Activate();
 
                     void Callback()
@@ -67,13 +69,11 @@ namespace Game
 
                 void FacebookLogin()
                 {
-                    Core.Facebook.Login.OnResult += Callback;
+                    SingleSubscribe.Execute(Core.Facebook.Login.OnResult, Callback);
                     Core.Facebook.Login.Request();
 
                     void Callback(Facebook.Unity.ILoginResult result)
                     {
-                        Core.Facebook.Login.OnResult -= Callback;
-
                         if (result == null) //No Response
                             InvokeError("No Response Recieved");
                         else if (result.Cancelled) //Canceled
@@ -87,13 +87,11 @@ namespace Game
 
                 void PlayFabLink(string token)
                 {
-                    PlayFab.Player.Link.Facebook.OnResponse += Callback;
+                    SingleSubscribe.Execute(PlayFab.Player.Link.Facebook.OnResponse, Callback);
                     PlayFab.Player.Link.Facebook.Request(token);
 
                     void Callback(PlayFabResultCommon result, PlayFabError error)
                     {
-                        PlayFab.Player.Link.Facebook.OnResponse += Callback;
-
                         if (error == null)
                             End();
                         else
@@ -119,21 +117,15 @@ namespace Game
                 {
                     Core.UI.Popup.Show("Linking");
 
-                    OnResponse += Callback;
+                    SingleSubscribe.Execute(OnResponse, Callback);
                     Request();
 
                     void Callback(string error)
                     {
-                        OnResponse -= Callback;
-
                         if (error == null)
-                        {
                             Core.UI.Popup.Hide();
-                        }
                         else
-                        {
                             Core.UI.Popup.Show(error, "Okay");
-                        }
                     }
                 }
 
@@ -181,30 +173,81 @@ namespace Game
 
                 Register(Procedures, element);
 
-                element.OnResponse += (string error) => ResponseCallback(element, error);
-                element.OnEnd += () => EndCallback(element);
-                element.OnError += ErrorCallback;
+                element.OnResponse.AddListener((string error) => ResponseCallback(element, error));
+                element.OnEnd.AddListener(() => EndCallback(element));
+                element.OnError.AddListener(ErrorCallback);
             }
 
             #region Events
-            public event RestDelegates.Response<Element, string> OnResponse;
+            public class ResponseEvent : UnityEvent<Element, string> { }
+            public ResponseEvent OnResponse { get; protected set; }
             private void ResponseCallback(Element element, string error)
             {
                 OnResponse?.Invoke(element, error);
             }
 
-            public event RestDelegates.Result<Element> OnEnd;
+            public class EndEvent : UnityEvent<Element> { }
+            public EndEvent OnEnd { get; protected set; }
             void EndCallback(Element element)
             {
                 OnEnd?.Invoke(element);
             }
 
-            public event RestDelegates.Error<string> OnError;
+            public class ErrorEvent : UnityEvent<string> { }
+            public ErrorEvent OnError { get; protected set; }
             void ErrorCallback(string error)
             {
                 OnError?.Invoke(error);
             }
             #endregion
+
+            public LinkProperty()
+            {
+                OnResponse = new ResponseEvent();
+
+                OnEnd = new EndEvent();
+
+                OnError = new ErrorEvent();
+            }
+        }
+    }
+
+    public static class SingleSubscribe
+    {
+        public static void Execute(UnityEvent uEvent, Action callback)
+        {
+            uEvent.AddListener(Callback);
+
+            void Callback()
+            {
+                uEvent.RemoveListener(Callback);
+
+                callback();
+            }
+        }
+
+        public static void Execute<T1>(UnityEvent<T1> uEvent, Action<T1> callback)
+        {
+            uEvent.AddListener(Callback);
+
+            void Callback(T1 arg1)
+            {
+                uEvent.RemoveListener(Callback);
+
+                callback(arg1);
+            }
+        }
+
+        public static void Execute<T1, T2>(UnityEvent<T1, T2> uEvent, Action<T1, T2> callback)
+        {
+            uEvent.AddListener(Callback);
+
+            void Callback(T1 arg1, T2 arg2)
+            {
+                uEvent.RemoveListener(Callback);
+
+                callback(arg1, arg2);
+            }
         }
     }
 }
