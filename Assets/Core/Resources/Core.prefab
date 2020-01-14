@@ -831,8 +831,10 @@ MonoBehaviour:
     auto: 1
     customID:
       _IDOverride:
-        enabled: 0
-        value: 
+        enabled: 1
+        value: 42069
+  link: {}
+  facebook: {}
 --- !u!1 &6478464170344696841
 GameObject:
   m_ObjectHideFlags: 0

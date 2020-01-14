@@ -42,53 +42,29 @@ namespace Game
                 {
                     base.Start();
 
-                    if (Core.Facebook.Active == false)
-                    {
-                        FacebookActivation();
-                    }
-                    else if (Core.Facebook.Login.Active == false)
-                    {
-                        FacebookLogin();
-                    }
+                    if (Procedures.Facebook.Login.Complete)
+                        PlayFabLink();
                     else
-                    {
-                        PlayFabLink(Core.Facebook.Login.AccessToken.TokenString);
-                    }
-                }
-
-                void FacebookActivation()
-                {
-                    SingleSubscribe.Execute(Core.Facebook.OnActivate, Callback);
-                    Core.Facebook.Activate();
-
-                    void Callback()
-                    {
                         FacebookLogin();
-                    }
                 }
 
                 void FacebookLogin()
                 {
-                    SingleSubscribe.Execute(Core.Facebook.Login.OnResult, Callback);
-                    Core.Facebook.Login.Request();
+                    RelyOn(Procedures.Facebook.Login, Callback);
 
-                    void Callback(Facebook.Unity.ILoginResult result)
+                    void Callback(string error)
                     {
-                        if (result == null) //No Response
-                            InvokeError("No Response Recieved");
-                        else if (result.Cancelled) //Canceled
-                            InvokeError("Login Canceled");
-                        else if (string.IsNullOrEmpty(result.Error) == false) //Error
-                            InvokeError(result.Error);
+                        if (error == null)
+                            PlayFabLink();
                         else
-                            PlayFabLink(result.AccessToken.TokenString);
+                            InvokeError(error);
                     }
                 }
 
-                void PlayFabLink(string token)
+                void PlayFabLink()
                 {
                     SingleSubscribe.Execute(PlayFab.Player.Link.Facebook.OnResponse, Callback);
-                    PlayFab.Player.Link.Facebook.Request(token);
+                    PlayFab.Player.Link.Facebook.Request(Core.Facebook.Login.AccessToken.TokenString);
 
                     void Callback(PlayFabResultCommon result, PlayFabError error)
                     {
@@ -96,7 +72,7 @@ namespace Game
                             End();
                         else
                         {
-                            if(error.Error == PlayFabErrorCode.LinkedAccountAlreadyClaimed) //Login instead if the account is already claimed
+                            if (error.Error == PlayFabErrorCode.LinkedAccountAlreadyClaimed) //Login instead if the account is already claimed
                                 LoginToExistantAccount();
                             else
                                 InvokeError(error.ErrorMessage);
@@ -115,7 +91,7 @@ namespace Game
 
                 public virtual void Require()
                 {
-                    Core.UI.Popup.Show("Linking");
+                    Popup.Show("Linking");
 
                     SingleSubscribe.Execute(OnResponse, Callback);
                     Request();
@@ -123,14 +99,41 @@ namespace Game
                     void Callback(string error)
                     {
                         if (error == null)
-                            Core.UI.Popup.Hide();
+                        {
+                            if (Popup.Element.Visible) Popup.Hide();
+                        }
                         else
-                            Core.UI.Popup.Show(error, "Okay");
+                        {
+                            Popup.Show(error, "Okay");
+                        }
+                    }
+                }
+
+                protected virtual void PromtToExistantLogin()
+                {
+                    Popup.Hide();
+
+                    Choice.Show("This Link was used for an Existing Account, Would You Like To Login to That Account ?", Callback);
+
+                    void Callback(bool agree)
+                    {
+                        if (agree)
+                            LoginToExistantAccount();
+                        else
+                            InvokeError("Link Canceled");
                     }
                 }
 
                 protected virtual void LoginToExistantAccount()
                 {
+                    Popup.Text = "Logging In";
+
+                    var previousData = new
+                    {
+                        playfabID = Core.PlayFab.Player.Profile.ID,
+                        customID = Procedures.Login.CustomID.ID
+                    };
+
                     PlayFab.Logout();
 
                     RelyOn(Procedures.Login[Method], Callback);
@@ -138,13 +141,22 @@ namespace Game
                     void Callback(string error)
                     {
                         if (error == null)
+                        {
+                            if(Core.PlayFab.Player.Profile.ID != previousData.playfabID)
+                            {
+                                Debug.Log("Clearing out old account");
+                                Core.PlayFab.Player.Clear.Request(previousData.playfabID, previousData.customID);
+                            }
+
                             End();
+                        }
                         else
                             InvokeError(error);
                     }
                 }
             }
 
+            #region List
             public List<Element> List { get; protected set; }
 
             public Element this[LoginMethod method] => Find(method);
@@ -157,6 +169,7 @@ namespace Game
 
                 return null;
             }
+            #endregion
 
             public override void Configure(ProceduresCore reference)
             {

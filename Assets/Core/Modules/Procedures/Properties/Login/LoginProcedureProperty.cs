@@ -46,22 +46,29 @@ namespace Game
                 protected StringToggleValue _IDOverride;
                 public StringToggleValue IDOverride { get { return _IDOverride; } }
 
+                public string ID
+                {
+                    get
+                    {
+#if UNITY_EDITOR
+                        if (IDOverride.Enabled)
+                            return IDOverride.Value;
+#endif
+
+                        return SystemInfo.deviceUniqueIdentifier;
+                    }
+                }
+
                 public override LoginMethod Method => LoginMethod.CustomID;
 
                 public override void Start()
                 {
                     base.Start();
 
-                    var ID = SystemInfo.deviceUniqueIdentifier;
-
-#if UNITY_EDITOR
-                    ID = IDOverride.Evaluate(ID);
-#endif
-
-                    PlayFabLogin(ID);
+                    PlayFabLogin();
                 }
 
-                void PlayFabLogin(string ID)
+                void PlayFabLogin()
                 {
                     SingleSubscribe.Execute(PlayFab.Login.CustomID.OnResponse, Callback);
                     PlayFab.Login.CustomID.Request(ID);
@@ -88,53 +95,29 @@ namespace Game
                 {
                     base.Start();
 
-                    if (Core.Facebook.Active == false)
-                    {
-                        FacebookActivation();
-                    }
-                    else if (Core.Facebook.Login.Active == false)
-                    {
-                        FacebookLogin();
-                    }
+                    if (Procedures.Facebook.Login.Complete)
+                        PlayFabLogin();
                     else
-                    {
-                        PlayFabLogin(Core.Facebook.Login.AccessToken.TokenString);
-                    }
-                }
-
-                void FacebookActivation()
-                {
-                    SingleSubscribe.Execute(Core.Facebook.OnActivate, Callback);
-                    Core.Facebook.Activate();
-
-                    void Callback()
-                    {
                         FacebookLogin();
-                    }
                 }
 
                 void FacebookLogin()
                 {
-                    SingleSubscribe.Execute(Core.Facebook.Login.OnResult, Callback);
-                    Core.Facebook.Login.Request();
+                    RelyOn(Procedures.Facebook.Login, Callback);
 
-                    void Callback(Facebook.Unity.ILoginResult result)
+                    void Callback(string error)
                     {
-                        if (result == null) //No Response
-                            InvokeError("No Response Recieved");
-                        else if (result.Cancelled) //Canceled
-                            InvokeError("Login Canceled");
-                        else if (string.IsNullOrEmpty(result.Error) == false) //Error
-                            InvokeError(result.Error);
+                        if (error == null)
+                            PlayFabLogin();
                         else
-                            PlayFabLogin(result.AccessToken.TokenString);
+                            InvokeError(error);
                     }
                 }
 
-                void PlayFabLogin(string token)
+                void PlayFabLogin()
                 {
                     SingleSubscribe.Execute(PlayFab.Login.Facebook.OnResponse, Callback);
-                    PlayFab.Login.Facebook.Request(token);
+                    PlayFab.Login.Facebook.Request(Core.Facebook.Login.AccessToken.TokenString);
 
                     void Callback(LoginResult result, PlayFabError error)
                     {
@@ -146,8 +129,7 @@ namespace Game
                 }
             }
 
-            public Element Procedure => Find(Method);
-
+#region List
             public List<Element> List { get; protected set; }
 
             public Element this[LoginMethod method] => Find(method);
@@ -159,6 +141,32 @@ namespace Game
                         return List[i];
 
                 return null;
+            }
+#endregion
+
+            public abstract class Element : ProceduresCore.Element
+            {
+                public LoginProperty Login => Procedures.Login;
+
+                public PlayFabCore PlayFab => Core.PlayFab;
+
+                public abstract LoginMethod Method { get; }
+
+                public virtual void Require()
+                {
+                    Popup.Show("Loggin In");
+
+                    SingleSubscribe.Execute(OnResponse, Callback);
+                    Request();
+
+                    void Callback(string error)
+                    {
+                        if (error == null)
+                            Popup.Hide();
+                        else
+                            Popup.Show(error, "Okay");
+                    }
+                }
             }
 
             public LoginMethod Method
@@ -174,30 +182,7 @@ namespace Game
             }
             public const string MethodID = "Login Method";
 
-            public abstract class Element : ProceduresCore.Element
-            {
-                public LoginProperty Login => Procedures.Login;
-
-                public PlayFabCore PlayFab => Core.PlayFab;
-
-                public abstract LoginMethod Method { get; }
-
-                public virtual void Require()
-                {
-                    Core.UI.Popup.Show("Loggin In");
-
-                    SingleSubscribe.Execute(OnResponse, Callback);
-                    Request();
-
-                    void Callback(string error)
-                    {
-                        if (error == null)
-                            Core.UI.Popup.Hide();
-                        else
-                            Core.UI.Popup.Show(error, "Okay");
-                    }
-                }
-            }
+            public Element Procedure => Find(Method);
 
             public override void Configure(ProceduresCore reference)
             {
@@ -210,9 +195,9 @@ namespace Game
 
                 Procedures.Link.OnEnd.AddListener(LinkResultCallback);
 
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 Method = LoginMethod.CustomID; //TODO Remove
-                #endif
+#endif
             }
 
             public virtual void Register(Element element)
@@ -239,14 +224,14 @@ namespace Game
             public virtual void Require() => Procedure.Require();
             public virtual void Start() => Procedure.Start();
 
-            #region Callbacks
+#region Callbacks
             private void LinkResultCallback(LinkProperty.Element result)
             {
                 Method = result.Method;
             }
-            #endregion
+#endregion
 
-            #region Events
+#region Events
             public class ResponseEvent : UnityEvent<Element, string> { }
             public ResponseEvent OnResponse { get; protected set; }
             void ResponseCallback(Element element, string error)
@@ -269,7 +254,7 @@ namespace Game
             {
                 OnError.Invoke(error);
             }
-            #endregion
+#endregion
 
             public LoginProperty()
             {

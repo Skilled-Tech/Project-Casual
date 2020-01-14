@@ -449,6 +449,33 @@ namespace Game
                 }
             }
 
+            public ClearRequest Clear { get; protected set; }
+            public class ClearRequest : CloudScriptRequest
+            {
+                public override string FunctionName => "ClearPlayer";
+
+                public virtual void Request(string playfabID, string customID)
+                {
+                    var request = GenerateRequest();
+
+                    request.FunctionParameter = new ParametersData(playfabID, customID);
+
+                    Send(request);
+                }
+
+                struct ParametersData
+                {
+                    public string playfabID;
+                    public string customID;
+
+                    public ParametersData(string playfabID, string customID)
+                    {
+                        this.playfabID = playfabID;
+                        this.customID = customID;
+                    }
+                }
+            }
+
             public override void Configure(PlayFabCore reference)
             {
                 base.Configure(reference);
@@ -457,6 +484,8 @@ namespace Game
                 Register(PlayFab, statistics);
                 Register(PlayFab, info);
                 Register(PlayFab, link);
+
+                Clear = new ClearRequest();
             }
         }
 
@@ -466,6 +495,21 @@ namespace Game
             public PlayFabCore PlayFab => Reference;
         }
 
+        public abstract class CloudScriptRequest : Request<ExecuteCloudScriptRequest, ExecuteCloudScriptResult>
+        {
+            public override MethodDelegate Method => PlayFabClientAPI.ExecuteCloudScript;
+
+            public abstract string FunctionName { get; }
+
+            public override ExecuteCloudScriptRequest GenerateRequest()
+            {
+                var request = base.GenerateRequest();
+
+                request.FunctionName = FunctionName;
+
+                return request;
+            }
+        }
         public abstract class Request<TRequest, TResult>
             where TRequest : PlayFabRequestCommon, new()
             where TResult : PlayFabResultCommon

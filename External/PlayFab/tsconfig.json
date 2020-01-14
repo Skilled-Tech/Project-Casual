@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "none",
+        "sourceMap": false,
+        "strict": true,
+        "alwaysStrict": true,
+        "outFile": "CloudScript.js"
+    }
+}

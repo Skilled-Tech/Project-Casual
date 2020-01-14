@@ -36,6 +36,65 @@ namespace Game
         public LinkProperty Link { get { return link; } }
 
         [SerializeField]
+        protected FacebookProperty facebook;
+        public FacebookProperty Facebook { get { return facebook; } }
+        [Serializable]
+        public class FacebookProperty : Property
+        {
+            [SerializeField]
+            protected LoginElement login;
+            public LoginElement Login { get { return login; } }
+            [Serializable]
+            public class LoginElement : Element
+            {
+                public bool Complete => Core.Facebook.Login.Active;
+
+                public override void Start()
+                {
+                    base.Start();
+
+                    if (Core.Facebook.Active == false)
+                        Activation();
+                    else if (Core.Facebook.Login.Active == false)
+                        Login();
+                    else
+                        End();
+                }
+
+                void Activation()
+                {
+                    SingleSubscribe.Execute(Core.Facebook.OnActivate, Login);
+                    Core.Facebook.Activate();
+                }
+
+                void Login()
+                {
+                    SingleSubscribe.Execute(Core.Facebook.Login.OnResult, Callback);
+                    Core.Facebook.Login.Request();
+
+                    void Callback(Facebook.Unity.ILoginResult result)
+                    {
+                        if (result == null) //No Response
+                            InvokeError("No Response Recieved");
+                        else if (result.Cancelled) //Canceled
+                            InvokeError("Login Canceled");
+                        else if (string.IsNullOrEmpty(result.Error) == false) //Error
+                            InvokeError(result.Error);
+                        else
+                            End();
+                    }
+                }
+            }
+
+            public override void Configure(ProceduresCore reference)
+            {
+                base.Configure(reference);
+
+                Register(Procedures, login);
+            }
+        }
+
+        [SerializeField]
         protected UpdateDisplayNameProcedure updateDisplayName;
         public UpdateDisplayNameProcedure UpdateDisplayName { get { return updateDisplayName; } }
         [Serializable]
@@ -43,7 +102,6 @@ namespace Game
         {
             public PlayFabCore PlayFab => Core.PlayFab;
 
-            public PopupUI Popup => Core.UI.Popup;
             public TextInputUI TextInput => Core.UI.TextInput;
 
             public override void Start()
@@ -94,13 +152,13 @@ namespace Game
                 Popup.Hide();
             }
 
-            public override void InvokeError(string error)
+            protected override void InvokeError(string error)
             {
                 base.InvokeError(error);
 
                 TextInput.Hide();
 
-                Core.UI.Popup.Show(error, "Okay");
+                Popup.Show(error, "Okay");
             }
         }
 
@@ -108,6 +166,10 @@ namespace Game
         public abstract class Element : Property
         {
             public bool IsProcessing { get; protected set; }
+
+            public PopupUI Popup => Core.UI.Popup;
+
+            public ChoiceUI Choice => Core.UI.Choice;
 
             public virtual void Request()
             {
@@ -138,9 +200,9 @@ namespace Game
 
             public class ErrorEvent : UnityEvent<string> { }
             public ErrorEvent OnError { get; protected set; }
-            public virtual void InvokeError(string error)
+            protected virtual void InvokeError(string error)
             {
-                IsProcessing = false;
+                Stop();
 
                 Debug.LogError(error);
 
@@ -149,11 +211,27 @@ namespace Game
                 Respond(error);
             }
 
+            protected virtual void Stop()
+            {
+                IsProcessing = false;
+            }
+
+            public class CancelEvent : UnityEvent { }
+            public CancelEvent OnCancel { get; protected set; }
+            protected virtual void Cancel()
+            {
+                Stop();
+
+                OnCancel.Invoke();
+
+                Respond(null);
+            }
+
             public class EndEvent : UnityEvent { }
             public EndEvent OnEnd { get; protected set; }
             protected virtual void End()
             {
-                IsProcessing = false;
+                Stop();
 
                 OnEnd.Invoke();
 
@@ -173,6 +251,8 @@ namespace Game
 
                 OnEnd = new EndEvent();
 
+                OnCancel = new CancelEvent();
+
                 OnResponse = new ResponseEvent();
             }
         }
@@ -191,6 +271,7 @@ namespace Game
 
             Register(this, login);
             Register(this, link);
+            Register(this, facebook);
             Register(this, updateDisplayName);
         }
     }

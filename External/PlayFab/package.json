@@ -1,0 +1,8 @@
+{
+	"scripts": {
+		"minify": "jsmin -o CloudScript.min.js CloudScript.js"
+	},
+	"dependencies": {
+		"jsmin": "^1.0.1"
+	}
+}
