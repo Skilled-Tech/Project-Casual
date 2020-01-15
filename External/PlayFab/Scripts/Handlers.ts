@@ -1,18 +1,18 @@
 handlers.ClearPlayer = function (args?: IClearPlayerArguments)
 {
-    if(args == null)
+    if (args == null)
     {
         log.error("No Arguments Passed");
         return;
     }
 
-    if(args.playfabID == null)
+    if (args.playfabID == null)
     {
         log.error("No PlayFabID Passed");
         return;
     }
 
-    if(args.customID == null)
+    if (args.customID == null)
     {
         log.error("No Custom ID Passed");
         return;
@@ -23,48 +23,48 @@ handlers.ClearPlayer = function (args?: IClearPlayerArguments)
         var profile = server.GetPlayerProfile(
             {
                 PlayFabId: args.playfabID,
-                ProfileConstraints : {
-                    ShowLinkedAccounts:true
+                ProfileConstraints: {
+                    ShowLinkedAccounts: true
                 }
             },
         ).PlayerProfile;
     }
-    catch(ex)
+    catch (ex)
     {
         let error = ex as IPlayFabError;
-        
-        if(error.apiErrorInfo?.apiError?.errorMessage != null) log.error(error.apiErrorInfo?.apiError?.errorMessage);
-        
+
+        if (error.apiErrorInfo?.apiError?.errorMessage != null) log.error(error.apiErrorInfo?.apiError?.errorMessage);
+
         return;
     }
 
-    if(profile == null)
+    if (profile == null)
     {
         log.error("No Player Profile Found");
         return;
     }
 
-    if(profile.LinkedAccounts == null || profile.LinkedAccounts.length == 0)
+    if (profile.LinkedAccounts == null || profile.LinkedAccounts.length == 0)
     {
         log.error("No Linked Accounts Found For Player");
         return;
     }
 
-    if(profile.LinkedAccounts.length > 1)
+    if (profile.LinkedAccounts.length > 1)
     {
         log.error("Cannot Clear Account with Multiple Linked Accounts");
         return;
     }
 
-    var ID = profile.LinkedAccounts.find((x)=>x.Platform == "Custom");
+    var ID = profile.LinkedAccounts.find((x) => x.Platform == "Custom");
 
-    if(ID == null)
+    if (ID == null)
     {
         log.error("Player Profile Has no Custom ID Link");
         return;
     }
 
-    if(ID.PlatformUserId != args.customID)
+    if (ID.PlatformUserId != args.customID)
     {
         log.error("Incorrect ID");
         return;
@@ -72,12 +72,12 @@ handlers.ClearPlayer = function (args?: IClearPlayerArguments)
 
     server.DeletePlayer(
         {
-            PlayFabId : args.playfabID
+            PlayFabId: args.playfabID
         }
     );
 }
 interface IClearPlayerArguments
 {
-    playfabID? : string;
-    customID? : string;
+    playfabID?: string;
+    customID?: string;
 }

@@ -46,20 +46,54 @@ namespace Game
                 protected StringToggleValue _IDOverride;
                 public StringToggleValue IDOverride { get { return _IDOverride; } }
 
-                public string ID
+                public IDData ID { get; protected set; } = new IDData();
+                public class IDData
                 {
-                    get
+                    public virtual string Value
                     {
-#if UNITY_EDITOR
-                        if (IDOverride.Enabled)
-                            return IDOverride.Value;
-#endif
+                        get
+                        {
+                            if (PlayerPrefs.HasKey(PlayerPrefID))
+                                return PlayerPrefs.GetString(PlayerPrefID);
+                            else
+                            {
+                                Generate();
 
-                        return SystemInfo.deviceUniqueIdentifier;
+                                return Value;
+                            }
+                        }
+                        set
+                        {
+                            PlayerPrefs.SetString(PlayerPrefID, value);
+                        }
+                    }
+
+                    public const string PlayerPrefID = "Custom Login ID";
+
+                    public virtual void Generate()
+                    {
+                        Debug.Log("Generating New Custom ID");
+
+                        Value = Guid.NewGuid().ToString("N");
                     }
                 }
 
                 public override LoginMethod Method => LoginMethod.CustomID;
+
+                public override void Configure(ProceduresCore reference)
+                {
+                    base.Configure(reference);
+
+                    Login.OnEnd.AddListener(LoginEndCallback);
+                }
+
+                void LoginEndCallback(Element element)
+                {
+                    if(element.Method != this.Method)
+                    {
+                        ID.Generate();
+                    }
+                }
 
                 public override void Start()
                 {
@@ -71,7 +105,7 @@ namespace Game
                 void PlayFabLogin()
                 {
                     SingleSubscribe.Execute(PlayFab.Login.CustomID.OnResponse, Callback);
-                    PlayFab.Login.CustomID.Request(ID);
+                    PlayFab.Login.CustomID.Request(ID.Value);
 
                     void Callback(LoginResult result, PlayFabError error)
                     {
@@ -129,7 +163,7 @@ namespace Game
                 }
             }
 
-#region List
+            #region List
             public List<Element> List { get; protected set; }
 
             public Element this[LoginMethod method] => Find(method);
@@ -142,7 +176,7 @@ namespace Game
 
                 return null;
             }
-#endregion
+            #endregion
 
             public abstract class Element : ProceduresCore.Element
             {

@@ -42,7 +42,9 @@ namespace Game
                 {
                     base.Start();
 
-                    if (Procedures.Facebook.Login.Complete)
+                    if (PlayFab.IsLoggedIn == false)
+                        InvokeError("Must Be Logged In To Link Account");
+                    else if (Procedures.Facebook.Login.Complete)
                         PlayFabLink();
                     else
                         FacebookLogin();
@@ -108,7 +110,7 @@ namespace Game
                         }
                     }
                 }
-
+                
                 protected virtual void PromtToExistantLogin()
                 {
                     Popup.Hide();
@@ -131,7 +133,7 @@ namespace Game
                     var previousData = new
                     {
                         playfabID = Core.PlayFab.Player.Profile.ID,
-                        customID = Procedures.Login.CustomID.ID
+                        customID = Procedures.Login.CustomID.ID.Value
                     };
 
                     PlayFab.Logout();
