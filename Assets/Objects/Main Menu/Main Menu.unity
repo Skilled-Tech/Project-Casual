@@ -239,11 +239,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 129452470}
     m_Modifications:
-    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
-        type: 3}
-      propertyPath: m_Name
-      value: Link Facebook
-      objectReference: {fileID: 0}
     - target: {fileID: 6991908327359174553, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -354,6 +349,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
+        type: 3}
+      propertyPath: m_Name
+      value: Link Facebook
+      objectReference: {fileID: 0}
     - target: {fileID: 6991908327359174555, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
       propertyPath: m_PixelsPerUnitMultiplier
@@ -387,7 +387,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 725351640}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6e44c7fc5b99d9428c27f307238f655, type: 3}
+  m_Script: {fileID: 11500000, guid: 3348bb6fd309fbf458efbca3d9a484e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   method: 1
@@ -398,10 +398,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2126494662}
     m_Modifications:
-    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
-      propertyPath: m_Name
+      propertyPath: m_Text
       value: Options
+      objectReference: {fileID: 0}
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+        type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6991908327359174553, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
@@ -508,15 +513,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
-      propertyPath: m_Text
+      propertyPath: m_Name
       value: Options
-      objectReference: {fileID: 0}
-    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
-        type: 3}
-      propertyPath: m_FontData.m_FontStyle
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 776c08730b0960c44b5acfe865993a8a, type: 3}
@@ -691,10 +691,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2126494662}
     m_Modifications:
-    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
-      propertyPath: m_Name
+      propertyPath: m_Text
       value: Credits
+      objectReference: {fileID: 0}
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+        type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6991908327359174553, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
@@ -801,15 +806,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
-      propertyPath: m_Text
+      propertyPath: m_Name
       value: Credits
-      objectReference: {fileID: 0}
-    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
-        type: 3}
-      propertyPath: m_FontData.m_FontStyle
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 776c08730b0960c44b5acfe865993a8a, type: 3}
@@ -1135,10 +1135,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2126494662}
     m_Modifications:
-    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
-      propertyPath: m_Name
+      propertyPath: m_Text
       value: Boards
+      objectReference: {fileID: 0}
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+        type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6991908327359174553, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
@@ -1245,15 +1250,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
-      propertyPath: m_Text
+      propertyPath: m_Name
       value: Boards
-      objectReference: {fileID: 0}
-    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
-        type: 3}
-      propertyPath: m_FontData.m_FontStyle
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 776c08730b0960c44b5acfe865993a8a, type: 3}
@@ -1617,10 +1617,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2126494662}
     m_Modifications:
-    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
+    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
-      propertyPath: m_Name
-      value: Play
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6991908327359174553, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
@@ -1727,10 +1727,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6991908326918729029, guid: 776c08730b0960c44b5acfe865993a8a,
+    - target: {fileID: 6991908327359174566, guid: 776c08730b0960c44b5acfe865993a8a,
         type: 3}
-      propertyPath: m_FontData.m_FontStyle
-      value: 1
+      propertyPath: m_Name
+      value: Play
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 776c08730b0960c44b5acfe865993a8a, type: 3}

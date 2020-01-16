@@ -43,16 +43,23 @@ namespace Game
             public class CustomIDElement : Element
             {
                 [SerializeField]
-                protected StringToggleValue _IDOverride;
-                public StringToggleValue IDOverride { get { return _IDOverride; } }
-
-                public IDData ID { get; protected set; } = new IDData();
+                protected IDData _ID;
+                public IDData ID { get { return _ID; } }
+                [Serializable]
                 public class IDData
                 {
+                    [SerializeField]
+                    protected StringToggleValue _override;
+                    public StringToggleValue Override { get { return _override; } }
+
                     public virtual string Value
                     {
                         get
                         {
+#if UNITY_EDITOR
+                            if (Override.Enabled) return Override.Value;
+#endif
+
                             if (PlayerPrefs.HasKey(PlayerPrefID))
                                 return PlayerPrefs.GetString(PlayerPrefID);
                             else

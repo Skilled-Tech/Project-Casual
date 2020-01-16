@@ -591,4 +591,43 @@ namespace Game
 
         public delegate void Response<TResult, TError>(TResult result, TError error);
     }
+
+    public static class SingleSubscribe
+    {
+        public static void Execute(UnityEvent uEvent, Action callback)
+        {
+            uEvent.AddListener(Callback);
+
+            void Callback()
+            {
+                uEvent.RemoveListener(Callback);
+
+                callback();
+            }
+        }
+
+        public static void Execute<T1>(UnityEvent<T1> uEvent, Action<T1> callback)
+        {
+            uEvent.AddListener(Callback);
+
+            void Callback(T1 arg1)
+            {
+                uEvent.RemoveListener(Callback);
+
+                callback(arg1);
+            }
+        }
+
+        public static void Execute<T1, T2>(UnityEvent<T1, T2> uEvent, Action<T1, T2> callback)
+        {
+            uEvent.AddListener(Callback);
+
+            void Callback(T1 arg1, T2 arg2)
+            {
+                uEvent.RemoveListener(Callback);
+
+                callback(arg1, arg2);
+            }
+        }
+    }
 }
