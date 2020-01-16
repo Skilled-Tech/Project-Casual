@@ -1,5 +1,5 @@
 {
-    "name": "PlayFabSDKEditor",
+    "name": "PlayFab-SDK-Editor",
     "references": [
         "PlayFab"
     ],

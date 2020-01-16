@@ -1,5 +1,5 @@
 {
-    "name": "PlayFabTestingEditor",
+    "name": "PlayFab-Testing-Editor",
     "references": [
         "PlayFab"
     ],
