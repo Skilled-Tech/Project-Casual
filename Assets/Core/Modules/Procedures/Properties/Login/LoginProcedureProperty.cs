@@ -81,6 +81,8 @@ namespace Game
 
             public bool IsProcessing => Procedure.IsProcessing;
 
+            [Header("Procedures")]
+
             [SerializeField]
             protected CustomIDElement customID;
             public CustomIDElement CustomID { get { return customID; } }
