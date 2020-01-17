@@ -31,9 +31,7 @@ namespace Game
         public LoginProperty Login { get; protected set; }
         public class LoginProperty : Property
         {
-            public bool Active => FB.IsLoggedIn;
-
-            public AccessToken AccessToken => AccessToken.CurrentAccessToken;
+            public bool Active => FB.IsLoggedIn && Facebook.HasAccessToken;
 
             public static readonly List<string> Permissions = new List<string>()
             {
@@ -49,9 +47,14 @@ namespace Game
             public ResultEvent OnResult { get; protected set; } = new ResultEvent();
             void ResultCallback(ILoginResult result)
             {
+                Facebook.AccessToken = result?.AccessToken;
+
                 OnResult.Invoke(result);
             }
         }
+
+        public AccessToken AccessToken { get; protected set; }
+        public bool HasAccessToken => string.IsNullOrEmpty(AccessToken?.TokenString) == false;
 
         [Serializable]
         public class Property : Core.Property<FacebookCore>
@@ -78,7 +81,9 @@ namespace Game
         {
             Debug.Log("Facebook Initiliazed");
 
+#if UNITY_EDITOR
             FB.ActivateApp();
+#endif
 
             OnActivate.Invoke();
         }

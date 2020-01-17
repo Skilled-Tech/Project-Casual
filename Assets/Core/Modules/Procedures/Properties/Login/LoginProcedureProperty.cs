@@ -166,10 +166,10 @@ namespace Game
                 {
                     base.Start();
 
-                    if (Procedures.Facebook.Login.Complete)
-                        PlayFabLogin();
-                    else
+                    if (Procedures.Facebook.Login.Complete == false)
                         FacebookLogin();
+                    else
+                        PlayFabLogin();
                 }
 
                 void FacebookLogin()
@@ -188,7 +188,7 @@ namespace Game
                 void PlayFabLogin()
                 {
                     SingleSubscribe.Execute(PlayFab.Login.Facebook.OnResponse, Callback);
-                    PlayFab.Login.Facebook.Request(Core.Facebook.Login.AccessToken.TokenString);
+                    PlayFab.Login.Facebook.Request(Core.Facebook.AccessToken.TokenString);
 
                     void Callback(LoginResult result, PlayFabError error)
                     {
@@ -255,7 +255,7 @@ namespace Game
             {
                 base.Init();
 
-                Debug.Log("Login Method: " + Method);
+                Debug.Log("Login Method: " + Method.Value);
 
                 if (auto) Request();
             }

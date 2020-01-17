@@ -66,7 +66,7 @@ namespace Game
                 void PlayFabLink()
                 {
                     SingleSubscribe.Execute(PlayFab.Player.Link.Facebook.OnResponse, Callback);
-                    PlayFab.Player.Link.Facebook.Request(Core.Facebook.Login.AccessToken.TokenString);
+                    PlayFab.Player.Link.Facebook.Request(Core.Facebook.AccessToken.TokenString);
 
                     void Callback(PlayFabResultCommon result, PlayFabError error)
                     {

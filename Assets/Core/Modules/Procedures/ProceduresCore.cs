@@ -53,12 +53,30 @@ namespace Game
                 {
                     base.Start();
 
-                    if (Core.Facebook.Active == false)
-                        Activation();
-                    else if (Core.Facebook.Login.Active == false)
-                        Login();
-                    else
-                        End();
+                    Procedures.StartCoroutine(Procedure());
+
+                    IEnumerator Procedure()
+                    {
+                        while(true)
+                        {
+                            if (Core.UI.Popup.Element.Visible)
+                            {
+                                if (Core.UI.Popup.Element.Transition.Value == 1f)
+                                    break;
+                            }
+                            else
+                                break;
+
+                            yield return new WaitForEndOfFrame();
+                        }
+
+                        if (Core.Facebook.Active == false)
+                            Activation();
+                        else if (Core.Facebook.Login.Active == false)
+                            Login();
+                        else
+                            End();
+                    }
                 }
 
                 void Activation()
