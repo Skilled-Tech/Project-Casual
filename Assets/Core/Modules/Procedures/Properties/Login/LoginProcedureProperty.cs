@@ -34,7 +34,52 @@ namespace Game
             protected bool auto;
             public bool Auto { get { return auto; } }
 
+            [SerializeField]
+            protected MethodData method;
+            public MethodData Method { get { return method; } }
+            [Serializable]
+            public class MethodData
+            {
+                [SerializeField]
+                protected LoginMethodToggleValue _override;
+                public LoginMethodToggleValue Override { get { return _override; } }
+
+                public virtual LoginMethod Evaluate(LoginMethodToggleValue toggle)
+                {
+                    if (toggle.Enabled)
+                        return toggle.Value;
+
+                    return Value;
+                }
+
+                public LoginMethod Value
+                {
+                    get
+                    {
+#if UNITY_EDITOR
+                        if (Override.Enabled) return Override.Value;
+#endif
+
+                        return (LoginMethod)Pref;
+                    }
+                    set
+                    {
+                        Pref = (int)value;
+                    }
+                }
+
+                protected virtual int Pref
+                {
+                    get => PlayerPrefs.GetInt(ID, 0);
+                    set => PlayerPrefs.SetInt(ID, value);
+                }
+
+                public const string ID = "Login Method";
+            }
+
             public bool IsComplete => Core.PlayFab.IsLoggedIn;
+
+            public bool IsProcessing => Procedure.IsProcessing;
 
             [SerializeField]
             protected CustomIDElement customID;
@@ -87,21 +132,6 @@ namespace Game
 
                 public override LoginMethod Method => LoginMethod.CustomID;
 
-                public override void Configure(ProceduresCore reference)
-                {
-                    base.Configure(reference);
-
-                    Login.OnEnd.AddListener(LoginEndCallback);
-                }
-
-                void LoginEndCallback(Element element)
-                {
-                    if(element.Method != this.Method)
-                    {
-                        ID.Generate();
-                    }
-                }
-
                 public override void Start()
                 {
                     base.Start();
@@ -146,12 +176,12 @@ namespace Game
                 {
                     RelyOn(Procedures.Facebook.Login, Callback);
 
-                    void Callback(string error)
+                    void Callback(Response response)
                     {
-                        if (error == null)
+                        if (response.Success)
                             PlayFabLogin();
                         else
-                            InvokeError(error);
+                            ApplyResponse(response);
                     }
                 }
 
@@ -185,7 +215,7 @@ namespace Game
             }
             #endregion
 
-            public abstract class Element : ProceduresCore.Element
+            public abstract class Element : Procedure
             {
                 public LoginProperty Login => Procedures.Login;
 
@@ -193,37 +223,10 @@ namespace Game
 
                 public abstract LoginMethod Method { get; }
 
-                public virtual void Require()
-                {
-                    Popup.Show("Loggin In");
-
-                    SingleSubscribe.Execute(OnResponse, Callback);
-                    Request();
-
-                    void Callback(string error)
-                    {
-                        if (error == null)
-                            Popup.Hide();
-                        else
-                            Popup.Show(error, "Okay");
-                    }
-                }
+                public virtual void Require() => Require("Loggin In");
             }
-
-            public LoginMethod Method
-            {
-                get
-                {
-                    return (LoginMethod)PlayerPrefs.GetInt(MethodID, 0);
-                }
-                set
-                {
-                    PlayerPrefs.SetInt(MethodID, (int)value);
-                }
-            }
-            public const string MethodID = "Login Method";
-
-            public Element Procedure => Find(Method);
+            
+            public Element Procedure => Find(Method.Value);
 
             public override void Configure(ProceduresCore reference)
             {
@@ -235,10 +238,6 @@ namespace Game
                 Register(facebook);
 
                 Procedures.Link.OnEnd.AddListener(LinkResultCallback);
-
-#if UNITY_EDITOR
-                Method = LoginMethod.CustomID; //TODO Remove
-#endif
             }
 
             public virtual void Register(Element element)
@@ -247,7 +246,7 @@ namespace Game
 
                 Register(Procedures, element);
 
-                element.OnResponse.AddListener((string error) => ResponseCallback(element, error));
+                element.OnResponse.AddListener((Procedure.Response response) => ResponseCallback(element, response));
                 element.OnEnd.AddListener(() => EndCallback(element));
                 element.OnError.AddListener(ErrorCallback);
             }
@@ -268,23 +267,23 @@ namespace Game
 #region Callbacks
             private void LinkResultCallback(LinkProperty.Element result)
             {
-                Method = result.Method;
+                Method.Value = result.Method;
             }
 #endregion
 
 #region Events
-            public class ResponseEvent : UnityEvent<Element, string> { }
+            public class ResponseEvent : UnityEvent<Element, Procedure.Response> { }
             public ResponseEvent OnResponse { get; protected set; }
-            void ResponseCallback(Element element, string error)
+            void ResponseCallback(Element element, Procedure.Response response)
             {
-                OnResponse.Invoke(element, error);
+                OnResponse.Invoke(element, response);
             }
 
             public class EndEvent : UnityEvent<Element> { }
             public EndEvent OnEnd { get; protected set; }
             void EndCallback(Element element)
             {
-                Method = element.Method;
+                Method.Value = element.Method;
 
                 OnEnd.Invoke(element);
             }
@@ -312,4 +311,7 @@ namespace Game
     {
         CustomID, Facebook
     }
+
+    [Serializable]
+    public class LoginMethodToggleValue : ToggleValue<LoginMethod> { }
 }

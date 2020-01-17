@@ -57,30 +57,23 @@ namespace Game
 
         }
 
-        public virtual void Show(string text)
-        {
-            Show(text, null, null);
-        }
-        public virtual void Show(string text, string instructions)
-        {
-            Show(text, Callback, instructions);
+        public virtual void Lock(string text) => Show(text, null, null);
 
-            void Callback()
-            {
+        public virtual void Show(string text) => Show(text, "Okay");
+        public virtual void Show(string text, string instructions) => Show(text, null, instructions);
 
-            }
-        }
-        public virtual void Show(string text, Action action, string instructions)
+        public virtual void Show(string text, Action callback, string instructions)
         {
             label.text = text;
-            this.callback = action;
+            this.callback = callback;
 
-            button.gameObject.SetActive(action != null);
-            if(controls != null) controls.IsOn = action != null;
+            button.gameObject.SetActive(instructions != null);
 
-            if(loading != null) loading.IsOn = action == null;
+            if(controls != null) controls.IsOn = instructions != null;
 
-            if (action == null)
+            if(loading != null) loading.IsOn = instructions == null;
+
+            if (string.IsNullOrEmpty(instructions))
             {
 
             }
@@ -99,7 +92,7 @@ namespace Game
         {
             Hide();
 
-            if (callback != null) callback();
+            callback?.Invoke();
         }
     }
 }

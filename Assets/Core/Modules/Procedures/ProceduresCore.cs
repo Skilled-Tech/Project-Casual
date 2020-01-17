@@ -45,7 +45,7 @@ namespace Game
             protected LoginElement login;
             public LoginElement Login { get { return login; } }
             [Serializable]
-            public class LoginElement : Element
+            public class LoginElement : Procedure
             {
                 public bool Complete => Core.Facebook.Login.Active;
 
@@ -63,8 +63,10 @@ namespace Game
 
                 void Activation()
                 {
-                    SingleSubscribe.Execute(Core.Facebook.OnActivate, Login);
+                    SingleSubscribe.Execute(Core.Facebook.OnActivate, Callback);
                     Core.Facebook.Activate();
+
+                    void Callback() => Login();
                 }
 
                 void Login()
@@ -77,7 +79,7 @@ namespace Game
                         if (result == null) //No Response
                             InvokeError("No Response Recieved");
                         else if (result.Cancelled) //Canceled
-                            InvokeError("Login Canceled");
+                            Cancel();
                         else if (string.IsNullOrEmpty(result.Error) == false) //Error
                             InvokeError(result.Error);
                         else
@@ -98,39 +100,43 @@ namespace Game
         protected UpdateDisplayNameProcedure updateDisplayName;
         public UpdateDisplayNameProcedure UpdateDisplayName { get { return updateDisplayName; } }
         [Serializable]
-        public class UpdateDisplayNameProcedure : Element
+        public class UpdateDisplayNameProcedure : Procedure
         {
             public PlayFabCore PlayFab => Core.PlayFab;
 
             public TextInputUI TextInput => Core.UI.TextInput;
 
+            public virtual void Require() => Require("Updating Display Name");
+
             public override void Start()
             {
                 base.Start();
 
-                DisplayTextInput();
+                DisplayInput();
             }
 
-            void DisplayTextInput()
+            void DisplayInput()
             {
+                Popup.Hide();
                 TextInput.Show("Enter Display Name", Callback);
 
-                void Callback(string text)
+                void Callback(TextInputUI.Response response)
                 {
-                    if (string.IsNullOrEmpty(text))
-                    {
-                        InvokeError("Canceled");
-                    }
+                    if (response.Success)
+                        PlayFabRequest(response.Text);
+                    else if (response.Canceled)
+                        Cancel();
                     else
                     {
-                        RequestNameChange(text);
+                        Debug.LogError("Unknown Condition Met");
+                        InvokeError("Unknown Error");
                     }
                 }
             }
 
-            void RequestNameChange(string name)
+            void PlayFabRequest(string name)
             {
-                Popup.Show("Updating Profile Info");
+                Popup.Lock("Updating Profile Info");
 
                 SingleSubscribe.Execute(PlayFab.Player.Info.UpdateDisplayName.OnResponse, Callback);
                 PlayFab.Player.Info.UpdateDisplayName.Request(name);
@@ -140,123 +146,25 @@ namespace Game
                     if (error == null)
                         End();
                     else
-                        Popup.Show(error.ErrorMessage, "Okay");
+                    {
+                        if(error.Error == PlayFabErrorCode.NameNotAvailable)
+                            Popup.Show("Name Not Available, Please Try A Different Name", "Okay");
+                        else
+                            InvokeError(error.ErrorMessage);
+                    }
                 }
             }
 
-            protected override void End()
+            protected override void Stop()
             {
-                base.End();
+                base.Stop();
 
-                TextInput.Hide();
                 Popup.Hide();
-            }
-
-            protected override void InvokeError(string error)
-            {
-                base.InvokeError(error);
 
                 TextInput.Hide();
-
-                Popup.Show(error, "Okay");
             }
         }
-
-        [Serializable]
-        public abstract class Element : Property
-        {
-            public bool IsProcessing { get; protected set; }
-
-            public PopupUI Popup => Core.UI.Popup;
-
-            public ChoiceUI Choice => Core.UI.Choice;
-
-            public virtual void Request()
-            {
-                if(IsProcessing)
-                {
-
-                }
-                else
-                {
-                    Start();
-                }
-            }
-
-            public event Action OnStart;
-            public virtual void Start()
-            {
-                IsProcessing = true;
-
-                OnStart?.Invoke();
-            }
-            
-            public virtual void RelyOn(Element element, Action<string> callback)
-            {
-                SingleSubscribe.Execute(element.OnResponse, callback);
-
-                element.Request();
-            }
-
-            public class ErrorEvent : UnityEvent<string> { }
-            public ErrorEvent OnError { get; protected set; }
-            protected virtual void InvokeError(string error)
-            {
-                Stop();
-
-                Debug.LogError(error);
-
-                OnError.Invoke(error);
-
-                Respond(error);
-            }
-
-            protected virtual void Stop()
-            {
-                IsProcessing = false;
-            }
-
-            public class CancelEvent : UnityEvent { }
-            public CancelEvent OnCancel { get; protected set; }
-            protected virtual void Cancel()
-            {
-                Stop();
-
-                OnCancel.Invoke();
-
-                Respond(null);
-            }
-
-            public class EndEvent : UnityEvent { }
-            public EndEvent OnEnd { get; protected set; }
-            protected virtual void End()
-            {
-                Stop();
-
-                OnEnd.Invoke();
-
-                Respond(null);
-            }
-
-            public class ResponseEvent : UnityEvent<string> { }
-            public ResponseEvent OnResponse { get; protected set; }
-            protected virtual void Respond(string error)
-            {
-                OnResponse.Invoke(error);
-            }
-
-            public Element()
-            {
-                OnError = new ErrorEvent();
-
-                OnEnd = new EndEvent();
-
-                OnCancel = new CancelEvent();
-
-                OnResponse = new ResponseEvent();
-            }
-        }
-
+        
         [Serializable]
         public class Property : Core.Property<ProceduresCore>
         {
@@ -273,6 +181,153 @@ namespace Game
             Register(this, link);
             Register(this, facebook);
             Register(this, updateDisplayName);
+        }
+    }
+
+    [Serializable]
+    public abstract class Procedure : ProceduresCore.Property
+    {
+        public bool IsProcessing { get; protected set; }
+
+        public PopupUI Popup => Core.UI.Popup;
+
+        public ChoiceUI Choice => Core.UI.Choice;
+
+        public virtual void Request()
+        {
+            if (IsProcessing)
+            {
+
+            }
+            else
+            {
+                Start();
+            }
+        }
+
+        public virtual void Require(string message)
+        {
+            Popup.Lock(message);
+
+            SingleSubscribe.Execute(OnResponse, Callback);
+            Request();
+
+            void Callback(Response response)
+            {
+                if (response.Success || response.Canceled)
+                    Popup.Hide();
+                else
+                    Popup.Show(response.Error, "Okay");
+            }
+        }
+
+        public virtual void RelyOn(Procedure element, Action<Response> callback)
+        {
+            SingleSubscribe.Execute(element.OnResponse, callback);
+
+            element.Request();
+        }
+
+        public event Action OnStart;
+        public virtual void Start()
+        {
+            IsProcessing = true;
+
+            OnStart?.Invoke();
+        }
+        
+        protected virtual void InvokeError(string error)
+        {
+            Stop();
+
+            Debug.LogError(error);
+
+            OnError.Invoke(error);
+
+            Respond(error, false);
+        }
+        public class ErrorEvent : UnityEvent<string> { }
+        public ErrorEvent OnError { get; protected set; }
+
+        protected virtual void Stop()
+        {
+            IsProcessing = false;
+        }
+        
+        protected virtual void Cancel()
+        {
+            Stop();
+
+            OnCancel.Invoke();
+
+            Respond(null, true);
+        }
+        public class CancelEvent : UnityEvent { }
+        public CancelEvent OnCancel { get; protected set; }
+        
+        protected virtual void End()
+        {
+            Stop();
+
+            OnEnd.Invoke();
+
+            Respond(null, false);
+        }
+        public class EndEvent : UnityEvent { }
+        public EndEvent OnEnd { get; protected set; }
+
+        #region Response
+        protected virtual void Respond(string error, bool canceled)
+        {
+            var response = new Response(error, canceled);
+
+            Respond(response);
+        }
+        protected virtual void Respond(Response response)
+        {
+            OnResponse.Invoke(response);
+        }
+
+        public class ResponseEvent : UnityEvent<Response> { }
+        public ResponseEvent OnResponse { get; protected set; }
+
+        public class Response
+        {
+            public bool Canceled { get; protected set; }
+
+            public string Error { get; protected set; }
+            public bool HasError => Error != null;
+
+            public bool Success => Canceled == false && HasError == false;
+
+            public Response(string error, bool canceled)
+            {
+                this.Canceled = canceled;
+
+                this.Error = error;
+            }
+        }
+
+        protected virtual void ApplyResponse(Response response)
+        {
+            if (response.HasError)
+                InvokeError(response.Error);
+            else if (response.Canceled)
+                Cancel();
+            else
+                End();
+        }
+        #endregion
+
+        public Procedure()
+        {
+            OnError = new ErrorEvent();
+
+            OnEnd = new EndEvent();
+
+            OnCancel = new CancelEvent();
+
+            OnResponse = new ResponseEvent();
         }
     }
 }

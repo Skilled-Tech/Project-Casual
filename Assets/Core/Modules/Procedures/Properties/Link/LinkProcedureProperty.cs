@@ -54,12 +54,12 @@ namespace Game
                 {
                     RelyOn(Procedures.Facebook.Login, Callback);
 
-                    void Callback(string error)
+                    void Callback(Response response)
                     {
-                        if (error == null)
+                        if (response.Success)
                             PlayFabLink();
                         else
-                            InvokeError(error);
+                            ApplyResponse(response);
                     }
                 }
 
@@ -83,7 +83,7 @@ namespace Game
                 }
             }
 
-            public abstract class Element : ProceduresCore.Element
+            public abstract class Element : Procedure
             {
                 public LinkProperty Link => Procedures.Link;
 
@@ -91,25 +91,7 @@ namespace Game
 
                 public abstract LoginMethod Method { get; }
 
-                public virtual void Require()
-                {
-                    Popup.Show("Linking");
-
-                    SingleSubscribe.Execute(OnResponse, Callback);
-                    Request();
-
-                    void Callback(string error)
-                    {
-                        if (error == null)
-                        {
-                            if (Popup.Element.Visible) Popup.Hide();
-                        }
-                        else
-                        {
-                            Popup.Show(error, "Okay");
-                        }
-                    }
-                }
+                public virtual void Require() => Require("Linking " + Method);
                 
                 protected virtual void PromtToExistantLogin()
                 {
@@ -140,11 +122,11 @@ namespace Game
 
                     RelyOn(Procedures.Login[Method], Callback);
 
-                    void Callback(string error)
+                    void Callback(Response response)
                     {
-                        if (error == null)
+                        if (response.Success)
                         {
-                            if(Core.PlayFab.Player.Profile.ID != previousData.playfabID)
+                            if (Core.PlayFab.Player.Profile.ID != previousData.playfabID)
                             {
                                 Debug.Log("Clearing out old account");
                                 Core.PlayFab.Player.Clear.Request(previousData.playfabID, previousData.customID);
@@ -153,7 +135,7 @@ namespace Game
                             End();
                         }
                         else
-                            InvokeError(error);
+                            ApplyResponse(response);
                     }
                 }
             }
@@ -188,17 +170,17 @@ namespace Game
 
                 Register(Procedures, element);
 
-                element.OnResponse.AddListener((string error) => ResponseCallback(element, error));
+                element.OnResponse.AddListener((Procedure.Response response) => ResponseCallback(element, response));
                 element.OnEnd.AddListener(() => EndCallback(element));
                 element.OnError.AddListener(ErrorCallback);
             }
 
             #region Events
-            public class ResponseEvent : UnityEvent<Element, string> { }
+            public class ResponseEvent : UnityEvent<Element, Procedure.Response> { }
             public ResponseEvent OnResponse { get; protected set; }
-            private void ResponseCallback(Element element, string error)
+            private void ResponseCallback(Element element, Procedure.Response response)
             {
-                OnResponse?.Invoke(element, error);
+                OnResponse?.Invoke(element, response);
             }
 
             public class EndEvent : UnityEvent<Element> { }

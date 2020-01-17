@@ -20,7 +20,7 @@ using Random = UnityEngine.Random;
 namespace Game
 {
     [RequireComponent(typeof(Button))]
-	public class LinkLoginMethodButton : MonoBehaviour
+	public class LoginButton : MonoBehaviour
 	{
         [SerializeField]
         protected LoginMethod method;
@@ -41,12 +41,32 @@ namespace Game
         private void Start()
         {
             button = GetComponent<Button>();
-
             button.onClick.AddListener(Action);
+
+            if (Core.Procedures.Login.IsProcessing)
+                WaitForCurrentLogin();
+        }
+
+        void WaitForCurrentLogin()
+        {
+            Interactable = false;
+
+            SingleSubscribe.Execute(Core.Procedures.Login.OnResponse, Callback);
+
+            void Callback(ProceduresCore.LoginProperty.Element element, Procedure.Response response)
+            {
+                Interactable = true;
+            }
         }
 
         void Action()
         {
+            if (Core.Procedures.Login.IsProcessing)
+            {
+                Debug.LogWarning("Cannot process new login request untill the old one is finished");
+
+                //TODO Provide Feedback ?
+            }
             if (Core.Procedures.Login.IsComplete == false)
                 Login();
             else
@@ -58,18 +78,12 @@ namespace Game
             Interactable = false;
 
             SingleSubscribe.Execute(Core.Procedures.Login.OnResponse, Callback);
-            Core.Procedures.Login.Request();
+            Core.Procedures.Login[method].Require();
 
-            void Callback(ProceduresCore.LoginProperty.Element element, string error)
+            void Callback(ProceduresCore.LoginProperty.Element element, Procedure.Response response)
             {
-                if(error == null)
-                {
-                    Link();
-                }
-                else
-                {
-                    //TODO provide some feedback ?
-                }
+                Interactable = true;
+                //TODO Provide Feedback
             }
         }
 
@@ -78,22 +92,12 @@ namespace Game
             Interactable = false;
 
             SingleSubscribe.Execute(Core.Procedures.Link.OnResponse, Callback);
-            Core.Procedures.Link[method].Request();
+            Core.Procedures.Link[method].Require();
 
-            void Callback(ProceduresCore.LinkProperty.Element element, string error)
+            void Callback(ProceduresCore.LinkProperty.Element element, Procedure.Response response)
             {
-                //TODO provide some feedback here too ?
-
                 Interactable = true;
-
-                if (error == null)
-                {
-                    
-                }
-                else
-                {
-
-                }
+                //TODO Provide Feedback
             }
         }
     }

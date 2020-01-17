@@ -60,7 +60,7 @@ namespace Game
             controls.Register(ConfirmCallback, DenyCallback);
         }
 
-        public virtual void Show(string text, ResultDelegate callback)
+        public virtual void Show(string text, ResponseDelegate callback)
         {
             label.text = text;
 
@@ -78,24 +78,43 @@ namespace Game
         }
 
         #region Callback
-        private void DenyCallback() => Action(null);
+        private void DenyCallback() => Action(null, true);
         private void ConfirmCallback()
         {
-            if(Validator.Check(inputField.text))
-            {
-                Action(inputField.text);
-            }
+            if (Validator.Check(inputField.text))
+                Action(inputField.text, false);
             else
-            {
                 Popup.Show("Invalid Text", "Ok");
-            }
+        }
+        
+        void Action(string result, bool canceled)
+        {
+            var response = new Response(result, canceled);
+
+            Action(response);
+        }
+        void Action(Response response)
+        {
+            callback?.Invoke(response);
         }
 
-        public delegate void ResultDelegate(string result);
-        ResultDelegate callback;
-        void Action(string result)
+        public delegate void ResponseDelegate(Response response);
+        ResponseDelegate callback;
+
+        public class Response
         {
-            callback?.Invoke(result);
+            public string Text { get; protected set; }
+
+            public bool Canceled { get; protected set; }
+
+            public bool Success => Canceled == false;
+
+            public Response(string text, bool canceled)
+            {
+                this.Text = text;
+
+                this.Canceled = canceled;
+            }
         }
         #endregion
     }

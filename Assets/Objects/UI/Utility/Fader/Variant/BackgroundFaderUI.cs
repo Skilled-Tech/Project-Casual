@@ -19,21 +19,18 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class BackgroundFaderUI : FaderUI
-	{
+    public class BackgroundFaderUI : FaderUI
+    {
         public const float Duration = 0.1f;
 
         public static List<BackgroundFaderUI> list = new List<BackgroundFaderUI>();
         static void Add(BackgroundFaderUI element)
         {
-            if(list.Contains(element))
-            {
-                Debug.LogWarning(nameof(BackgroundFaderUI) + " already contains element: " + element.name + ", ignoring add request");
+            if (list.Contains(element))
                 return;
-            }
 
             element.To(element.InitialValue, Duration);
-            if(Last != null) element.Value = Last.Value;
+            if (Last != null) element.Value = Last.Value;
 
             if (Last != null) Last.To(0f, Duration);
 
@@ -42,10 +39,7 @@ namespace Game
         static void Remove(BackgroundFaderUI element)
         {
             if (list.Contains(element) == false)
-            {
-                Debug.LogWarning(nameof(BackgroundFaderUI) + " doesn't contain element: " + element.transform.parent.name + ", ignoring remove request");
                 return;
-            }
 
             list.Remove(element);
 

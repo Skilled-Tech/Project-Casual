@@ -124,7 +124,7 @@ namespace Game
 
             public virtual void ShowRequirementPopup()
             {
-                Core.UI.Popup.Show("You need to be logged in to perform this operation");
+                Core.UI.Popup.Show("You need to be logged in to perform this operation", "Okay");
             }
 
             #region Events

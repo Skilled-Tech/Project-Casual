@@ -829,6 +829,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   login:
     auto: 1
+    method:
+      _override:
+        enabled: 0
+        value: 0
     customID:
       _ID:
         _override:
