@@ -77,6 +77,26 @@ namespace Game
                 }
             }
 
+            public class GoogleRequest : Request<LoginWithGoogleAccountRequest>
+            {
+                public override MethodDelegate Method => PlayFabClientAPI.LoginWithGoogleAccount;
+
+                public override void ApplyDefaults(ref LoginWithGoogleAccountRequest request)
+                {
+                    request.CreateAccount = true;
+                    request.InfoRequestParameters = DefaultInfoRequestParameters;
+                }
+
+                public virtual void Request(string authCode)
+                {
+                    var request = GenerateRequest();
+
+                    request.ServerAuthCode = authCode;
+
+                    Send(request);
+                }
+            }
+
             public abstract class Request<TRequest> : Request<TRequest, LoginResult>
                 where TRequest : PlayFabRequestCommon, new()
             {
