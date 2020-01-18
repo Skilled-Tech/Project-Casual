@@ -21,8 +21,6 @@ using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.SharedModels;
 
-using UnityEngine.Events;
-
 namespace Game
 {
 	public class PlayFabCore : Core.Module
@@ -115,11 +113,11 @@ namespace Game
             protected virtual void Register<TRequest>(Request<TRequest> element)
                 where TRequest : PlayFabRequestCommon, new()
             {
-                element.OnResponse.AddListener(ResponseCallback);
+                element.OnResponse.Add(ResponseCallback);
 
-                element.OnResult.AddListener(ResultCallback);
+                element.OnResult.Add(ResultCallback);
 
-                element.OnError.AddListener(ErrorCallback);
+                element.OnError.Add(ErrorCallback);
             }
 
             public virtual void ShowRequirementPopup()
@@ -128,15 +126,13 @@ namespace Game
             }
 
             #region Events
-            public ResponseEvent OnResponse { get; protected set; }
-            public class ResponseEvent : UnityEvent<LoginResult, PlayFabError> { }
+            public MoeEvent<LoginResult, PlayFabError> OnResponse { get; protected set; }
             void ResponseCallback(LoginResult result, PlayFabError error)
             {
                 OnResponse.Invoke(result, error);
             }
 
-            public ResultEvent OnResult { get; protected set; }
-            public class ResultEvent : UnityEvent<LoginResult> { }
+            public MoeEvent<LoginResult> OnResult { get; protected set; }
             void ResultCallback(LoginResult result)
             {
                 PlayFab.Player.Profile.Update(result);
@@ -144,8 +140,7 @@ namespace Game
                 OnResult.Invoke(result);
             }
 
-            public ErrorEvent OnError { get; protected set; }
-            public class ErrorEvent : UnityEvent<PlayFabError> { }
+            public MoeEvent<PlayFabError> OnError { get; protected set; }
             void ErrorCallback(PlayFabError error)
             {
                 OnError?.Invoke(error);
@@ -154,16 +149,15 @@ namespace Game
 
             public LoginProperty()
             {
-                OnResponse = new ResponseEvent();
+                OnResponse = new MoeEvent<LoginResult, PlayFabError>();
 
-                OnResult = new ResultEvent();
+                OnResult = new MoeEvent<LoginResult>();
 
-                OnError = new ErrorEvent();
+                OnError = new MoeEvent<PlayFabError>();
             }
         }
 
-        public class LogoutEvent : UnityEvent { }
-        public LogoutEvent OnLogout { get; protected set; } = new LogoutEvent();
+        public MoeEvent OnLogout { get; protected set; } = new MoeEvent();
         public virtual void Logout()
         {
             PlayFabAuthenticationAPI.ForgetAllCredentials();
@@ -373,7 +367,7 @@ namespace Game
                     base.Configure(reference);
 
                     UpdateDisplayName = new UpdateDisplayNameRequest();
-                    UpdateDisplayName.OnResult.AddListener(PlayFab.Player.Profile.Update);
+                    UpdateDisplayName.OnResult.Add(PlayFab.Player.Profile.Update);
                 }
             }
 
@@ -409,30 +403,27 @@ namespace Game
                     where TRequest : PlayFabRequestCommon, new()
                     where TResult : PlayFabResultCommon
                 {
-                    element.OnResponse.AddListener(ResponseCallback);
+                    element.OnResponse.Add(ResponseCallback);
 
-                    element.OnResult.AddListener(ResultCallback);
+                    element.OnResult.Add(ResultCallback);
 
-                    element.OnError.AddListener(ErrorCallback);
+                    element.OnError.Add(ErrorCallback);
                 }
 
                 #region Events
-                public ResponseEvent OnResponse { get; protected set; }
-                public class ResponseEvent : UnityEvent<PlayFabResultCommon, PlayFabError> { }
+                public MoeEvent<PlayFabResultCommon, PlayFabError> OnResponse { get; protected set; }
                 void ResponseCallback(PlayFabResultCommon result, PlayFabError error)
                 {
                     OnResponse?.Invoke(result, error);
                 }
 
-                public ResultEvent OnResult { get; protected set; }
-                public class ResultEvent : UnityEvent<PlayFabResultCommon> { }
+                public MoeEvent<PlayFabResultCommon> OnResult { get; protected set; }
                 void ResultCallback(PlayFabResultCommon result)
                 {
                     OnResult.Invoke(result);
                 }
 
-                public ErrorEvent OnError { get; protected set; }
-                public class ErrorEvent : UnityEvent<PlayFabError> { }
+                public MoeEvent<PlayFabError> OnError { get; protected set; }
                 void ErrorCallback(PlayFabError error)
                 {
                     OnError.Invoke(error);
@@ -441,11 +432,11 @@ namespace Game
 
                 public LinkProperty()
                 {
-                    OnResponse = new ResponseEvent();
+                    OnResponse = new MoeEvent<PlayFabResultCommon, PlayFabError>();
 
-                    OnResult = new ResultEvent();
+                    OnResult = new MoeEvent<PlayFabResultCommon>();
 
-                    OnError = new ErrorEvent();
+                    OnError = new MoeEvent<PlayFabError>();
                 }
             }
 
@@ -535,8 +526,7 @@ namespace Game
             }
 
             #region Events
-            public ResultEvent OnResult { get; protected set; }
-            public class ResultEvent : UnityEvent<TResult> { }
+            public MoeEvent<TResult> OnResult { get; protected set; }
             public virtual void ResultCallback(TResult result)
             {
                 OnResult.Invoke(result);
@@ -544,8 +534,7 @@ namespace Game
                 Respond(result, null);
             }
 
-            public ErrorEvent OnError { get; protected set; }
-            public class ErrorEvent : UnityEvent<PlayFabError> { }
+            public MoeEvent<PlayFabError> OnError { get; protected set; }
             public virtual void ErrorCallback(PlayFabError error)
             {
                 Debug.LogError(error.GenerateErrorReport());
@@ -555,8 +544,7 @@ namespace Game
                 Respond(null, error);
             }
 
-            public ResponseEvent OnResponse { get; protected set; }
-            public class ResponseEvent : UnityEvent<TResult, PlayFabError> { }
+            public MoeEvent<TResult, PlayFabError> OnResponse { get; protected set; }
             public virtual void Respond(TResult result, PlayFabError error)
             {
                 OnResponse.Invoke(result, error);
@@ -565,11 +553,11 @@ namespace Game
 
             public Request()
             {
-                OnResult = new ResultEvent();
+                OnResult = new MoeEvent<TResult>();
 
-                OnError = new ErrorEvent();
+                OnError = new MoeEvent<PlayFabError>();
 
-                OnResponse = new ResponseEvent();
+                OnResponse = new MoeEvent<TResult, PlayFabError>();
             }
         }
 
@@ -590,44 +578,5 @@ namespace Game
         public delegate void Error<TError>(TError error);
 
         public delegate void Response<TResult, TError>(TResult result, TError error);
-    }
-
-    public static class SingleSubscribe
-    {
-        public static void Execute(UnityEvent uEvent, Action callback)
-        {
-            uEvent.AddListener(Callback);
-
-            void Callback()
-            {
-                uEvent.RemoveListener(Callback);
-
-                callback();
-            }
-        }
-
-        public static void Execute<T1>(UnityEvent<T1> uEvent, Action<T1> callback)
-        {
-            uEvent.AddListener(Callback);
-
-            void Callback(T1 arg1)
-            {
-                uEvent.RemoveListener(Callback);
-
-                callback(arg1);
-            }
-        }
-
-        public static void Execute<T1, T2>(UnityEvent<T1, T2> uEvent, Action<T1, T2> callback)
-        {
-            uEvent.AddListener(Callback);
-
-            void Callback(T1 arg1, T2 arg2)
-            {
-                uEvent.RemoveListener(Callback);
-
-                callback(arg1, arg2);
-            }
-        }
     }
 }

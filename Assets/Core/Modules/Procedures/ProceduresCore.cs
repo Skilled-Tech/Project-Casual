@@ -21,8 +21,6 @@ using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.SharedModels;
 
-using UnityEngine.Events;
-
 namespace Game
 {
 	public partial class ProceduresCore : Core.Module
@@ -81,7 +79,7 @@ namespace Game
 
                 void Activation()
                 {
-                    SingleSubscribe.Execute(Core.Facebook.OnActivate, Callback);
+                    Core.Facebook.OnActivate.Enque(Callback);
                     Core.Facebook.Activate();
 
                     void Callback() => Login();
@@ -89,7 +87,7 @@ namespace Game
 
                 void Login()
                 {
-                    SingleSubscribe.Execute(Core.Facebook.Login.OnResult, Callback);
+                    Core.Facebook.Login.OnResult.Enque(Callback);
                     Core.Facebook.Login.Request();
 
                     void Callback(Facebook.Unity.ILoginResult result)
@@ -156,7 +154,7 @@ namespace Game
             {
                 Popup.Lock("Updating Profile Info");
 
-                SingleSubscribe.Execute(PlayFab.Player.Info.UpdateDisplayName.OnResponse, Callback);
+                PlayFab.Player.Info.UpdateDisplayName.OnResponse.Enque(Callback);
                 PlayFab.Player.Info.UpdateDisplayName.Request(name);
 
                 void Callback(UpdateUserTitleDisplayNameResult result, PlayFabError error)
@@ -227,7 +225,7 @@ namespace Game
         {
             Popup.Lock(message);
 
-            SingleSubscribe.Execute(OnResponse, Callback);
+            OnResponse.Enque(Callback);
             Request();
 
             void Callback(Response response)
@@ -239,9 +237,11 @@ namespace Game
             }
         }
 
-        public virtual void RelyOn(Procedure element, Action<Response> callback)
+        public virtual void RelyOn(Procedure element, Action<Response> action)
         {
-            SingleSubscribe.Execute(element.OnResponse, callback);
+            element.OnResponse.Enque(Callback);
+
+            void Callback(Response response) => action(response);
 
             element.Request();
         }
@@ -264,8 +264,7 @@ namespace Game
 
             Respond(error, false);
         }
-        public class ErrorEvent : UnityEvent<string> { }
-        public ErrorEvent OnError { get; protected set; }
+        public MoeEvent<string> OnError { get; protected set; }
 
         protected virtual void Stop()
         {
@@ -280,8 +279,7 @@ namespace Game
 
             Respond(null, true);
         }
-        public class CancelEvent : UnityEvent { }
-        public CancelEvent OnCancel { get; protected set; }
+        public MoeEvent OnCancel { get; protected set; }
         
         protected virtual void End()
         {
@@ -291,8 +289,7 @@ namespace Game
 
             Respond(null, false);
         }
-        public class EndEvent : UnityEvent { }
-        public EndEvent OnEnd { get; protected set; }
+        public MoeEvent OnEnd { get; protected set; }
 
         #region Response
         protected virtual void Respond(string error, bool canceled)
@@ -306,8 +303,7 @@ namespace Game
             OnResponse.Invoke(response);
         }
 
-        public class ResponseEvent : UnityEvent<Response> { }
-        public ResponseEvent OnResponse { get; protected set; }
+        public MoeEvent<Response> OnResponse { get; protected set; }
 
         public class Response
         {
@@ -339,13 +335,13 @@ namespace Game
 
         public Procedure()
         {
-            OnError = new ErrorEvent();
+            OnError = new MoeEvent<string>();
 
-            OnEnd = new EndEvent();
+            OnEnd = new MoeEvent();
 
-            OnCancel = new CancelEvent();
+            OnCancel = new MoeEvent();
 
-            OnResponse = new ResponseEvent();
+            OnResponse = new MoeEvent<Response>();
         }
     }
 }

@@ -26,6 +26,18 @@ namespace Game
 	{
         public TextInputUI TextInput => Core.Instance.UI.TextInput;
 
-        
+        public MoeEvent MyEvent = new MoeEvent();
+
+        private void Start()
+        {
+            MyEvent.Add(() => Debug.Log("Add"));
+            MyEvent.Enque(() => Debug.Log("Subscribe"));
+        }
+
+        private void Update()
+        {
+            if (Input.anyKeyDown)
+                MyEvent.Invoke();
+        }
     }
 }

@@ -102,7 +102,7 @@ namespace Game
 
         private void RequireLogin()
         {
-            SingleSubscribe.Execute(Core.Procedures.Login.OnResponse, Callback);
+            Core.Procedures.Login.OnResponse.Enque(Callback);
             Core.Procedures.Login.Require();
 
             void Callback(ProceduresCore.LoginProperty.Element result, Procedure.Response response)
@@ -118,7 +118,7 @@ namespace Game
 
         private void RequestDisplayNameUpdate()
         {
-            SingleSubscribe.Execute(Core.Procedures.UpdateDisplayName.OnResponse, Callback);
+            Core.Procedures.UpdateDisplayName.OnResponse.Enque(Callback);
             Core.Procedures.UpdateDisplayName.Require();
 
             void Callback(Procedure.Response response)

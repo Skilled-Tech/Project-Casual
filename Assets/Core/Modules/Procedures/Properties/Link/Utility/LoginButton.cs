@@ -51,7 +51,7 @@ namespace Game
         {
             Interactable = false;
 
-            SingleSubscribe.Execute(Core.Procedures.Login.OnResponse, Callback);
+            Core.Procedures.Login.OnResponse.Enque(Callback);
 
             void Callback(ProceduresCore.LoginProperty.Element element, Procedure.Response response)
             {
@@ -77,7 +77,7 @@ namespace Game
         {
             Interactable = false;
 
-            SingleSubscribe.Execute(Core.Procedures.Login.OnResponse, Callback);
+            Core.Procedures.Login.OnResponse.Enque(Callback);
             Core.Procedures.Login[method].Require();
 
             void Callback(ProceduresCore.LoginProperty.Element element, Procedure.Response response)
@@ -91,7 +91,7 @@ namespace Game
         {
             Interactable = false;
 
-            SingleSubscribe.Execute(Core.Procedures.Link.OnResponse, Callback);
+            Core.Procedures.Link.OnResponse.Enque(Callback);
             Core.Procedures.Link[method].Require();
 
             void Callback(ProceduresCore.LinkProperty.Element element, Procedure.Response response)

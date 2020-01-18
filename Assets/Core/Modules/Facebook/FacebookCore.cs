@@ -20,8 +20,6 @@ using Random = UnityEngine.Random;
 using Facebook;
 using Facebook.Unity;
 
-using UnityEngine.Events;
-
 namespace Game
 {
 	public class FacebookCore : Core.Module
@@ -43,8 +41,7 @@ namespace Game
                 FB.LogInWithReadPermissions(Permissions, ResultCallback);
             }
 
-            public class ResultEvent : UnityEvent<ILoginResult> { }
-            public ResultEvent OnResult { get; protected set; } = new ResultEvent();
+            public MoeEvent<ILoginResult> OnResult { get; protected set; } = new MoeEvent<ILoginResult>();
             void ResultCallback(ILoginResult result)
             {
                 Facebook.AccessToken = result?.AccessToken;
@@ -75,8 +72,7 @@ namespace Game
             FB.Init(InitCallback, HideCallback);
         }
 
-        public class ActivateEvent : UnityEvent { }
-        public ActivateEvent OnActivate { get; protected set; } = new ActivateEvent();
+        public MoeEvent OnActivate { get; protected set; } = new MoeEvent();
         private void InitCallback()
         {
             Debug.Log("Facebook Initiliazed");
