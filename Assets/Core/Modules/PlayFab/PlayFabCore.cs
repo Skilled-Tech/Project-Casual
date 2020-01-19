@@ -77,6 +77,7 @@ namespace Game
                 }
             }
 
+            public GoogleRequest Google { get; protected set; }
             public class GoogleRequest : Request<LoginWithGoogleAccountRequest>
             {
                 public override MethodDelegate Method => PlayFabClientAPI.LoginWithGoogleAccount;
@@ -128,6 +129,9 @@ namespace Game
 
                 Facebook = new FacebookRequest();
                 Register(Facebook);
+
+                Google = new GoogleRequest();
+                Register(Google);
             }
 
             protected virtual void Register<TRequest>(Request<TRequest> element)

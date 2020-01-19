@@ -832,7 +832,7 @@ MonoBehaviour:
     method:
       _override:
         enabled: 0
-        value: 0
+        value: 1
     customID:
       _ID:
         _override:
