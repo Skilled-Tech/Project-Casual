@@ -21,8 +21,6 @@ using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.SharedModels;
 
-using UnityEngine.Events;
-
 namespace Game
 {
     public partial class ProceduresCore
@@ -65,7 +63,7 @@ namespace Game
 
                 void PlayFabLink()
                 {
-                    SingleSubscribe.Execute(PlayFab.Player.Link.Facebook.OnResponse, Callback);
+                    PlayFab.Player.Link.Facebook.OnResponse.Enque(Callback);
                     PlayFab.Player.Link.Facebook.Request(Core.Facebook.AccessToken.TokenString);
 
                     void Callback(PlayFabResultCommon result, PlayFabError error)
@@ -170,28 +168,25 @@ namespace Game
 
                 Register(Procedures, element);
 
-                element.OnResponse.AddListener((Procedure.Response response) => ResponseCallback(element, response));
-                element.OnEnd.AddListener(() => EndCallback(element));
-                element.OnError.AddListener(ErrorCallback);
+                element.OnResponse.Add((Procedure.Response response) => ResponseCallback(element, response));
+                element.OnEnd.Add(() => EndCallback(element));
+                element.OnError.Add(ErrorCallback);
             }
 
             #region Events
-            public class ResponseEvent : UnityEvent<Element, Procedure.Response> { }
-            public ResponseEvent OnResponse { get; protected set; }
+            public MoeEvent<Element, Procedure.Response> OnResponse { get; protected set; }
             private void ResponseCallback(Element element, Procedure.Response response)
             {
                 OnResponse?.Invoke(element, response);
             }
 
-            public class EndEvent : UnityEvent<Element> { }
-            public EndEvent OnEnd { get; protected set; }
+            public MoeEvent<Element> OnEnd { get; protected set; }
             void EndCallback(Element element)
             {
                 OnEnd?.Invoke(element);
             }
 
-            public class ErrorEvent : UnityEvent<string> { }
-            public ErrorEvent OnError { get; protected set; }
+            public MoeEvent<string> OnError { get; protected set; }
             void ErrorCallback(string error)
             {
                 OnError?.Invoke(error);
@@ -200,11 +195,11 @@ namespace Game
 
             public LinkProperty()
             {
-                OnResponse = new ResponseEvent();
+                OnResponse = new MoeEvent<Element, Procedure.Response>();
 
-                OnEnd = new EndEvent();
+                OnEnd = new MoeEvent<Element>();
 
-                OnError = new ErrorEvent();
+                OnError = new MoeEvent<string>();
             }
         }
     }

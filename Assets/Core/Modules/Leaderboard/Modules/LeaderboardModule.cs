@@ -144,7 +144,7 @@ namespace Game
 
                 List = new List<LeaderboardElement>();
 
-                PlayFabRequest.OnResponse.AddListener(ResponseCallback);
+                PlayFabRequest.OnResponse.Add(ResponseCallback);
             }
 
             public virtual void Request()
@@ -222,11 +222,11 @@ namespace Game
             Personal = new PersonalElement();
             Register(Personal);
 
-            PlayFab.Login.OnResult.AddListener(LoginResultCallback);
+            PlayFab.Login.OnResult.Add(LoginResultCallback);
 
-            PlayFab.OnLogout.AddListener(LogoutCallback);
+            PlayFab.OnLogout.Add(LogoutCallback);
 
-            PlayFab.Player.Statistics.Update.OnResult.AddListener(PlayerUpdateStatisticCallback);
+            PlayFab.Player.Statistics.Update.OnResult.Add(PlayerUpdateStatisticCallback);
         }
         
         public virtual void Request()
