@@ -476,6 +476,11 @@ PrefabInstance:
       propertyPath: m_Spacing
       value: 40
       objectReference: {fileID: 0}
+    - target: {fileID: 3053397389621303178, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
+        type: 3}
+      propertyPath: axisConstraints.Y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8366811115945440159, guid: c93e1212da9c82b4a8cb7c35b7f8fa63,
         type: 3}
       propertyPath: m_EffectDistance.x
