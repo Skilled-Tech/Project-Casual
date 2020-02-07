@@ -22,24 +22,35 @@ using PlayFab.ClientModels;
 
 using System.Threading.Tasks;
 
+using NaughtyAttributes;
+
 namespace Game
 {
 	public class Sandbox : MonoBehaviour
 	{
-        public TextInputUI TextInput => Core.Instance.UI.TextInput;
+        [ReadOnly]
+        public Vector3 vector;
 
-        public MoeEvent MyEvent = new MoeEvent();
+        [ShowNativeProperty]
+        public float A => 5f;
+
+        [ShowNativeProperty]
+        public static float B => 5f;
+
+        [Button]
+        void Call()
+        {
+            Debug.Log("Hello World");
+        }
 
         private void Start()
         {
-            MyEvent.Add(() => Debug.Log("Add"));
-            MyEvent.Enque(() => Debug.Log("Subscribe"));
+            
         }
 
         private void Update()
         {
-            if (Input.anyKeyDown)
-                MyEvent.Invoke();
+            
         }
     }
 }
