@@ -55,7 +55,86 @@ namespace Game
 
                     IEnumerator Procedure()
                     {
-                        while(true)
+                        while (true)
+                        {
+                            if (Core.UI.Popup.Element.Visible)
+                            {
+                                if (Core.UI.Popup.Element.Transition.Value == 1f)
+                                    break;
+                            }
+                            else
+                                break;
+
+                            yield return new WaitForEndOfFrame();
+                        }
+
+                        if (Core.Facebook.Active == false)
+                            Activation();
+                        else if (Core.Facebook.Login.Active == false)
+                            Login();
+                        else
+                            End();
+                    }
+                }
+
+                void Activation()
+                {
+                    Core.Facebook.OnActivate.Enque(Callback);
+                    Core.Facebook.Activate();
+
+                    void Callback() => Login();
+                }
+
+                void Login()
+                {
+                    Core.Facebook.Login.OnResult.Enque(Callback);
+                    Core.Facebook.Login.Request();
+
+                    void Callback(Facebook.Unity.ILoginResult result)
+                    {
+                        if (result == null) //No Response
+                            InvokeError("No Response Recieved");
+                        else if (result.Cancelled) //Canceled
+                            Cancel();
+                        else if (string.IsNullOrEmpty(result.Error) == false) //Error
+                            InvokeError(result.Error);
+                        else
+                            End();
+                    }
+                }
+            }
+
+            public override void Configure(ProceduresCore reference)
+            {
+                base.Configure(reference);
+
+                Register(Procedures, login);
+            }
+        }
+
+        [SerializeField]
+        protected GoogleProperty google;
+        public GoogleProperty Google { get { return google; } }
+        [Serializable]
+        public class GoogleProperty : Property
+        {
+            [SerializeField]
+            protected LoginElement login;
+            public LoginElement Login { get { return login; } }
+            [Serializable]
+            public class LoginElement : Procedure
+            {
+                public bool Complete => Core.Facebook.Login.Active;
+
+                public override void Start()
+                {
+                    base.Start();
+
+                    Procedures.StartCoroutine(Procedure());
+
+                    IEnumerator Procedure()
+                    {
+                        while (true)
                         {
                             if (Core.UI.Popup.Element.Visible)
                             {
