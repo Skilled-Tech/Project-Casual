@@ -28,6 +28,8 @@ namespace Game
         public LoginProperty Login { get; protected set; }
         public class LoginProperty : Property
         {
+            public bool Active => Google.Platform.IsAuthenticated();
+
             public void Request()
             {
                 var builder = new PlayGamesClientConfiguration.Builder();
@@ -51,7 +53,7 @@ namespace Game
             {
                 if (success)
                 {
-                    
+                    Debug.Log("Google Login Success: " + Google.AuthCode);
                 }
                 else
                 {
@@ -68,7 +70,9 @@ namespace Game
             public GoogleCore Google => Reference;
         }
 
-        public string AuthCode => PlayGamesPlatform.Instance?.GetServerAuthCode();
+        public PlayGamesPlatform Platform => PlayGamesPlatform.Instance;
+
+        public string AuthCode => Platform?.GetServerAuthCode();
 
         public override void Configure(Core reference)
         {

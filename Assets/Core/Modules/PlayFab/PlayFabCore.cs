@@ -415,12 +415,31 @@ namespace Game
                         Send(request);
                     }
                 }
+
+                public GoogleRequest Google { get; protected set; }
+                public class GoogleRequest : Request<LinkGoogleAccountRequest, LinkGoogleAccountResult>
+                {
+                    public override MethodDelegate Method => PlayFabClientAPI.LinkGoogleAccount;
+
+                    public virtual void Request(string authCode)
+                    {
+                        var request = GenerateRequest();
+
+                        request.ServerAuthCode = authCode;
+
+                        Send(request);
+                    }
+                }
+
                 public override void Configure(PlayFabCore reference)
                 {
                     base.Configure(reference);
 
                     Facebook = new FacebookRequest();
                     Register(Facebook);
+
+                    Google = new GoogleRequest();
+                    Register(Google);
                 }
 
                 protected virtual void Register<TRequest, TResult>(Request<TRequest, TResult> element)
