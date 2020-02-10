@@ -832,12 +832,12 @@ MonoBehaviour:
     method:
       _override:
         enabled: 0
-        value: 1
+        value: 0
     customID:
       _ID:
         _override:
           enabled: 0
-          value: 9f0fad5041478021ba3e821a72802defdba990f2
+          value: 
   link: {}
   facebook: {}
 --- !u!1 &6478464170344696841
