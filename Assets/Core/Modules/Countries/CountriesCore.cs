@@ -23,21 +23,6 @@ namespace Game
 {
 	public class CountriesCore : Core.Module
 	{
-        public Sprite[] sprites;
-
-        [Button("Extract")]
-        void Extract()
-        {
-            list = new Element[sprites.Length];
-
-            for (int i = 0; i < sprites.Length; i++)
-            {
-                list[i] = new Element(sprites[i].name, sprites[i]);
-            }
-
-            EditorUtility.SetDirty(this);
-        }
-
         [SerializeField]
         protected Element[] list;
         public Element[] List { get { return list; } }
@@ -58,13 +43,17 @@ namespace Game
                 this.sprite = sprite;
             }
         }
-
+        
         public int Count => list.Length;
 
         public Element this[int index] => list[index];
-        public Element this[string code] => Get(code);
+        public Element this[string code] => From(code);
 
-        public Element Get(string code)
+        [SerializeField]
+        protected Element _default;
+        public Element Default { get { return _default; } }
+
+        public Element From(string code)
         {
             for (int i = 0; i < list.Length; i++)
                 if (string.Equals(list[i].Code, code, StringComparison.OrdinalIgnoreCase))
@@ -72,5 +61,31 @@ namespace Game
 
             return null;
         }
+        public Element From(PlayFab.ClientModels.CountryCode code) => From(code.ToString());
+
+        #region Editor
+        [Space]
+        public EditorProperty editor;
+        [Serializable]
+        public class EditorProperty
+        {
+            public Sprite[] sprites;
+        }
+
+#if UNITY_EDITOR
+        [Button("Create From Sprites")]
+        void CreateFromSprites()
+        {
+            list = new Element[editor.sprites.Length];
+
+            for (int i = 0; i < editor.sprites.Length; i++)
+            {
+                list[i] = new Element(editor.sprites[i].name, editor.sprites[i]);
+            }
+
+            EditorUtility.SetDirty(this);
+        }
+#endif
+        #endregion
     }
 }

@@ -43,7 +43,7 @@ namespace Game
         {
             base.UpdateState(reference);
 
-            location.sprite = Core.Countries[reference.Location.CountryCode.Value.ToString()].Sprite;
+            UpdateLocation(reference.Location);
 
             displayName.text = string.IsNullOrEmpty(reference.DisplayName) ? "Anonymous Player" : reference.DisplayName;
 
@@ -55,12 +55,25 @@ namespace Game
             {
                 DisplayName.text += " (You)";
             }
-            else
-            {
-
-            }
 
             gameObject.name = displayName.text;
+        }
+
+        protected virtual void UpdateLocation(LocationModel model)
+        {
+            if(model?.CountryCode == null)
+            {
+                location.sprite = Core.Countries.Default.Sprite;
+            }
+            else
+            {
+                var element = Core.Countries.From(model.CountryCode.Value);
+
+                if (element == null)
+                    location.sprite = Core.Countries.Default.Sprite;
+                else
+                    location.sprite = element.Sprite;
+            }
         }
     }
 }

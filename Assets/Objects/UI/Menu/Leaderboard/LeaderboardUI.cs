@@ -140,9 +140,9 @@ namespace Game
 
         protected virtual void UpdateState()
         {
-            emptyIndicator.IsOn = !HasEntries;
-
             Scroll.gameObject.SetActive(HasEntries);
+
+            emptyIndicator.IsOn = !HasEntries;
         }
 
         private void UpdateCallback(LeaderboardModule result) => Create();

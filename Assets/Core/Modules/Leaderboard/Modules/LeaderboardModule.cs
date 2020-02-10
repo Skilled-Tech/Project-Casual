@@ -45,9 +45,16 @@ namespace Game
         #endregion
 
         #region Element
-        public TopElement Top { get; protected set; }
+        [SerializeField]
+        protected TopElement top;
+        public TopElement Top { get { return top; } }
+        [Serializable]
         public class TopElement : Element<GetLeaderboardRequest, GetLeaderboardResult>
         {
+            [SerializeField]
+            protected int max = 5;
+            public int Max { get { return max; } }
+
             public override PlayFabCore.Request<GetLeaderboardRequest, GetLeaderboardResult> PlayFabRequest
                 => PlayFab.Title.Leaderboards.Get;
 
@@ -60,13 +67,20 @@ namespace Game
             {
                 base.Request();
 
-                PlayFab.Title.Leaderboards.Get.Request(Leaderboard.ID);
+                PlayFab.Title.Leaderboards.Get.Request(Leaderboard.ID, max);
             }
         }
 
-        public PersonalElement Personal { get; protected set; }
+        [SerializeField]
+        protected PersonalElement personal;
+        public PersonalElement Personal { get { return personal; } }
+        [Serializable]
         public class PersonalElement : Element<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult>
         {
+            [SerializeField]
+            protected int max = 3;
+            public int Max { get { return max; } }
+
             public override PlayFabCore.Request<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult> PlayFabRequest
                 => PlayFab.Title.Leaderboards.GetAroundPlayer;
 
@@ -79,10 +93,11 @@ namespace Game
             {
                 base.Request();
 
-                PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, 3);
+                PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, max);
             }
         }
 
+        [Serializable]
         public class Element : Property
         {
             #region List
@@ -129,15 +144,16 @@ namespace Game
                 OnError?.Invoke(error);
             }
         }
+        [Serializable]
         public abstract class Element<TRequest, TResult> : Element
             where TRequest :  PlayFabRequestCommon, new()
             where TResult :  PlayFabResultCommon
         {
-            public abstract string ExtractStatisitcName(TRequest request);
-            public abstract IList<PlayerLeaderboardEntry> ExtractEntries(TResult result);
-
             public abstract PlayFabCore.Request<TRequest, TResult> PlayFabRequest { get; }
 
+            public abstract string ExtractStatisitcName(TRequest request);
+            public abstract IList<PlayerLeaderboardEntry> ExtractEntries(TResult result);
+            
             public override void Configure(LeaderboardModule reference)
             {
                 base.Configure(reference);
@@ -182,6 +198,7 @@ namespace Game
         }
         #endregion
 
+        [Serializable]
         public class Property : IReference<LeaderboardModule>
         {
             public LeaderboardModule Leaderboard { get; protected set; }
@@ -202,6 +219,22 @@ namespace Game
         }
 
         public PlayFabCore PlayFab => Core.PlayFab;
+        
+        public override void Configure(LeaderboardsCore reference)
+        {
+            base.Configure(reference);
+
+            List = new List<LeaderboardElement>();
+
+            Register(top);
+            Register(personal);
+
+            PlayFab.Login.OnResult.Add(LoginResultCallback);
+
+            PlayFab.OnLogout.Add(LogoutCallback);
+
+            PlayFab.Player.Statistics.Update.OnResult.Add(PlayerUpdateStatisticCallback);
+        }
 
         public virtual void Register(Element element)
         {
@@ -210,25 +243,6 @@ namespace Game
             element.OnUpdate += (IList<LeaderboardElement> result) => ElementUpdateCallback(element, result);
         }
 
-        public override void Configure(LeaderboardsCore reference)
-        {
-            base.Configure(reference);
-
-            List = new List<LeaderboardElement>();
-
-            Top = new TopElement();
-            Register(Top);
-
-            Personal = new PersonalElement();
-            Register(Personal);
-
-            PlayFab.Login.OnResult.Add(LoginResultCallback);
-
-            PlayFab.OnLogout.Add(LogoutCallback);
-
-            PlayFab.Player.Statistics.Update.OnResult.Add(PlayerUpdateStatisticCallback);
-        }
-        
         public virtual void Request()
         {
             if(PlayFab.IsLoggedIn == false)
@@ -239,8 +253,8 @@ namespace Game
 
             List.Clear();
 
-            Top.Request();
-            if(PlayFab.Player.Profile.HasDisplayName) Personal.Request();
+            top.Request();
+            if(PlayFab.Player.Profile.HasDisplayName) personal.Request();
         }
 
         public virtual void Clear()
@@ -295,6 +309,8 @@ namespace Game
         {
             for (int i = 0; i < elements.Count; i++)
             {
+                if (elements[i].Value == 0) continue;
+
                 if (ContainsID(elements[i].ID)) continue;
 
                 List.Add(elements[i]);
