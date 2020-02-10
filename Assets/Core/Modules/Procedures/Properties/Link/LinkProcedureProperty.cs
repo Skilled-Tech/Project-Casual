@@ -81,59 +81,6 @@ namespace Game
                 }
             }
 
-            [SerializeField]
-            protected GoogleElement google;
-            public GoogleElement Google { get { return google; } }
-            [Serializable]
-            public class GoogleElement : Element
-            {
-                public override LoginMethod Method => LoginMethod.Google;
-
-                public override void Start()
-                {
-                    base.Start();
-
-                    if (PlayFab.IsLoggedIn == false)
-                        InvokeError("Must Be Logged In To Link Account");
-                    else if (Procedures.Google.Login.Complete)
-                        PlayFabLink();
-                    else
-                        GoogleLogin();
-                }
-
-                void GoogleLogin()
-                {
-                    RelyOn(Procedures.Google.Login, Callback);
-
-                    void Callback(Response response)
-                    {
-                        if (response.Success)
-                            PlayFabLink();
-                        else
-                            ApplyResponse(response);
-                    }
-                }
-
-                void PlayFabLink()
-                {
-                    PlayFab.Player.Link.Google.OnResponse.Enque(Callback);
-                    PlayFab.Player.Link.Google.Request(Core.Google.AuthCode);
-
-                    void Callback(PlayFabResultCommon result, PlayFabError error)
-                    {
-                        if (error == null)
-                            End();
-                        else
-                        {
-                            if (error.Error == PlayFabErrorCode.LinkedAccountAlreadyClaimed) //Login instead if the account is already claimed
-                                LoginToExistantAccount();
-                            else
-                                InvokeError(error.ErrorMessage);
-                        }
-                    }
-                }
-            }
-
             public abstract class Element : Procedure
             {
                 public LinkProperty Link => Procedures.Link;
@@ -213,7 +160,6 @@ namespace Game
                 List = new List<Element>();
 
                 Register(facebook);
-                Register(google);
             }
 
             public virtual void Register(Element element)

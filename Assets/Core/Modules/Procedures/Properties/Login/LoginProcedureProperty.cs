@@ -161,7 +161,7 @@ namespace Game
             public class FacebookElement : Element
             {
                 public override LoginMethod Method => LoginMethod.Facebook;
-                
+
                 public override void Start()
                 {
                     base.Start();
@@ -212,15 +212,15 @@ namespace Game
                 {
                     base.Start();
 
-                    if (Procedures.Google.Login.Complete == false)
-                        GoogleLogin();
+                    if (Procedures.Facebook.Login.Complete == false)
+                        FacebookLogin();
                     else
                         PlayFabLogin();
                 }
 
-                void GoogleLogin()
+                void FacebookLogin()
                 {
-                    RelyOn(Procedures.Google.Login, Callback);
+                    RelyOn(Procedures.Facebook.Login, Callback);
 
                     void Callback(Response response)
                     {
@@ -234,7 +234,7 @@ namespace Game
                 void PlayFabLogin()
                 {
                     PlayFab.Login.Google.OnResponse.Enque(Callback);
-                    PlayFab.Login.Google.Request(Core.Google.AuthCode);
+                    PlayFab.Login.Google.Request(Core.Facebook.AccessToken.TokenString);
 
                     void Callback(LoginResult result, PlayFabError error)
                     {
@@ -244,7 +244,6 @@ namespace Game
                             InvokeError(error.ErrorMessage);
                     }
                 }
-
             }
 
             #region List
@@ -283,7 +282,6 @@ namespace Game
 
                 Register(customID);
                 Register(facebook);
-                Register(google);
 
                 Procedures.Link.OnEnd.Add(LinkResultCallback);
             }

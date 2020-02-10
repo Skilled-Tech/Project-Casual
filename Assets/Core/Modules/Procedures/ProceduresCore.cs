@@ -124,7 +124,7 @@ namespace Game
             [Serializable]
             public class LoginElement : Procedure
             {
-                public bool Complete => Core.Google.Login.Active;
+                public bool Complete => Core.Facebook.Login.Active;
 
                 public override void Start()
                 {
@@ -147,24 +147,38 @@ namespace Game
                             yield return new WaitForEndOfFrame();
                         }
 
-                        if (Core.Google.Login.Active == false)
+                        if (Core.Facebook.Active == false)
+                            Activation();
+                        else if (Core.Facebook.Login.Active == false)
                             Login();
                         else
                             End();
                     }
                 }
 
+                void Activation()
+                {
+                    Core.Facebook.OnActivate.Enque(Callback);
+                    Core.Facebook.Activate();
+
+                    void Callback() => Login();
+                }
+
                 void Login()
                 {
-                    Core.Google.Login.OnResult.Enque(Callback);
-                    Core.Google.Login.Request();
+                    Core.Facebook.Login.OnResult.Enque(Callback);
+                    Core.Facebook.Login.Request();
 
-                    void Callback(bool success, string error)
+                    void Callback(Facebook.Unity.ILoginResult result)
                     {
-                        if(success)
-                            End();
+                        if (result == null) //No Response
+                            InvokeError("No Response Recieved");
+                        else if (result.Cancelled) //Canceled
+                            Cancel();
+                        else if (string.IsNullOrEmpty(result.Error) == false) //Error
+                            InvokeError(result.Error);
                         else
-                            InvokeError(error);
+                            End();
                     }
                 }
             }
@@ -261,7 +275,6 @@ namespace Game
             Register(this, login);
             Register(this, link);
             Register(this, facebook);
-            Register(this, google);
             Register(this, updateDisplayName);
         }
     }
