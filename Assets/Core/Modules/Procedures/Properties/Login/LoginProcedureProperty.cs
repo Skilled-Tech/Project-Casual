@@ -200,52 +200,6 @@ namespace Game
                 }
             }
 
-            [SerializeField]
-            protected GoogleElement google;
-            public GoogleElement Google { get { return google; } }
-            [Serializable]
-            public class GoogleElement : Element
-            {
-                public override LoginMethod Method => LoginMethod.Google;
-
-                public override void Start()
-                {
-                    base.Start();
-
-                    if (Procedures.Facebook.Login.Complete == false)
-                        FacebookLogin();
-                    else
-                        PlayFabLogin();
-                }
-
-                void FacebookLogin()
-                {
-                    RelyOn(Procedures.Facebook.Login, Callback);
-
-                    void Callback(Response response)
-                    {
-                        if (response.Success)
-                            PlayFabLogin();
-                        else
-                            ApplyResponse(response);
-                    }
-                }
-
-                void PlayFabLogin()
-                {
-                    PlayFab.Login.Google.OnResponse.Enque(Callback);
-                    PlayFab.Login.Google.Request(Core.Facebook.AccessToken.TokenString);
-
-                    void Callback(LoginResult result, PlayFabError error)
-                    {
-                        if (error == null)
-                            End();
-                        else
-                            InvokeError(error.ErrorMessage);
-                    }
-                }
-            }
-
             #region List
             public List<Element> List { get; protected set; }
 
@@ -352,7 +306,7 @@ namespace Game
 
     public enum LoginMethod
     {
-        CustomID, Facebook, Google
+        CustomID, Facebook
     }
 
     [Serializable]

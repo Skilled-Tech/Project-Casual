@@ -49,15 +49,15 @@ namespace Game
                 OnResult.Invoke(result);
             }
         }
-        
+
+        public AccessToken AccessToken { get; protected set; }
+        public bool HasAccessToken => string.IsNullOrEmpty(AccessToken?.TokenString) == false;
+
         [Serializable]
         public class Property : Core.Property<FacebookCore>
         {
             public FacebookCore Facebook => Reference;
         }
-
-        public AccessToken AccessToken { get; protected set; }
-        public bool HasAccessToken => string.IsNullOrEmpty(AccessToken?.TokenString) == false;
 
         public override void Configure(Core reference)
         {

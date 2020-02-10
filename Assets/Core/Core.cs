@@ -52,7 +52,6 @@ namespace Game
         public LeaderboardsCore Leaderboards { get; protected set; }
         public ProceduresCore Procedures { get; protected set; }
         public FacebookCore Facebook { get; protected set; }
-        public GoogleCore Google { get; protected set; }
 
         #region Modules
         public class Module<TModule> : MonoBehaviour, IReference<TModule>
@@ -156,7 +155,6 @@ namespace Game
             PlayFab = this.GetDependancy<PlayFabCore>();
             Procedures = this.GetDependancy<ProceduresCore>();
             Facebook = this.GetDependancy<FacebookCore>();
-            Google = this.GetDependancy<GoogleCore>();
 
             Application.targetFrameRate = 60;
 
