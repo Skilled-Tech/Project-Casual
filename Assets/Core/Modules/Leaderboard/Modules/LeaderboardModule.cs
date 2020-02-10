@@ -323,6 +323,8 @@ namespace Game
 
         public int Value { get; protected set; }
 
+        public LocationModel Location { get; protected set; }
+
         public static class Comparisons
         {
             public class Position : IComparer<LeaderboardElement>
@@ -336,16 +338,17 @@ namespace Game
             }
         }
 
-        public LeaderboardElement(PlayerLeaderboardEntry entry) : this(entry.PlayFabId, entry.Position, entry.DisplayName, entry.StatValue)
+        public LeaderboardElement(PlayerLeaderboardEntry entry) : this(entry.PlayFabId, entry.Position, entry.DisplayName, entry.StatValue, entry.Profile.Locations.FirstOrDefault())
         {
 
         }
-        public LeaderboardElement(string ID, int position, string displayName, int value)
+        public LeaderboardElement(string ID, int position, string displayName, int value, LocationModel location)
         {
             this.ID = ID;
             this.Position = position;
             this.DisplayName = displayName;
             this.Value = value;
+            this.Location = location;
         }
     }
 }

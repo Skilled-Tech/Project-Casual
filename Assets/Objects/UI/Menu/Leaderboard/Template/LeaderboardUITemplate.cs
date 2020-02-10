@@ -24,6 +24,10 @@ namespace Game
 	public class LeaderboardUITemplate : UITemplate<LeaderboardElement, LeaderboardUITemplate>
 	{
         [SerializeField]
+        protected Image location;
+        public Image Location { get { return location; } }
+
+        [SerializeField]
         protected Text displayName;
         public Text DisplayName { get { return displayName; } }
 
@@ -38,6 +42,8 @@ namespace Game
         protected override void UpdateState(LeaderboardElement reference)
         {
             base.UpdateState(reference);
+
+            location.sprite = Core.Countries[reference.Location.CountryCode.Value.ToString()].Sprite;
 
             displayName.text = string.IsNullOrEmpty(reference.DisplayName) ? "Anonymous Player" : reference.DisplayName;
 

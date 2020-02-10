@@ -51,6 +51,7 @@ namespace Game
         public PlayFabCore PlayFab { get; protected set; }
         public LeaderboardsCore Leaderboards { get; protected set; }
         public ProceduresCore Procedures { get; protected set; }
+        public CountriesCore Countries { get; protected set; }
         public FacebookCore Facebook { get; protected set; }
 
         #region Modules
@@ -154,6 +155,7 @@ namespace Game
             Leaderboards = this.GetDependancy<LeaderboardsCore>();
             PlayFab = this.GetDependancy<PlayFabCore>();
             Procedures = this.GetDependancy<ProceduresCore>();
+            Countries = this.GetDependancy<CountriesCore>();
             Facebook = this.GetDependancy<FacebookCore>();
 
             Application.targetFrameRate = 60;
