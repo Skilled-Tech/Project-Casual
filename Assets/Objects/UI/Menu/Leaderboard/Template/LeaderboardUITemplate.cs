@@ -21,7 +21,7 @@ using PlayFab.ClientModels;
 
 namespace Game
 {
-	public class LeaderboardUITemplate : UITemplate<LeaderboardElement, LeaderboardUITemplate>
+	public class LeaderboardUITemplate : UITemplate<LeaderboardEntry, LeaderboardUITemplate>
 	{
         [SerializeField]
         protected Image location;
@@ -39,7 +39,7 @@ namespace Game
         protected Text value;
         public Text Value { get { return value; } }
 
-        protected override void UpdateState(LeaderboardElement reference)
+        protected override void UpdateState(LeaderboardEntry reference)
         {
             base.UpdateState(reference);
 

@@ -28,101 +28,46 @@ namespace Game
         public string ID => gameObject.name;
 
         #region List
-        public List<LeaderboardElement> List { get; protected set; }
+        public List<Element> List { get; protected set; }
 
         public int Count => List.Count;
 
-        public LeaderboardElement this[int index] => List[index];
-
-        public bool ContainsID(string ID)
-        {
-            for (int i = 0; i < Count; i++)
-                if (this[i].ID == ID)
-                    return true;
-
-            return false;
-        }
+        public Element this[int index] => List[index];
         #endregion
 
-        #region Element
-        [SerializeField]
-        protected TopElement top;
-        public TopElement Top { get { return top; } }
-        [Serializable]
-        public class TopElement : Element<GetLeaderboardRequest, GetLeaderboardResult>
+        public bool IsProcessing
         {
-            [SerializeField]
-            protected int max = 5;
-            public int Max { get { return max; } }
-
-            public override PlayFabCore.Request<GetLeaderboardRequest, GetLeaderboardResult> PlayFabRequest
-                => PlayFab.Title.Leaderboards.Get;
-
-            public override IList<PlayerLeaderboardEntry> ExtractEntries(GetLeaderboardResult result)
-                => result.Leaderboard;
-            public override string ExtractStatisitcName(GetLeaderboardRequest request)
-                => request.StatisticName;
-
-            public override void Request()
+            get
             {
-                base.Request();
+                for (int i = 0; i < Count; i++)
+                    if (this[i].IsProcessing)
+                        return true;
 
-                PlayFab.Title.Leaderboards.Get.Request(Leaderboard.ID, max);
+                return false;
             }
         }
 
-        [SerializeField]
-        protected PersonalElement personal;
-        public PersonalElement Personal { get { return personal; } }
-        [Serializable]
-        public class PersonalElement : Element<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult>
+        public abstract class Element : Module
         {
-            [SerializeField]
-            protected int max = 3;
-            public int Max { get { return max; } }
+            public abstract string ID { get; }
 
-            public override PlayFabCore.Request<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult> PlayFabRequest
-                => PlayFab.Title.Leaderboards.GetAroundPlayer;
-
-            public override IList<PlayerLeaderboardEntry> ExtractEntries(GetLeaderboardAroundPlayerResult result)
-                => result.Leaderboard;
-            public override string ExtractStatisitcName(GetLeaderboardAroundPlayerRequest request)
-                => request.StatisticName;
-
-            public override void Request()
-            {
-                base.Request();
-
-                PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, max);
-            }
-        }
-
-        [Serializable]
-        public class Element : Property
-        {
             #region List
-            public List<LeaderboardElement> List { get; protected set; }
+            public List<LeaderboardEntry> List { get; protected set; }
 
             public int Count => List.Count;
 
-            public LeaderboardElement this[int index] => List[index];
+            public LeaderboardEntry this[int index] => List[index];
             #endregion
 
-            protected virtual void Update(IList<PlayerLeaderboardEntry> results)
+            public bool IsProcessing { get; protected set; }
+
+            public override void Configure(LeaderboardModule reference)
             {
-                if(results != null && results.Count > 0)
-                {
-                    for (int i = 0; i < results.Count; i++)
-                    {
-                        var element = new LeaderboardElement(results[i]);
+                base.Configure(reference);
 
-                        List.Add(element);
-                    }
+                IsProcessing = false;
 
-                    List.Sort(LeaderboardElement.Comparisons.Position.Instance); //Just incase ¯\_(ツ)_/¯ ?
-
-                    InvokeUpdate();
-                }
+                List = new List<LeaderboardEntry>();
             }
 
             public virtual void Clear()
@@ -132,90 +77,73 @@ namespace Game
                 InvokeUpdate();
             }
 
-            public event RestDelegates.Result<IList<LeaderboardElement>> OnUpdate;
-            protected virtual void InvokeUpdate()
-            {
-                OnUpdate?.Invoke(List);
-            }
-
-            public event RestDelegates.Error<PlayFabError> OnError;
-            protected virtual void ErrorCallback(PlayFabError error)
-            {
-                OnError?.Invoke(error);
-            }
-        }
-        [Serializable]
-        public abstract class Element<TRequest, TResult> : Element
-            where TRequest :  PlayFabRequestCommon, new()
-            where TResult :  PlayFabResultCommon
-        {
-            public abstract PlayFabCore.Request<TRequest, TResult> PlayFabRequest { get; }
-
-            public abstract string ExtractStatisitcName(TRequest request);
-            public abstract IList<PlayerLeaderboardEntry> ExtractEntries(TResult result);
-            
-            public override void Configure(LeaderboardModule reference)
-            {
-                base.Configure(reference);
-
-                List = new List<LeaderboardElement>();
-
-                PlayFabRequest.OnResponse.Add(ResponseCallback);
-            }
-
             public virtual void Request()
             {
-
+                IsProcessing = true;
             }
 
-            #region Events
-            private void ResponseCallback(TResult result, PlayFabError error)
-            {
-                var request = result.Request as TRequest;
-
-                if (ExtractStatisitcName(request) == Leaderboard.ID)
-                    ResponseAction(request, result, error);
-            }
-
-            public event RestDelegates.Response<IList<LeaderboardElement>, PlayFabError> OnResponse;
-            protected virtual void ResponseAction(TRequest request, TResult result, PlayFabError error)
-            {
-                if (error == null)
-                    ResultAction(request, result);
-                else
-                    ErrorCallback(error);
-
-                OnResponse?.Invoke(List, error);
-            }
-
-            protected virtual void ResultAction(TRequest request, TResult result)
+            protected virtual void ProcessResult(IList<PlayerLeaderboardEntry> result)
             {
                 List.Clear();
 
-                Update(ExtractEntries(result));
+                for (int i = 0; i < result.Count; i++)
+                {
+                    var instance = new LeaderboardEntry(result[i]);
+
+                    List.Add(instance);
+                }
+
+                IsProcessing = false;
+
+                InvokeUpdate();
             }
-            #endregion
+
+            protected virtual void InvokeError(PlayFabError error)
+            {
+                IsProcessing = false;
+            }
+
+            public MoeEvent<Element> OnUpdate { get; protected set; } = new MoeEvent<Element>();
+            protected virtual void InvokeUpdate()
+            {
+                OnUpdate.Invoke(this);
+            }
         }
-        #endregion
-
-        [Serializable]
-        public class Property : IReference<LeaderboardModule>
+        public abstract class Element<TResult> : Element
+            where TResult : PlayFabResultCommon
         {
-            public LeaderboardModule Leaderboard { get; protected set; }
+            public abstract IList<PlayerLeaderboardEntry> ResultToList(TResult result);
 
-            public Core Core => Core.Instance;
-
-            public PlayFabCore PlayFab => Core.PlayFab;
-
-            public virtual void Configure(LeaderboardModule reference)
+            protected virtual void ResponseCallback(TResult result, PlayFabError error)
             {
-                Leaderboard = reference;
+                if (error == null)
+                    ProcessResult(ResultToList(result));
+                else
+                    InvokeError(error);
             }
+        }
 
-            public virtual void Init()
+        public IEnumerable<LeaderboardEntry> IEnumerate() => IEnumerate(true);
+        public IEnumerable<LeaderboardEntry> IEnumerate(bool ignoreDuplicates)
+        {
+            var hash = new HashSet<string>();
+
+            for (int x = 0; x < Count; x++)
             {
+                for (int y = 0; y < this[x].Count; y++)
+                {
+                    if (ignoreDuplicates && hash.Contains(this[x][y].ID)) continue;
 
+                    hash.Add(this[x][y].ID);
+
+                    yield return this[x][y];
+                }
             }
+        }
+
+        public class Module : Core.Module<LeaderboardModule>
+        {
+            public LeaderboardModule Leaderboard => Reference;
         }
 
         public PlayFabCore PlayFab => Core.PlayFab;
@@ -224,50 +152,55 @@ namespace Game
         {
             base.Configure(reference);
 
-            List = new List<LeaderboardElement>();
-
-            Register(top);
-            Register(personal);
+            List = this.GetAllDependancies<Element>();
 
             PlayFab.Login.OnResult.Add(LoginResultCallback);
-
             PlayFab.OnLogout.Add(LogoutCallback);
-
             PlayFab.Player.Statistics.Update.OnResult.Add(PlayerUpdateStatisticCallback);
+
+            References.Configure(this);
         }
 
-        public virtual void Register(Element element)
+        public override void Init()
         {
-            base.Register(this, element);
+            base.Init();
 
-            element.OnUpdate += (IList<LeaderboardElement> result) => ElementUpdateCallback(element, result);
+            for (int i = 0; i < Count; i++)
+            {
+                this[i].OnUpdate.Add(ElementUpdateCalllback);
+            }
+
+            References.Init(this);
         }
 
         public virtual void Request()
         {
-            if(PlayFab.IsLoggedIn == false)
+            if (PlayFab.IsLoggedIn == false)
             {
                 Debug.LogWarning("Can't request leaderboard " + ID + " when the player isn't logged in, ignoring");
                 return;
             }
 
-            List.Clear();
-
-            top.Request();
-            if(PlayFab.Player.Profile.HasDisplayName) personal.Request();
+            for (int i = 0; i < Count; i++)
+                this[i].Request();
         }
 
         public virtual void Clear()
         {
-            List.Clear();
-
-            InvokeUpdate();
+            for (int i = 0; i < Count; i++)
+                this[i].Clear();
         }
 
         #region Callbacks
-        private void LoginResultCallback(LoginResult result) => Request();
+        private void LoginResultCallback(LoginResult result)
+        {
+            Request();
+        }
 
-        private void LogoutCallback() => InvokeUpdate();
+        private void LogoutCallback()
+        {
+            InvokeUpdate();
+        }
 
         Coroutine PlayerUpdateStatisticCoroutine;
         void PlayerUpdateStatisticCallback(UpdatePlayerStatisticsResult result)
@@ -293,9 +226,16 @@ namespace Game
             }
         }
 
-        private void ElementUpdateCallback(Element element, IList<LeaderboardElement> list)
+        void ElementUpdateCalllback(Element element)
         {
-            UpdateAction(list);
+            if(IsProcessing)
+            {
+
+            }
+            else
+            {
+                InvokeUpdate();
+            }
         }
 
         public event RestDelegates.Error<PlayFabError> OnError;
@@ -304,22 +244,6 @@ namespace Game
             OnError?.Invoke(error);
         }
         #endregion
-        
-        protected virtual void UpdateAction(IList<LeaderboardElement> elements)
-        {
-            for (int i = 0; i < elements.Count; i++)
-            {
-                if (elements[i].Value == 0) continue;
-
-                if (ContainsID(elements[i].ID)) continue;
-
-                List.Add(elements[i]);
-            }
-
-            List.Sort(LeaderboardElement.Comparisons.Position.Instance);
-
-            InvokeUpdate();
-        }
 
         public event RestDelegates.Result<LeaderboardModule> OnUpdate;
         protected virtual void InvokeUpdate()
@@ -329,7 +253,7 @@ namespace Game
     }
 
     [Serializable]
-    public class LeaderboardElement
+    public class LeaderboardEntry
     {
         public string ID { get; protected set; }
 
@@ -343,22 +267,22 @@ namespace Game
 
         public static class Comparisons
         {
-            public class Position : IComparer<LeaderboardElement>
+            public class Position : IComparer<LeaderboardEntry>
             {
                 public static Position Instance = new Position();
 
-                public int Compare(LeaderboardElement x, LeaderboardElement y)
+                public int Compare(LeaderboardEntry x, LeaderboardEntry y)
                 {
                     return x.Position - y.Position;
                 }
             }
         }
 
-        public LeaderboardElement(PlayerLeaderboardEntry entry) : this(entry.PlayFabId, entry.Position, entry.DisplayName, entry.StatValue, entry.Profile.Locations.FirstOrDefault())
+        public LeaderboardEntry(PlayerLeaderboardEntry entry) : this(entry.PlayFabId, entry.Position, entry.DisplayName, entry.StatValue, entry.Profile.Locations.FirstOrDefault())
         {
 
         }
-        public LeaderboardElement(string ID, int position, string displayName, int value, LocationModel location)
+        public LeaderboardEntry(string ID, int position, string displayName, int value, LocationModel location)
         {
             this.ID = ID;
             this.Position = position;

@@ -151,16 +151,16 @@ namespace Game
         {
             Clear();
 
-            for (int i = 0; i < Leaderboard.Count; i++)
+            foreach (var entry in Leaderboard.IEnumerate())
             {
-                if (Leaderboard[i].Value == 0 && String.IsNullOrEmpty(Leaderboard[i].DisplayName)) continue;
+                if (entry.Value == 0 && (entry.DisplayName == null || entry.DisplayName == string.Empty)) continue;
 
-                if(i != 0 && Leaderboard[i].Position > Leaderboard[i - 1].Position + 1)
+                if(Entries.Count > 0 && entry.Position != Entries.Last().Reference.Position + 1)
                 {
                     Elements.Add(Seperator());
                 }
 
-                var instance = LeaderboardUITemplate.Create(Leaderboard[i], prefabs.Template, Scroll.content);
+                var instance = LeaderboardUITemplate.Create(entry, prefabs.Template, Scroll.content);
 
                 Entries.Add(instance);
                 Elements.Add(instance.Element);
@@ -168,10 +168,7 @@ namespace Game
 
             UpdateState();
 
-            if (Element.Visible)
-            {
-                ChainShow();
-            }
+            if (Element.Visible) ChainShow();
 
             UIElement Seperator()
             {
