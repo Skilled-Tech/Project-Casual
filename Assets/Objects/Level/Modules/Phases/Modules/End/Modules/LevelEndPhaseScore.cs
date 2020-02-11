@@ -25,9 +25,9 @@ namespace Game
         protected int adMultiplier = 2;
         public int AdMultiplier { get { return adMultiplier; } }
 
-        public PopupUI Popup => Core.UI.Popup;
-
         public bool RequireManualSubmit => ProcessManualSubmit(false);
+
+        public PopupUI Popup => Core.UI.Popup;
 
         public override void Configure(LevelEndPhase reference)
         {
