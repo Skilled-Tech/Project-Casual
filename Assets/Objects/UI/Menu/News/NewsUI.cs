@@ -21,7 +21,7 @@ namespace Game
 {
     [RequireComponent(typeof(UIElement))]
     public class NewsUI : MonoBehaviour, IInitialize
-	{
+    {
         [SerializeField]
         protected UIElement panel;
         public UIElement Panel { get { return panel; } }
@@ -71,7 +71,7 @@ namespace Game
 
                 panel.gameObject.SetActive(report.HasLinks);
 
-                if(report.HasLinks)
+                if (report.HasLinks)
                 {
                     for (int i = 0; i < report.Links.Length; i++)
                     {
@@ -92,6 +92,73 @@ namespace Game
             }
         }
 
+        [SerializeField]
+        protected ProgressProperty progress;
+        public ProgressProperty Progress { get { return progress; } }
+        [Serializable]
+        public class ProgressProperty : Property
+        {
+            [SerializeField]
+            protected Text label;
+            public Text Label { get { return label; } }
+
+            public string Text
+            {
+                get => label.text;
+                set => label.text = value;
+            }
+
+            [SerializeField]
+            protected SelectableRelay relay;
+            public SelectableRelay Relay { get { return relay; } }
+
+            public override void Configure(NewsUI reference)
+            {
+                base.Configure(reference);
+
+                relay.OnInvoke += RelayCallback;
+            }
+
+            private void RelayCallback()
+            {
+                News.StartCoroutine(Procedure());
+                IEnumerator Procedure()
+                {
+                    if (News.Queue.Count == 0)
+                    {
+                        News.Hide();
+                    }
+                    else
+                    {
+                        relay.Interactable = false;
+                        {
+                            News.Panel.Hide();
+                            bool PanelIsHidden() => News.Panel.Transition == null ? true : News.Panel.Transition.Value == 0f;
+                            yield return new WaitUntil(PanelIsHidden);
+                        }
+                        relay.Interactable = true;
+
+                        Action();
+                    }
+                }
+            }
+
+            public virtual NewsReport Action()
+            {
+                if (News.Queue.Count == 0)
+                {
+                    Debug.Log("trying to progress empty news queue, ignoring");
+                    return null;
+                }
+
+                var report = News.Queue.Dequeue();
+
+                News.Report(report);
+
+                return report;
+            }
+        }
+
         public class Property : IReference<NewsUI>
         {
             public NewsUI News { get; protected set; }
@@ -107,11 +174,7 @@ namespace Game
             }
         }
 
-        [SerializeField]
-        protected Relay progress;
-        public Relay Progress { get { return progress; } }
-
-        public int Index { get; protected set; }
+        public Queue<NewsReport> Queue { get; protected set; }
 
         public UIElement Element { get; protected set; }
 
@@ -121,63 +184,41 @@ namespace Game
         {
             Element = GetComponent<UIElement>();
 
+            Queue = new Queue<NewsReport>();
+
             References.Configure(this, links);
+            References.Configure(this, progress);
         }
         public virtual void Init()
         {
-            progress.OnInvoke += ProgressAction;
-
-            Core.News.OnUpdate.Add(UpdateCallback);
+            Core.News.OnUpdate.Add(CoreUpdateCallback);
 
             References.Init(this, links);
+            References.Init(this, progress);
         }
 
-        void UpdateCallback()
+        void CoreUpdateCallback()
         {
-            Show();
+            Show(Core.News.Reports);
         }
 
-        void ProgressAction()
+        public virtual void Show(IList<NewsReport> list)
         {
-            StartCoroutine(Procedure());
-            IEnumerator Procedure()
-            {
-                Index++;
+            Queue.Clear();
 
-                if (Index >= Core.News.Reports.Count)
-                {
-                    Panel.Hide();
-                    Element.Hide();
-                }
-                else
-                {
-                    progress.enabled = false;
-                    {
-                        panel.Hide();
-                        bool PanelIsHidden() => panel.Transition == null ? true : panel.Transition.Value == 0f;
-                        yield return new WaitUntil(PanelIsHidden);
-                    }
-                    progress.enabled = true;
+            for (int i = 0; i < list.Count; i++)
+                Queue.Enqueue(list[i]);
 
-                    Report(Core.News.Reports[Index]);
-                }
-            }
-        }
-
-        public virtual void Show()
-        {
-            if(Core.News.Reports.Count == 0)
+            if (Queue.Count == 0)
             {
                 Debug.LogWarning("Trying to show news UI with zero news reports, ignoring");
                 return;
             }
 
-            Index = 0;
-
             Element.Show();
             panel.SetActive(false);
 
-            Report(Core.News.Reports[0]);
+            Progress.Action();
         }
 
         public virtual void Report(NewsReport report)
@@ -191,10 +232,17 @@ namespace Game
         protected virtual void UpdateState(NewsReport report)
         {
             title.text = report.Title;
-
             text.text = report.Text;
 
             links.UpdateState(report);
+
+            progress.Text = Queue.Count == 0 ? "Close" : "Next";
+        }
+
+        public virtual void Hide()
+        {
+            Panel.Hide();
+            Element.Hide();
         }
     }
 }

@@ -46,6 +46,8 @@ namespace Game
         {
             base.UpdateState(reference);
 
+            gameObject.name = reference.Title;
+
             title.text = reference.Title;
         }
 

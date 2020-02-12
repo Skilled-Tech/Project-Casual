@@ -20,35 +20,16 @@ using Random = UnityEngine.Random;
 using PlayFab;
 using PlayFab.ClientModels;
 
-using System.Threading.Tasks;
-
 using NaughtyAttributes;
+
+using Newtonsoft.Json;
 
 namespace Game
 {
 	public class Sandbox : MonoBehaviour
 	{
-        [ReadOnly]
-        public Vector3 vector;
-
-        [ShowNativeProperty]
-        public float A => 5f;
-
-        [ShowNativeProperty]
-        public static float B => 5f;
-
-        [Button]
-        void Call()
-        {
-            Debug.Log("Hello World");
-        }
-
-        private void Start()
-        {
-            
-        }
-
-        private void Update()
+        [Button("Execute")]
+        void Execute()
         {
             
         }
