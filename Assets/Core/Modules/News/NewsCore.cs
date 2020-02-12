@@ -21,17 +21,15 @@ using PlayFab;
 using PlayFab.ClientModels;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Game
 {
     public class NewsCore : Core.Module
     {
-        public const string Key = "News";
-
-        public string JSON { get; protected set; }
-
         [SerializeField]
         protected List<NewsReport> reports;
         public List<NewsReport> Reports { get { return reports; } }
@@ -42,34 +40,36 @@ namespace Game
         {
             base.Configure(reference);
 
-            PlayFab.Title.Data.OnResponse.Add(TitleDataCallback);
+            reports = new List<NewsReport>();
 
+            PlayFab.Title.News.OnResponse.Add(PlayFabResponseCallback);
             PlayFab.Login.OnResult.Add(LoginCallback);
         }
 
         public void Request()
         {
-            PlayFab.Title.Data.Request(Key);
+            PlayFab.Title.News.Request();
         }
 
-        protected virtual void Parse(string json)
+        protected virtual void Parse(IList<TitleNewsItem> list)
         {
-            if (string.IsNullOrEmpty(json))
+            reports.Clear();
+
+            for (int i = 0; i < list.Count; i++)
             {
-                reports.Clear();
-            }
-            else
-            {
+                NewsReport instance;
+
                 try
                 {
-                    reports = JsonConvert.DeserializeObject<List<NewsReport>>(json);
+                    instance = NewsReport.Create(list[i]);
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Error parsing news: " + Environment.NewLine + e.Message);
-
-                    reports.Clear();
+                    Debug.LogError("Error parsing news item " + list[i].NewsId + ", ignoring news report" + Environment.NewLine + e.Message);
+                    continue;
                 }
+
+                reports.Add(instance);
             }
 
             InvokeUpdate();
@@ -86,46 +86,35 @@ namespace Game
             Request();
         }
 
-        void TitleDataCallback(GetTitleDataResult result, PlayFabError error)
+        void PlayFabResponseCallback(GetTitleNewsResult result, PlayFabError error)
         {
-            var request = result.Request as GetTitleDataRequest;
-
-            if (request.Keys.Contains(Key))
+            if(error == null)
             {
-                if (error == null)
-                {
-                    if (result.Data.ContainsKey(Key))
-                        JSON = result.Data[Key];
-                    else
-                        JSON = string.Empty;
+                Parse(result.News);
+            }
+            else
+            {
 
-                    Parse(JSON);
-                }
-                else
-                {
-
-                }
             }
         }
     }
 
     [Serializable]
-    public struct NewsReport
+    public class NewsReport
     {
-        [JsonProperty(Required = Required.Always)]
-        [SerializeField]
-        private string id;
-        public string ID { get { return id; } }
+        public string ID { get; protected set; }
 
-        [JsonProperty(Required = Required.Always)]
         [SerializeField]
         private string title;
         public string Title { get { return title; } }
 
-        [JsonProperty(Required = Required.Always)]
+        public string Body { get; protected set; }
+
+        [JsonProperty]
+        [TextArea]
         [SerializeField]
-        private string body;
-        public string Body { get { return body; } }
+        private string text;
+        public string Text { get { return text; } }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue(NewsReportRecurrence.Once)]
@@ -133,12 +122,18 @@ namespace Game
         private NewsReportRecurrence recurrence;
         public NewsReportRecurrence Recurrence { get { return recurrence; } }
 
-        public NewsReport(string id, string title, string body, NewsReportRecurrence recurrence)
+        public static NewsReport Create(TitleNewsItem item)
         {
-            this.id = id;
-            this.title = title;
-            this.body = body;
-            this.recurrence = recurrence;
+            var result = new NewsReport()
+            {
+                ID = item.NewsId,
+                title = item.Title,
+                Body = item.Body,
+            };
+
+            JsonConvert.PopulateObject(result.Body, result);
+
+            return result;
         }
     }
 

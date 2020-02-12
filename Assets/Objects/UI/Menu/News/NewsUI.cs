@@ -31,8 +31,8 @@ namespace Game
         public Text Title { get { return title; } }
 
         [SerializeField]
-        protected Text body;
-        public Text Body { get { return body; } }
+        protected Text text;
+        public Text Text { get { return text; } }
 
         [SerializeField]
         protected Relay progress;
@@ -105,8 +105,6 @@ namespace Game
 
         public virtual void Report(NewsReport report)
         {
-            Debug.Log("Reporting: " + report.Title);
-
             Element.Show();
             panel.Show();
 
@@ -117,7 +115,7 @@ namespace Game
         {
             title.text = report.Title;
 
-            body.text = report.Body;
+            text.text = report.Text;
         }
     }
 }

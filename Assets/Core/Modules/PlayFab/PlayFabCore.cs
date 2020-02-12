@@ -301,6 +301,22 @@ namespace Game
                 }
             }
 
+            public NewsRequest News { get; protected set; }
+            public class NewsRequest : Request<GetTitleNewsRequest, GetTitleNewsResult>
+            {
+                public override MethodDelegate Method => PlayFabClientAPI.GetTitleNews;
+
+                public virtual void Request() => Request(10);
+                public virtual void Request(int count)
+                {
+                    var request = GenerateRequest();
+
+                    request.Count = count;
+
+                    Send(request);
+                }
+            }
+
             public override void Configure(PlayFabCore reference)
             {
                 base.Configure(reference);
@@ -308,6 +324,8 @@ namespace Game
                 Register(PlayFab, leaderboards);
 
                 Data = new DataRequest();
+
+                News = new NewsRequest();
             }
         }
 
