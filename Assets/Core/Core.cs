@@ -53,6 +53,7 @@ namespace Game
         public ProceduresCore Procedures { get; protected set; }
         public CountriesCore Countries { get; protected set; }
         public FacebookCore Facebook { get; protected set; }
+        public NewsCore News { get; protected set; }
 
         #region Modules
         public class Module<TModule> : MonoBehaviour, IReference<TModule>
@@ -157,6 +158,7 @@ namespace Game
             Procedures = this.GetDependancy<ProceduresCore>();
             Countries = this.GetDependancy<CountriesCore>();
             Facebook = this.GetDependancy<FacebookCore>();
+            News = this.GetDependancy<NewsCore>();
 
             Application.targetFrameRate = 60;
 

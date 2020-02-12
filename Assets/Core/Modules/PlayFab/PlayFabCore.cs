@@ -270,11 +270,44 @@ namespace Game
                 }
             }
 
+            public DataRequest Data { get; protected set; }
+            public class DataRequest : Request<GetTitleDataRequest, GetTitleDataResult>
+            {
+                public override MethodDelegate Method => PlayFabClientAPI.GetTitleData;
+
+                public virtual void Request() => Query(null);
+
+                public virtual void Request(params string[] keys)
+                {
+                    var list = keys.ToList();
+
+                    Query(list);
+                }
+
+                public virtual void Request(IList<string> keys)
+                {
+                    var list = keys.ToList();
+
+                    Query(list);
+                }
+
+                protected virtual void Query(List<string> keys)
+                {
+                    var request = GenerateRequest();
+
+                    request.Keys = keys;
+
+                    Send(request);
+                }
+            }
+
             public override void Configure(PlayFabCore reference)
             {
                 base.Configure(reference);
 
                 Register(PlayFab, leaderboards);
+
+                Data = new DataRequest();
             }
         }
 

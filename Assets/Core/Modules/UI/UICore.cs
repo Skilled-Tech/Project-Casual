@@ -44,6 +44,10 @@ namespace Game
         }
 
         [SerializeField]
+        protected NewsUI news;
+        public NewsUI News { get { return news; } }
+
+        [SerializeField]
         protected TextInputUI textInput;
         public TextInputUI TextInput { get { return textInput; } }
 
@@ -77,6 +81,8 @@ namespace Game
             base.Init();
 
             optionsMenu.SetActive(false);
+
+            news.Element.SetActive(false);
 
             textInput.Element.SetActive(false);
             textInput.Validator.Add(BadWordsFilter.IsClean);
