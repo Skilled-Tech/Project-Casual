@@ -110,6 +110,7 @@ namespace Game
 
         public string Body { get; protected set; }
 
+#pragma warning disable CS0649
         [JsonProperty]
         [TextArea]
         [SerializeField]
@@ -121,6 +122,28 @@ namespace Game
         [SerializeField]
         private NewsReportRecurrence recurrence;
         public NewsReportRecurrence Recurrence { get { return recurrence; } }
+
+        [JsonProperty]
+        [SerializeField]
+        private LinkData[] links;
+        public LinkData[] Links { get { return links; } }
+
+        public bool HasLinks => links != null && links.Length > 0;
+
+        [Serializable]
+        public class LinkData
+        {
+            [JsonProperty]
+            [SerializeField]
+            protected string title;
+            public string Title { get { return title; } }
+
+            [JsonProperty(PropertyName = "url")]
+            [SerializeField]
+            protected string _URL;
+            public string URL { get { return _URL; } }
+        }
+#pragma warning restore CS0649
 
         public static NewsReport Create(TitleNewsItem item)
         {

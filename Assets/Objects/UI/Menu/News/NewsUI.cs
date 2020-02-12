@@ -35,6 +35,79 @@ namespace Game
         public Text Text { get { return text; } }
 
         [SerializeField]
+        protected LinksProperty links;
+        public LinksProperty Links { get { return links; } }
+        [Serializable]
+        public class LinksProperty : Property
+        {
+            [SerializeField]
+            protected RectTransform panel;
+            public RectTransform Panel { get { return panel; } }
+
+            [SerializeField]
+            protected GameObject template;
+            public GameObject Template { get { return template; } }
+
+            public List<NewsReportLinkUITemplate> Elements { get; protected set; }
+
+            public override void Configure(NewsUI reference)
+            {
+                base.Configure(reference);
+
+                Elements = new List<NewsReportLinkUITemplate>();
+            }
+
+            public virtual void Clear()
+            {
+                for (int i = 0; i < Elements.Count; i++)
+                    Destroy(Elements[i].gameObject);
+
+                Elements.Clear();
+            }
+
+            public virtual void UpdateState(NewsReport report)
+            {
+                Clear();
+
+                panel.gameObject.SetActive(report.HasLinks);
+
+                if(report.HasLinks)
+                {
+                    for (int i = 0; i < report.Links.Length; i++)
+                    {
+                        var instance = Create(report.Links[i]);
+
+                        Elements.Add(instance);
+                    }
+                }
+            }
+
+            protected virtual NewsReportLinkUITemplate Create(NewsReport.LinkData link)
+            {
+                var instance = NewsReportLinkUITemplate.Create(template, panel);
+
+                instance.Set(link);
+
+                return instance;
+            }
+        }
+
+        public class Property : IReference<NewsUI>
+        {
+            public NewsUI News { get; protected set; }
+
+            public virtual void Configure(NewsUI reference)
+            {
+                News = reference;
+            }
+
+            public virtual void Init()
+            {
+
+            }
+        }
+
+        [SerializeField]
         protected Relay progress;
         public Relay Progress { get { return progress; } }
 
@@ -47,12 +120,16 @@ namespace Game
         public virtual void Configure()
         {
             Element = GetComponent<UIElement>();
+
+            References.Configure(this, links);
         }
         public virtual void Init()
         {
             progress.OnInvoke += ProgressAction;
 
             Core.News.OnUpdate.Add(UpdateCallback);
+
+            References.Init(this, links);
         }
 
         void UpdateCallback()
@@ -116,6 +193,8 @@ namespace Game
             title.text = report.Title;
 
             text.text = report.Text;
+
+            links.UpdateState(report);
         }
     }
 }
