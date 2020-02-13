@@ -28,10 +28,18 @@ namespace Game
 {
 	public class Sandbox : MonoBehaviour
 	{
-        [Button("Execute")]
-        void Execute()
+        public BellUI bell;
+
+        private void Update()
         {
-            
+            if (Input.GetKeyDown(KeyCode.A))
+                bell.Show();
+
+            if (Input.GetKeyDown(KeyCode.S))
+                bell.Chime();
+
+            if (Input.GetKeyDown(KeyCode.D))
+                bell.Hide();
         }
     }
 }

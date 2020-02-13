@@ -195,17 +195,11 @@ namespace Game
         }
         public virtual void Init()
         {
-            Core.News.OnUpdate.Add(CoreUpdateCallback);
-
             References.Init(this, links);
             References.Init(this, progress);
         }
 
-        void CoreUpdateCallback()
-        {
-            Show(Core.News.Reports);
-        }
-
+        public virtual void Show() => Show(Core.News.Reports);
         public virtual void Show(IList<NewsReport> list)
         {
             if (list.Count == 0)

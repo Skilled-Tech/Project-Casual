@@ -143,6 +143,22 @@ namespace Game
             }
         }
 
+        public bool ContainsUnseenReports
+        {
+            get
+            {
+                for (int i = 0; i < reports.Count; i++)
+                {
+                    if (occurrence.Contains(reports[i].ID))
+                        continue;
+                    else
+                        return true;
+                }
+
+                return false;
+            }
+        }
+
         [Button("Clear Occurences")]
         void ClearOccurences()
         {
