@@ -26,6 +26,8 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
+using NaughtyAttributes;
+
 namespace Game
 {
     public class NewsCore : Core.Module
@@ -33,6 +35,125 @@ namespace Game
         [SerializeField]
         protected List<NewsReport> reports;
         public List<NewsReport> Reports { get { return reports; } }
+
+        [SerializeField]
+        protected OccurrenceProperty occurrence;
+        public OccurrenceProperty Occurrence { get { return occurrence; } }
+        [Serializable]
+        public class OccurrenceProperty : Property
+        {
+            public HashSet<string> Hash { get; protected set; }
+
+            public const string Key = "News Reports Occurences";
+
+            public string Pref
+            {
+                get => PlayerPrefs.GetString(Key, string.Empty);
+                set => PlayerPrefs.SetString(Key, value);
+            }
+
+            public override void Configure(NewsCore reference)
+            {
+                base.Configure(reference);
+
+                Hash = new HashSet<string>();
+
+                Load();
+            }
+
+            public virtual void Load()
+            {
+                Parse(Pref);
+            }
+            public virtual void Parse(string json)
+            {
+                Hash.Clear();
+
+                if (String.IsNullOrEmpty(json))
+                {
+
+                }
+                else
+                {
+                    Hash = JsonConvert.DeserializeObject<HashSet<string>>(json);
+                }
+            }
+            public virtual void Save()
+            {
+                var json = JsonConvert.SerializeObject(Hash);
+
+                Pref = json;
+            }
+
+            public virtual bool Contains(string ID) => Hash.Contains(ID);
+
+            public virtual void Add(string ID)
+            {
+                if(Hash.Contains(ID))
+                {
+                    Debug.Log("News Report ID: " + ID + " Already Added to Occurence Property, Ignoring Add");
+                    return;
+                }
+
+                Hash.Add(ID);
+
+                Save();
+            }
+            public virtual void Remove(string ID)
+            {
+                if(Hash.Contains(ID) == false)
+                {
+                    Debug.Log("News Report ID: " + ID + " Not Found in Occurence Property, Ignoring Remove");
+                    return;
+                }
+
+                Hash.Remove(ID);
+
+                Save();
+            }
+
+            public virtual void Register(NewsReport report)
+            {
+                if(Contains(report.ID))
+                {
+
+                }
+                else
+                {
+                    Add(report.ID);
+                }
+            }
+
+            public virtual void Clear()
+            {
+                Pref = string.Empty;
+            }
+
+            public virtual bool CanDisplay(NewsReport report)
+            {
+                if (report.Recurrence == NewsReportRecurrence.Constant)
+                    return true;
+                else if (report.Recurrence == NewsReportRecurrence.Once)
+                    return Contains(report.ID) == false;
+                else
+                {
+                    Debug.LogWarning("News Report Reccurence Type: " + report.Recurrence + " Not Handeled withing the News Report Occurence Property, returning true");
+                    return true;
+                }
+            }
+        }
+
+        [Button("Clear Occurences")]
+        void ClearOccurences()
+        {
+            occurrence.Clear();
+        }
+
+        [Serializable]
+        public class Property : Core.Property<NewsCore>
+        {
+            public NewsCore News => Reference;
+        }
 
         public PlayFabCore PlayFab => Core.PlayFab;
 
@@ -44,6 +165,8 @@ namespace Game
 
             PlayFab.Title.News.OnResponse.Add(PlayFabResponseCallback);
             PlayFab.Login.OnResult.Add(LoginCallback);
+
+            Register(this, occurrence);
         }
 
         public void Request()

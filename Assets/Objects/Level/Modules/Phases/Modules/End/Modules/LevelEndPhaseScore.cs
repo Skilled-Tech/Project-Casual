@@ -45,7 +45,7 @@ namespace Game
 
             Core.PlayFab.Player.Profile.OnUpdate += PlayerProfileUpdateCallback;
 
-            Core.UI.Leaderboards.Score.Submit.OnInvoke += LeaderboardSubmitCallback;
+            Core.UI.Leaderboards.Score.Submit.Relay.OnInvoke += LeaderboardSubmitCallback;
 
             UpdateSubmitState();
         }
@@ -134,7 +134,7 @@ namespace Game
 
         protected virtual void UpdateSubmitState()
         {
-            Core.UI.Leaderboards.Score.Submit.Element.IsOn = RequireManualSubmit;
+            Core.UI.Leaderboards.Score.Submit.Panel.IsOn = RequireManualSubmit;
         }
         #endregion
 
@@ -152,7 +152,7 @@ namespace Game
         {
             Core.Ads.Placements.Common.RewardedVideo.OnFinish -= RewardedVideoAdFinishCallback;
 
-            Core.UI.Leaderboards.Score.Submit.OnInvoke -= LeaderboardSubmitCallback;
+            Core.UI.Leaderboards.Score.Submit.Relay.OnInvoke -= LeaderboardSubmitCallback;
 
             Core.PlayFab.Player.Profile.OnUpdate -= PlayerProfileUpdateCallback;
         }

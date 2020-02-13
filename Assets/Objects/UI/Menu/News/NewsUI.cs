@@ -102,6 +102,10 @@ namespace Game
             protected Text label;
             public Text Label { get { return label; } }
 
+            [SerializeField]
+            protected Selectable selectable;
+            public Selectable Selectable { get { return selectable; } }
+
             public string Text
             {
                 get => label.text;
@@ -109,8 +113,8 @@ namespace Game
             }
 
             [SerializeField]
-            protected SelectableRelay relay;
-            public SelectableRelay Relay { get { return relay; } }
+            protected Relay relay;
+            public Relay Relay { get { return relay; } }
 
             public override void Configure(NewsUI reference)
             {
@@ -130,13 +134,13 @@ namespace Game
                     }
                     else
                     {
-                        relay.Interactable = false;
+                        selectable.interactable = false;
                         {
                             News.Panel.Hide();
                             bool PanelIsHidden() => News.Panel.Transition == null ? true : News.Panel.Transition.Value == 0f;
                             yield return new WaitUntil(PanelIsHidden);
                         }
-                        relay.Interactable = true;
+                        selectable.interactable = true;
 
                         Action();
                     }
@@ -204,14 +208,23 @@ namespace Game
 
         public virtual void Show(IList<NewsReport> list)
         {
+            if (list.Count == 0)
+            {
+                Debug.LogWarning("Trying to show news UI with zero news reports, ignoring");
+                return;
+            }
+
             Queue.Clear();
 
             for (int i = 0; i < list.Count; i++)
-                Queue.Enqueue(list[i]);
-
-            if (Queue.Count == 0)
             {
-                Debug.LogWarning("Trying to show news UI with zero news reports, ignoring");
+                if (Core.News.Occurrence.CanDisplay(list[i]) == false) continue;
+
+                Queue.Enqueue(list[i]);
+            }
+
+            if(Queue.Count == 0)
+            {
                 return;
             }
 
@@ -227,6 +240,8 @@ namespace Game
             panel.Show();
 
             UpdateState(report);
+
+            Core.News.Occurrence.Register(report);
         }
 
         protected virtual void UpdateState(NewsReport report)

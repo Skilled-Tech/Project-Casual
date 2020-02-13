@@ -52,8 +52,19 @@ namespace Game
         public UIElement EmptyIndicator { get { return emptyIndicator; } }
 
         [SerializeField]
-        protected RelayPanelUI submit;
-        public RelayPanelUI Submit { get { return submit; } }
+        protected SubmitData submit;
+        public SubmitData Submit { get { return submit; } }
+        [Serializable]
+        public class SubmitData
+        {
+            [SerializeField]
+            protected UIElement panel;
+            public UIElement Panel { get { return panel; } }
+
+            [SerializeField]
+            protected Relay relay;
+            public Relay Relay { get { return relay; } }
+        }
 
         #region Entries
         public List<LeaderboardUITemplate> Entries { get; protected set; }
