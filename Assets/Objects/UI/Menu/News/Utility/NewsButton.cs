@@ -26,6 +26,20 @@ namespace Game
         protected BellUI notification;
         public BellUI Notification { get { return notification; } }
 
+        public void SetNotification(bool value)
+        {
+            if(value)
+            {
+                if (notification.IsOn == false)
+                    notification.Show();
+            }
+            else
+            {
+                if (notification.IsOn)
+                    notification.Hide();
+            }
+        }
+
         public Button Button { get; protected set; }
 
         public Core Core => Core.Instance;
@@ -70,17 +84,9 @@ namespace Game
         void UpdateState()
         {
             if (Core.UI.News.Element.Visible)
-            {
-                if (notification.IsOn)
-                    notification.Hide();
-            }
+                SetNotification(false);
             else
-            {
-                if (Core.News.ContainsUnseenReports)
-                    notification.Show();
-                else
-                    notification.Hide();
-            }
+                SetNotification(Core.News.ContainsUnseenReports);
         }
 
         private void CoreUpdateCallback()
