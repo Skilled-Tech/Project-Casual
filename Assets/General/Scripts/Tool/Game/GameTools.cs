@@ -17,6 +17,8 @@ using UnityEditorInternal;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
+using System.Text;
+
 namespace Game
 {
     public static partial class GameTools

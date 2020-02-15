@@ -530,22 +530,22 @@ PrefabInstance:
     - target: {fileID: 8306565357011354941, guid: aaf7bef5c687b33408e3bc08cd08ef76,
         type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.125
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8306565357011354941, guid: aaf7bef5c687b33408e3bc08cd08ef76,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.875
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 8306565357011354941, guid: aaf7bef5c687b33408e3bc08cd08ef76,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.125
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8306565357011354941, guid: aaf7bef5c687b33408e3bc08cd08ef76,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.875
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 8306565357011354943, guid: aaf7bef5c687b33408e3bc08cd08ef76,
         type: 3}
@@ -1663,6 +1663,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bell
       objectReference: {fileID: 0}
+    - target: {fileID: 4906017814622616958, guid: 465ed4ade6df62f4bb3efe8bdf71d5b3,
+        type: 3}
+      propertyPath: animations.popIn
+      value: 
+      objectReference: {fileID: 7400000, guid: 564936e979d5b9d4c95a4571eff6f46d, type: 2}
+    - target: {fileID: 4906017814622616958, guid: 465ed4ade6df62f4bb3efe8bdf71d5b3,
+        type: 3}
+      propertyPath: animations.popOut
+      value: 
+      objectReference: {fileID: 7400000, guid: eba4ea69dbc68874b8d9a256b604f499, type: 2}
     - target: {fileID: 4906017814622616953, guid: 465ed4ade6df62f4bb3efe8bdf71d5b3,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1768,16 +1778,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4906017814622616958, guid: 465ed4ade6df62f4bb3efe8bdf71d5b3,
-        type: 3}
-      propertyPath: animations.popIn
-      value: 
-      objectReference: {fileID: 7400000, guid: 564936e979d5b9d4c95a4571eff6f46d, type: 2}
-    - target: {fileID: 4906017814622616958, guid: 465ed4ade6df62f4bb3efe8bdf71d5b3,
-        type: 3}
-      propertyPath: animations.popOut
-      value: 
-      objectReference: {fileID: 7400000, guid: eba4ea69dbc68874b8d9a256b604f499, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 465ed4ade6df62f4bb3efe8bdf71d5b3, type: 3}
 --- !u!1001 &6991908327940220217

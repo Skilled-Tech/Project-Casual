@@ -33,7 +33,6 @@ namespace Game
         public virtual void Configure()
         {
             Button = GetComponent<Button>();
-
             Button.onClick.AddListener(Action);
         }
         public virtual void Init()
@@ -41,24 +40,56 @@ namespace Game
             notification.Element.Hide();
 
             Core.News.OnUpdate.Add(CoreUpdateCallback);
-
             Core.UI.News.Element.OnShow += ElementShowCallback;
+        }
+
+        protected virtual void OnEnable()
+        {
+            StartCoroutine(Procedure());
+
+            IEnumerator Procedure()
+            {
+                yield return new WaitForEndOfFrame();
+
+                UpdateState();
+            }
         }
 
         void Action()
         {
-            Core.UI.News.Show();
+            if(Core.News.Reports.Count > 0)
+            {
+                Core.UI.News.Show();
+            }
+            else
+            {
+                Core.UI.Popup.Show("No News To See Now");
+            }
+        }
+
+        void UpdateState()
+        {
+            if (Core.UI.News.Element.Visible)
+            {
+                if (notification.IsOn)
+                    notification.Hide();
+            }
+            else
+            {
+                if (Core.News.ContainsUnseenReports)
+                    notification.Show();
+                else
+                    notification.Hide();
+            }
         }
 
         private void CoreUpdateCallback()
         {
-            if (Core.News.ContainsUnseenReports)
-                if (notification.IsOn == false) notification.Show();
+            UpdateState();
         }
-
         private void ElementShowCallback()
         {
-            if(notification.IsOn) notification.Hide();
+            UpdateState();
         }
     }
 }

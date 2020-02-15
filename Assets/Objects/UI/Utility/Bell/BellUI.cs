@@ -59,11 +59,16 @@ namespace Game
             
         }
 
-        private void Awake() => Configure();
-
         protected virtual void OnEnable()
         {
-            if (Element.IsOn) Show();
+            StartCoroutine(Procedure());
+
+            IEnumerator Procedure()
+            {
+                yield return new WaitForEndOfFrame();
+
+                if (Element.IsOn) Show();
+            }
         }
 
         Coroutine state;

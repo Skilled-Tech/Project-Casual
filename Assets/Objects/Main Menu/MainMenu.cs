@@ -29,7 +29,7 @@ namespace Game
 
         private void Start()
         {
-            
+
         }
     }
 }

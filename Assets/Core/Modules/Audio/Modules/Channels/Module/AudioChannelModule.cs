@@ -71,7 +71,7 @@ namespace Game
 
             StartCoroutine(Procedure());
 
-            IEnumerator Procedure() //We need to wait one frame for the audio mixer system to kick in, great coding, Obama
+            IEnumerator Procedure() //We need to wait one frame for the audio mixer system to kick in. Great coding, Obama
             {
                 yield return new WaitForEndOfFrame();
 
