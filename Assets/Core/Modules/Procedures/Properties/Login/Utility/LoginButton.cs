@@ -55,6 +55,8 @@ namespace Game
 
             void Callback(ProceduresCore.LoginProperty.Element element, Procedure.Response response)
             {
+                if (this == null) return; //Counter measure if the gameobject got destroyed mid procedure
+
                 Interactable = true;
             }
         }
@@ -82,6 +84,8 @@ namespace Game
 
             void Callback(ProceduresCore.LoginProperty.Element element, Procedure.Response response)
             {
+                if (this == null) return; //Counter measure if the gameobject got destroyed mid procedure
+
                 Interactable = true;
                 //TODO Provide Feedback
             }
@@ -96,6 +100,8 @@ namespace Game
 
             void Callback(ProceduresCore.LinkProperty.Element element, Procedure.Response response)
             {
+                if (this == null) return; //Counter measure if the gameobject got destroyed mid procedure
+
                 Interactable = true;
                 //TODO Provide Feedback
             }

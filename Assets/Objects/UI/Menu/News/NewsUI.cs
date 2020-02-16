@@ -240,8 +240,11 @@ namespace Game
 
         protected virtual void UpdateState(NewsReport report)
         {
-            title.text = report.Title;
-            text.text = report.Text;
+            title.gameObject.SetActive(report.HasTitle);
+            if(report.HasTitle) title.text = report.Title;
+
+            text.gameObject.SetActive(report.HasText);
+            if(report.HasText) text.text = report.Text;
 
             links.UpdateState(report);
 

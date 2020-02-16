@@ -28,18 +28,29 @@ namespace Game
 {
 	public class Sandbox : MonoBehaviour
 	{
-        public BellUI bell;
+        public RunCoroutine Run { get; protected set; }
+        public class RunCoroutine : MoeCoroutine
+        {
+            public override IEnumerator Function()
+            {
+                yield return new WaitForSeconds(2f);
+
+                Debug.Log("Hello");
+            }
+        }
+
+        private void Start()
+        {
+            Run = new RunCoroutine();
+            Run.Configure(this);
+
+            Run.Start();
+        }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.A))
-                bell.Show();
-
-            if (Input.GetKeyDown(KeyCode.S))
-                bell.Chime();
-
-            if (Input.GetKeyDown(KeyCode.D))
-                bell.Hide();
+            if (Run.IsProcessing)
+                Debug.Log("Is Running");
         }
     }
 }

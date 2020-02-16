@@ -17,6 +17,8 @@ using UnityEditorInternal;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
+using NaughtyAttributes;
+
 namespace Game
 {
 	public class Core : MonoBehaviour
@@ -175,6 +177,12 @@ namespace Game
             Initializer.Init(gameObject);
 
             OnInit?.Invoke();
+        }
+
+        [Button("Clear Player Prefs")]
+        public virtual void ClearPlayerPrefs()
+        {
+            PlayerPrefs.DeleteAll();
         }
 	}
 }

@@ -97,5 +97,11 @@ namespace Game
         {
             UpdateState();
         }
+
+        protected virtual void OnDestroy()
+        {
+            Core.News.OnUpdate.Remove(CoreUpdateCallback);
+            Core.UI.News.Element.OnShow -= ElementShowCallback;
+        }
     }
 }

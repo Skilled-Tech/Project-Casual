@@ -247,7 +247,10 @@ namespace Game
         private string title;
         public string Title { get { return title; } }
 
+        public bool HasTitle => String.IsNullOrEmpty(title) == false;
+
         public string Body { get; protected set; }
+        public bool HasBody => String.IsNullOrEmpty(Body) == false;
 
 #pragma warning disable CS0649
         [JsonProperty]
@@ -255,6 +258,8 @@ namespace Game
         [SerializeField]
         private string text;
         public string Text { get { return text; } }
+
+        public bool HasText => string.IsNullOrEmpty(text) == false;
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue(NewsReportRecurrence.Once)]
@@ -286,16 +291,17 @@ namespace Game
 
         public static NewsReport Create(TitleNewsItem item)
         {
-            var result = new NewsReport()
+            var report = new NewsReport()
             {
                 ID = item.NewsId,
                 title = item.Title,
                 Body = item.Body,
             };
 
-            JsonConvert.PopulateObject(result.Body, result);
+            if(report.HasBody)
+                JsonConvert.PopulateObject(report.Body, report);
 
-            return result;
+            return report;
         }
     }
 
