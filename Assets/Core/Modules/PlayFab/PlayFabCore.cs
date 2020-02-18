@@ -39,7 +39,7 @@ namespace Game
             {
                 public override MethodDelegate Method => PlayFabClientAPI.LoginWithCustomID;
 
-                public override void ApplyDefaults(ref LoginWithCustomIDRequest request)
+                protected override void ApplyDefaults(ref LoginWithCustomIDRequest request)
                 {
                     request.CreateAccount = true;
                     request.InfoRequestParameters = DefaultInfoRequestParameters;
@@ -61,7 +61,7 @@ namespace Game
             {
                 public override MethodDelegate Method => PlayFabClientAPI.LoginWithFacebook;
 
-                public override void ApplyDefaults(ref LoginWithFacebookRequest request)
+                protected override void ApplyDefaults(ref LoginWithFacebookRequest request)
                 {
                     request.CreateAccount = true;
                     request.InfoRequestParameters = DefaultInfoRequestParameters;
@@ -82,7 +82,7 @@ namespace Game
             {
                 public override MethodDelegate Method => PlayFabClientAPI.LoginWithGoogleAccount;
 
-                public override void ApplyDefaults(ref LoginWithGoogleAccountRequest request)
+                protected override void ApplyDefaults(ref LoginWithGoogleAccountRequest request)
                 {
                     request.CreateAccount = true;
                     request.InfoRequestParameters = DefaultInfoRequestParameters;
@@ -101,7 +101,7 @@ namespace Game
             public abstract class Request<TRequest> : Request<TRequest, LoginResult>
                 where TRequest : PlayFabRequestCommon, new()
             {
-                public override TRequest GenerateRequest()
+                protected override TRequest GenerateRequest()
                 {
                     var request = base.GenerateRequest();
 
@@ -110,7 +110,7 @@ namespace Game
                     return request;
                 }
 
-                public abstract void ApplyDefaults(ref TRequest request);
+                protected abstract void ApplyDefaults(ref TRequest request);
             }
 
             public static readonly GetPlayerCombinedInfoRequestParams DefaultInfoRequestParameters = new GetPlayerCombinedInfoRequestParams()
@@ -209,7 +209,7 @@ namespace Game
                 {
                     public override MethodDelegate Method => PlayFabClientAPI.GetLeaderboard;
 
-                    public override GetLeaderboardRequest GenerateRequest()
+                    protected override GetLeaderboardRequest GenerateRequest()
                     {
                         var request = base.GenerateRequest();
 
@@ -235,7 +235,7 @@ namespace Game
                 {
                     public override MethodDelegate Method => PlayFabClientAPI.GetLeaderboardAroundPlayer;
 
-                    public override GetLeaderboardAroundPlayerRequest GenerateRequest()
+                    protected override GetLeaderboardAroundPlayerRequest GenerateRequest()
                     {
                         var request = base.GenerateRequest();
 
@@ -323,17 +323,37 @@ namespace Game
             [Serializable]
             public class CatalogProperty : Property
             {
+                [SerializeField]
+                protected string name = "Default";
+                public string Name { get { return name; } }
+
                 public GetRequest Get { get; protected set; }
                 public class GetRequest : Request<GetCatalogItemsRequest, GetCatalogItemsResult>
                 {
                     public override MethodDelegate Method => PlayFabClientAPI.GetCatalogItems;
+
+                    public CatalogProperty Catalog { get; protected set; }
+
+                    public virtual void Request()
+                    {
+                        var request = GenerateRequest();
+
+                        request.CatalogVersion = Catalog.Name;
+
+                        Send(request);
+                    }
+
+                    public GetRequest(CatalogProperty catalog)
+                    {
+                        this.Catalog = catalog;
+                    }
                 }
 
                 public override void Configure(PlayFabCore reference)
                 {
                     base.Configure(reference);
 
-                    Get = new GetRequest();
+                    Get = new GetRequest(this);
                 }
             }
 
@@ -587,7 +607,7 @@ namespace Game
 
             public abstract string FunctionName { get; }
 
-            public override ExecuteCloudScriptRequest GenerateRequest()
+            protected override ExecuteCloudScriptRequest GenerateRequest()
             {
                 var request = base.GenerateRequest();
 
@@ -613,7 +633,7 @@ namespace Game
                 void ErrorCallback(PlayFabError error) => callback(null, error);
             }
 
-            public virtual TRequest GenerateRequest() => new TRequest();
+            protected virtual TRequest GenerateRequest() => new TRequest();
 
             protected virtual void Send(TRequest request)
             {

@@ -169,27 +169,38 @@ namespace Game
                 Register(Procedures, element);
 
                 element.OnResponse.Add((Procedure.Response response) => ResponseCallback(element, response));
-                element.OnEnd.Add(() => EndCallback(element));
-                element.OnError.Add(ErrorCallback);
             }
 
             #region Events
             public MoeEvent<Element, Procedure.Response> OnResponse { get; protected set; }
-            private void ResponseCallback(Element element, Procedure.Response response)
+            void ResponseCallback(Element element, Procedure.Response response)
             {
-                OnResponse?.Invoke(element, response);
+                if (response.HasError)
+                    ErrorCallback(element, response.Error);
+                else if (response.Canceled)
+                    CancelCallback(element);
+                else if (response.Success)
+                    EndCallback(element);
+
+                OnResponse.Invoke(element, response);
             }
 
             public MoeEvent<Element> OnEnd { get; protected set; }
             void EndCallback(Element element)
             {
-                OnEnd?.Invoke(element);
+                OnEnd.Invoke(element);
             }
 
-            public MoeEvent<string> OnError { get; protected set; }
-            void ErrorCallback(string error)
+            public MoeEvent<Element> OnCancel { get; protected set; }
+            void CancelCallback(Element element)
             {
-                OnError?.Invoke(error);
+                OnCancel.Invoke(element);
+            }
+
+            public MoeEvent<Element, string> OnError { get; protected set; }
+            void ErrorCallback(Element element, string error)
+            {
+                OnError.Invoke(element, error);
             }
             #endregion
 
@@ -199,7 +210,9 @@ namespace Game
 
                 OnEnd = new MoeEvent<Element>();
 
-                OnError = new MoeEvent<string>();
+                OnCancel = new MoeEvent<Element>();
+
+                OnError = new MoeEvent<Element, string>();
             }
         }
     }

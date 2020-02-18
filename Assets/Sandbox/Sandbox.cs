@@ -26,7 +26,7 @@ using Newtonsoft.Json;
 
 namespace Game
 {
-	public class Sandbox : MonoBehaviour
+	public partial class Sandbox : MonoBehaviour
 	{
         public RunCoroutine Run { get; protected set; }
         public class RunCoroutine : MoeCoroutine

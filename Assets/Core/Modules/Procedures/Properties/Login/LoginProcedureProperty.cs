@@ -247,8 +247,6 @@ namespace Game
                 Register(Procedures, element);
 
                 element.OnResponse.Add((Procedure.Response response) => ResponseCallback(element, response));
-                element.OnEnd.Add(() => EndCallback(element));
-                element.OnError.Add(ErrorCallback);
             }
 
             public override void Init()
@@ -275,6 +273,13 @@ namespace Game
             public MoeEvent<Element, Procedure.Response> OnResponse { get; protected set; }
             void ResponseCallback(Element element, Procedure.Response response)
             {
+                if (response.HasError)
+                    ErrorCallback(element, response.Error);
+                else if (response.Canceled)
+                    CancelCallback(element);
+                else if (response.Success)
+                    EndCallback(element);
+
                 OnResponse.Invoke(element, response);
             }
 
@@ -286,10 +291,16 @@ namespace Game
                 OnEnd.Invoke(element);
             }
 
-            public MoeEvent<string> OnError { get; protected set; }
-            void ErrorCallback(string error)
+            public MoeEvent<Element> OnCancel { get; protected set; }
+            void CancelCallback(Element element)
             {
-                OnError.Invoke(error);
+                OnCancel.Invoke(element);
+            }
+
+            public MoeEvent<Element, string> OnError { get; protected set; }
+            void ErrorCallback(Element element, string error)
+            {
+                OnError.Invoke(element, error);
             }
 #endregion
 
@@ -299,7 +310,9 @@ namespace Game
 
                 OnEnd = new MoeEvent<Element>();
 
-                OnError = new MoeEvent<string>();
+                OnCancel = new MoeEvent<Element>();
+
+                OnError = new MoeEvent<Element, string>();
             }
         }
     }

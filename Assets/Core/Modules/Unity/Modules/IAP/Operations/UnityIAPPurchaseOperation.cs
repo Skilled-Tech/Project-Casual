@@ -17,19 +17,17 @@ using UnityEditorInternal;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
-using PlayFab;
-using PlayFab.ClientModels;
-
 namespace Game
 {
-	public class MainMenu : MonoBehaviour
+	public class UnityIAPPurchaseOperation : Operation
 	{
-        public Core Core => Core.Instance;
-        public PlayFabCore PlayFab => Core.PlayFab;
+        [SerializeField]
+        protected string _ID;
+        public string ID { get { return _ID; } }
 
-        private void Start()
+        public override void Execute()
         {
-            
+            Core.Instance.Unity.IAP.Purchase(ID);
         }
     }
 }
