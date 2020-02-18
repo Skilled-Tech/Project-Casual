@@ -19,15 +19,15 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class AdsPlacementsCore : AdsCore.Module
+	public class UnityAdsPlacementsCore : UnityAdsCore.Module
 	{
         #region List
-        public List<AdsPlacementModule> List { get; protected set; }
+        public List<UnityAdsPlacementModule> List { get; protected set; }
 
         public int Count => List.Count;
-        public AdsPlacementModule this[int index] => List[index];
+        public UnityAdsPlacementModule this[int index] => List[index];
 
-        public AdsPlacementModule Find(string ID)
+        public UnityAdsPlacementModule Find(string ID)
         {
             for (int i = 0; i < List.Count; i++)
                 if (List[i].ID == ID)
@@ -44,26 +44,26 @@ namespace Game
         public class CommonData
         {
             [SerializeField]
-            protected AdsPlacementModule video;
-            public AdsPlacementModule Video { get { return video; } }
+            protected UnityAdsPlacementModule video;
+            public UnityAdsPlacementModule Video { get { return video; } }
 
             [SerializeField]
-            protected AdsPlacementModule rewardedVideo;
-            public AdsPlacementModule RewardedVideo { get { return rewardedVideo; } }
+            protected UnityAdsPlacementModule rewardedVideo;
+            public UnityAdsPlacementModule RewardedVideo { get { return rewardedVideo; } }
         }
 
-        public class Module : Core.Module<AdsPlacementsCore>
+        public class Module : Core.Module<UnityAdsPlacementsCore>
         {
-            public AdsPlacementsCore Placements => Reference;
+            public UnityAdsPlacementsCore Placements => Reference;
 
-            public AdsCore Ads => Placements.Ads;
+            public UnityAdsCore Ads => Placements.Ads;
         }
 
-        public override void Configure(AdsCore reference)
+        public override void Configure(UnityAdsCore reference)
         {
             base.Configure(reference);
 
-            List = this.GetAllDependancies<AdsPlacementModule>();
+            List = this.GetAllDependancies<UnityAdsPlacementModule>();
 
             References.Configure(this);
         }

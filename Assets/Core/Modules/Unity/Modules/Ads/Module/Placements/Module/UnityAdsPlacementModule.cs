@@ -21,7 +21,7 @@ using UnityEngine.Advertisements;
 
 namespace Game
 {
-	public class AdsPlacementModule : AdsPlacementsCore.Module
+	public class UnityAdsPlacementModule : UnityAdsPlacementsCore.Module
 	{
         [SerializeField]
         protected string _ID = "";
@@ -31,7 +31,7 @@ namespace Game
 
         public bool IsReady => Advertisement.IsReady(ID);
 
-        public override void Configure(AdsPlacementsCore reference)
+        public override void Configure(UnityAdsPlacementsCore reference)
         {
             base.Configure(reference);
 

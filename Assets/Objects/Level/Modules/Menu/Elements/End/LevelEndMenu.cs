@@ -61,9 +61,9 @@ namespace Game
 
         private void AdAction()
         {
-            if(Core.Ads.Placements.Common.RewardedVideo.IsReady)
+            if(Core.Unity.Ads.Placements.Common.RewardedVideo.IsReady)
             {
-                Core.Ads.Placements.Common.RewardedVideo.Show();
+                Core.Unity.Ads.Placements.Common.RewardedVideo.Show();
             }
             else
             {

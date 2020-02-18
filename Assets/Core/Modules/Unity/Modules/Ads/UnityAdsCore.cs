@@ -21,44 +21,8 @@ using UnityEngine.Advertisements;
 
 namespace Game
 {
-	public class AdsCore : Core.Module
+	public class UnityAdsCore : UnityCore.Module
     {
-        [SerializeField]
-        protected GameIDProperty gameID;
-        public GameIDProperty GameID { get { return gameID; } }
-        [Serializable]
-        public class GameIDProperty
-        {
-            [SerializeField]
-            protected string android;
-            public string Android { get { return android; } }
-
-            [SerializeField]
-            protected string iOS;
-            public string IOS { get { return iOS; } }
-
-            public string Current
-            {
-                get
-                {
-                    if(Application.isEditor)
-                        return android;
-
-                    switch (Application.platform)
-                    {
-                        case RuntimePlatform.Android:
-                            return android;
-
-                        case RuntimePlatform.IPhonePlayer:
-                            return iOS;
-                    }
-
-                    Debug.LogWarning("No advertisment game id set for platform: " + Application.platform + ", returning empty string");
-                    return string.Empty;
-                }
-            }
-        }
-
         public ListenerProperty Listener { get; protected set; }
         public class ListenerProperty : IUnityAdsListener
         {
@@ -93,11 +57,11 @@ namespace Game
             }
         }
 
-        public AdsPlacementsCore Placements { get; protected set; }
+        public UnityAdsPlacementsCore Placements { get; protected set; }
 
-        public class Module : Core.Module<AdsCore>
+        public class Module : Core.Module<UnityAdsCore>
         {
-            public AdsCore Ads => Reference;
+            public UnityAdsCore Ads => Reference;
         }
 
         public bool TestMode
@@ -114,7 +78,7 @@ namespace Game
             }
         }
 
-        public override void Configure(Core reference)
+        public override void Configure(UnityCore reference)
         {
             base.Configure(reference);
 
@@ -123,11 +87,11 @@ namespace Game
             Listener = new ListenerProperty();
             Advertisement.AddListener(Listener);
 
-            Placements = this.GetDependancy<AdsPlacementsCore>();
+            Placements = this.GetDependancy<UnityAdsPlacementsCore>();
 
             References.Configure(this);
 
-            Advertisement.Initialize(gameID.Current, TestMode);
+            Advertisement.Initialize(Unity.GameID.Current, TestMode);
         }
 
         public override void Init()

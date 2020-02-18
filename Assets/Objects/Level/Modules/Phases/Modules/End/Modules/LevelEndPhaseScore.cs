@@ -41,7 +41,7 @@ namespace Game
         {
             if(RequireManualSubmit == false) Submit();
 
-            Core.Ads.Placements.Common.RewardedVideo.OnFinish += RewardedVideoAdFinishCallback;
+            Core.Unity.Ads.Placements.Common.RewardedVideo.OnFinish += RewardedVideoAdFinishCallback;
 
             Core.PlayFab.Player.Profile.OnUpdate += PlayerProfileUpdateCallback;
 
@@ -150,7 +150,7 @@ namespace Game
 
         private void ClearCallbacks()
         {
-            Core.Ads.Placements.Common.RewardedVideo.OnFinish -= RewardedVideoAdFinishCallback;
+            Core.Unity.Ads.Placements.Common.RewardedVideo.OnFinish -= RewardedVideoAdFinishCallback;
 
             Core.UI.Leaderboards.Score.Submit.Relay.OnInvoke -= LeaderboardSubmitCallback;
 

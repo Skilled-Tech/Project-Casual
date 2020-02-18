@@ -49,13 +49,13 @@ namespace Game
         public AudioCore Audio { get; protected set; }
         public ScenesCore Scenes { get; protected set; }
         public UICore UI { get; protected set; }
-        public AdsCore Ads { get; protected set; }
         public PlayFabCore PlayFab { get; protected set; }
         public LeaderboardsCore Leaderboards { get; protected set; }
         public ProceduresCore Procedures { get; protected set; }
         public CountriesCore Countries { get; protected set; }
         public FacebookCore Facebook { get; protected set; }
         public NewsCore News { get; protected set; }
+        public UnityCore Unity { get; protected set; }
 
         #region Modules
         public class Module<TModule> : MonoBehaviour, IReference<TModule>
@@ -154,13 +154,13 @@ namespace Game
             Audio = this.GetDependancy<AudioCore>();
             Scenes = this.GetDependancy<ScenesCore>();
             UI = this.GetDependancy<UICore>();
-            Ads = this.GetDependancy<AdsCore>();
             Leaderboards = this.GetDependancy<LeaderboardsCore>();
             PlayFab = this.GetDependancy<PlayFabCore>();
             Procedures = this.GetDependancy<ProceduresCore>();
             Countries = this.GetDependancy<CountriesCore>();
             Facebook = this.GetDependancy<FacebookCore>();
             News = this.GetDependancy<NewsCore>();
+            Unity = this.GetDependancy<UnityCore>();
 
             Application.targetFrameRate = 60;
 
