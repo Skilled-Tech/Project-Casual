@@ -317,14 +317,34 @@ namespace Game
                 }
             }
 
+            [SerializeField]
+            protected CatalogProperty catalog;
+            public CatalogProperty Catalog { get { return catalog; } }
+            [Serializable]
+            public class CatalogProperty : Property
+            {
+                public GetRequest Get { get; protected set; }
+                public class GetRequest : Request<GetCatalogItemsRequest, GetCatalogItemsResult>
+                {
+                    public override MethodDelegate Method => PlayFabClientAPI.GetCatalogItems;
+                }
+
+                public override void Configure(PlayFabCore reference)
+                {
+                    base.Configure(reference);
+
+                    Get = new GetRequest();
+                }
+            }
+
             public override void Configure(PlayFabCore reference)
             {
                 base.Configure(reference);
 
                 Register(PlayFab, leaderboards);
+                Register(PlayFab, catalog);
 
                 Data = new DataRequest();
-
                 News = new NewsRequest();
             }
         }
