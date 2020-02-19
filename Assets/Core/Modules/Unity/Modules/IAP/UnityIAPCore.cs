@@ -288,6 +288,8 @@ namespace Game
                 element.OnResponse.Add((Element.ResponseData data) => ResponseCallback(element, data));
             }
 
+            public virtual void Request(Product product) => Module.Request(product);
+
             public MoeEvent<Element, Element.ResultData> OnResult { get; protected set; } = new MoeEvent<Element, Element.ResultData>();
             protected virtual void ResultCallback(Element element, Element.ResultData result)
             {
@@ -334,8 +336,8 @@ namespace Game
         {
             base.Init();
 
-            Listener.InitializeEvent += InitializeCallback;
-            Listener.InitializeFailEvent += InitializeFailedCallback;
+            Listener.InitializeEvent += InitializeCompleteCallback;
+            Listener.InitializeFailEvent += InitializeFailCallback;
             Listener.PurchaseFailEvent += PurchaseFailedCallback;
 
             Validate.OnResponse.Add(ValidateResponse);
@@ -381,13 +383,13 @@ namespace Game
             UnityPurchasing.Initialize(Listener, builder);
         }
 
-        void InitializeCallback(IStoreController controller, IExtensionProvider extensions)
+        void InitializeCompleteCallback(IStoreController controller, IExtensionProvider extensions)
         {
             Debug.Log("IAP Initialzed Correctly");
 
             StoreController = controller;
         }
-        void InitializeFailedCallback(InitializationFailureReason error)
+        void InitializeFailCallback(InitializationFailureReason error)
         {
             Debug.LogError("Store initialization failed, reason: " + error);
         }
@@ -419,7 +421,7 @@ namespace Game
                 return PurchaseProcessingResult.Complete;
             }
 
-            Debug.Log("Processing purchase for item: " + product.definition.storeSpecificId + " with transaction ID: " + product.transactionID);
+            Debug.Log("Processing purchase validation for item: " + product.definition.storeSpecificId + " with transaction ID: " + product.transactionID);
 
             Validate.Module.Request(product);
 
