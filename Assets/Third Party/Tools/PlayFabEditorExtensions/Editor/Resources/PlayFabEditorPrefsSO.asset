@@ -15,9 +15,9 @@ MonoBehaviour:
   DevAccountEmail: Moe4Baker@gmail.com
   DevAccountToken: noa9j346ktdisedi7npshm6me3cakgnxqakyir4ygospchahuf1fbtfkegfjkqkk1k1ges37m5q1gkmx4ngsy1afpgjas6excp63bwp37zie5zhddtppq7pn9yw6kqux9zxic18eehyd4t1zf8ipg59j7px8xseuu78jekuj7qk3n1ddwrb3zizbefh6trd5cxeurfu6
   SelectedStudio: T4 Games
-  SdkPath: Assets/Third Party/PlayFabSdk
-  EdExPath: Assets/Third Party/PlayFabEditorExtensions
+  SdkPath: Assets/Third Party/Tools/PlayFabSdk
+  EdExPath: Assets/Third Party/Tool/PlayFabEditorExtensions
   LocalCloudScriptPath: 
-  PanelIsShown: 0
-  curMainMenuIdx: 1
+  PanelIsShown: 1
+  curMainMenuIdx: 0
   curSubMenuIdx: 0
