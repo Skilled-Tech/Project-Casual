@@ -49,6 +49,7 @@ namespace Game
         public AudioCore Audio { get; protected set; }
         public ScenesCore Scenes { get; protected set; }
         public UICore UI { get; protected set; }
+        public PlayerCore Player { get; protected set; }
         public PlayFabCore PlayFab { get; protected set; }
         public LeaderboardsCore Leaderboards { get; protected set; }
         public ProceduresCore Procedures { get; protected set; }
@@ -155,6 +156,7 @@ namespace Game
             Scenes = this.GetDependancy<ScenesCore>();
             UI = this.GetDependancy<UICore>();
             Leaderboards = this.GetDependancy<LeaderboardsCore>();
+            Player = this.GetDependancy<PlayerCore>();
             PlayFab = this.GetDependancy<PlayFabCore>();
             Procedures = this.GetDependancy<ProceduresCore>();
             Countries = this.GetDependancy<CountriesCore>();

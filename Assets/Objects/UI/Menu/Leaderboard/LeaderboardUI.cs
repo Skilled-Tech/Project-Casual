@@ -164,8 +164,6 @@ namespace Game
 
             foreach (var entry in Leaderboard.IEnumerate())
             {
-                if (entry.Value == 0 && (entry.DisplayName == null || entry.DisplayName == string.Empty)) continue;
-
                 if(Entries.Count > 0 && entry.Position != Entries.Last().Reference.Position + 1)
                 {
                     Elements.Add(Seperator());

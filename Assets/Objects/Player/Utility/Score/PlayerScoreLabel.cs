@@ -35,7 +35,7 @@ namespace Game
             UpdateState();
         }
 
-        private void ChangeCallback(int value) => UpdateState();
+        private void ChangeCallback(int value, int change) => UpdateState();
 
         void UpdateState()
         {

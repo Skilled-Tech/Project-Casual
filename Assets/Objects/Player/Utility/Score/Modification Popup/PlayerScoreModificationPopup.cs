@@ -35,7 +35,7 @@ namespace Game
 
         private void Start()
         {
-            Player.Score.OnValueModified += ModificationCallback;
+            Player.Score.OnValueChange += ModificationCallback;
         }
 
         private void ModificationCallback(int value, int change)

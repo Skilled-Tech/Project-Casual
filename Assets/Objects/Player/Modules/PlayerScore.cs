@@ -21,8 +21,6 @@ namespace Game
 {
 	public class PlayerScore : Player.Module
 	{
-        public const string ID = "Score";
-
         [SerializeField]
         protected int _value;
         public int Value
@@ -35,19 +33,15 @@ namespace Game
             {
                 if (value < 0) value = 0;
 
-                var change = value - _value;
+                var change = value - this._value;
 
                 this._value = value;
 
-                OnValueChange?.Invoke(Value);
-                OnValueModified?.Invoke(Value, change);
+                OnValueChange?.Invoke(Value, change);
             }
         }
 
-        public delegate void ValueModifiedDelegate(int value, int change);
-        public event ValueModifiedDelegate OnValueModified;
-
-        public delegate void ValueChangeDelegate(int value);
+        public delegate void ValueChangeDelegate(int value, int change);
         public event ValueChangeDelegate OnValueChange;
 
         [SerializeField]
@@ -58,7 +52,7 @@ namespace Game
         {
             base.Configure(reference);
 
-            OnValueModified += ValueModifiedCallback;
+            OnValueChange += ValueModifiedCallback;
         }
 
         private void ValueModifiedCallback(int value, int change)
@@ -68,14 +62,15 @@ namespace Game
 
         public virtual void UpdateStatistic()
         {
-            if(Core.PlayFab.IsLoggedIn)
+            if(Value > Core.Player.Statistics.HighScore.Value)
             {
-                Core.PlayFab.Player.Statistics.Update.Request(ID, Value);
+                Core.Player.Statistics.HighScore.Value = Value;
             }
-            else
-            {
+        }
 
-            }
+        public virtual void Roundup()
+        {
+            Core.Player.Statistics.Score.Value += Value;
         }
     }
 }

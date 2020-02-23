@@ -45,18 +45,24 @@ namespace Game
 
             UpdateLocation(reference.Location);
 
-            displayName.text = string.IsNullOrEmpty(reference.DisplayName) ? "Anonymous Player" : reference.DisplayName;
+            UpdateDisplayName(reference);
 
             position.text = (reference.Position + 1).ToString("N0") + GameTools.Text.GetOrdinalIndicator(reference.Position + 1);
 
             value.text = reference.Value.ToString("N0");
 
-            if (reference.ID == Core.PlayFab.Player.Profile.ID)
-            {
-                DisplayName.text += " (You)";
-            }
-
             gameObject.name = displayName.text;
+        }
+
+        protected virtual void UpdateDisplayName(LeaderboardEntry entry)
+        {
+            if(string.IsNullOrEmpty(entry.DisplayName))
+                displayName.text = entry.ID == Core.PlayFab.Player.Profile.ID ? string.Empty : "Anonymous Player";
+            else
+                displayName.text = entry.DisplayName;
+
+            if (entry.ID == Core.PlayFab.Player.Profile.ID)
+                displayName.text += (displayName.text.Length > 0 ? " " : string.Empty) + "(YOU)";
         }
 
         protected virtual void UpdateLocation(LocationModel model)

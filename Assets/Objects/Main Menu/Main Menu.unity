@@ -436,7 +436,7 @@ PrefabInstance:
     - target: {fileID: 5680916322489904260, guid: aaf7bef5c687b33408e3bc08cd08ef76,
         type: 3}
       propertyPath: m_Name
-      value: No Ads
+      value: Premium Pass
       objectReference: {fileID: 0}
     - target: {fileID: 5680916322489904260, guid: aaf7bef5c687b33408e3bc08cd08ef76,
         type: 3}

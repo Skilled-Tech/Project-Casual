@@ -465,10 +465,12 @@ namespace Game
 
         static void IAPInitializeCallback(IStoreController controller, IExtensionProvider extensions)
         {
+            /*
             CoroutineManager.YieldSeconds(() =>
             {
                 Core.Unity.IAP.Purchase("premium_pass");
             }, 0.2f);
+            */
         }
     }
 }

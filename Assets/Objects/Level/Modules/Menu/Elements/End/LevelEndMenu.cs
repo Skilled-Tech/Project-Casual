@@ -57,7 +57,7 @@ namespace Game
             UpdateState();
         }
 
-        private void PlayerScoreChangeCallback(int value) => UpdateState();
+        private void PlayerScoreChangeCallback(int value, int change) => UpdateState();
 
         private void AdAction()
         {
