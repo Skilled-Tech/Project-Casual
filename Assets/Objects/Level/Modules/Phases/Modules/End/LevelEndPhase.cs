@@ -63,14 +63,14 @@ namespace Game
 
             Level.Menu.End.Show();
 
-            Level.OnEnd += End;
+            Level.OnExit += End;
         }
 
         protected override void End()
         {
             base.End();
 
-            Level.OnEnd -= End;
+            Level.OnExit -= End;
         }
     }
 }

@@ -35,6 +35,7 @@ namespace Game
 
             Phase.OnBegin += BeginCallback;
             Phase.OnEnd += EndCallback;
+            Level.OnExit += ExitCallback;
         }
 
         void BeginCallback()
@@ -146,6 +147,11 @@ namespace Game
         private void EndCallback()
         {
             ClearCallbacks();
+        }
+
+        private void ExitCallback()
+        {
+            Level.Player.Instance.Score.Roundup();
         }
 
         private void ClearCallbacks()

@@ -68,24 +68,24 @@ namespace Game
 
         public virtual void Retry()
         {
-            End();
+            Exit();
 
             Core.Scenes.Load(gameObject.scene.name);
         }
 
         public virtual void Quit()
         {
-            End();
+            Exit();
 
             Core.Scenes.Load(Core.Scenes.MainMenu);
         }
 
-        public event Action OnEnd;
-        protected virtual void End()
+        public event Action OnExit;
+        protected virtual void Exit()
         {
             if (Menu.End.Element.IsOn) Menu.End.Element.Hide();
 
-            OnEnd?.Invoke();
+            OnExit?.Invoke();
         }
     }
 }
