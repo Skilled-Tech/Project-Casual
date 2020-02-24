@@ -21,6 +21,8 @@ using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.SharedModels;
 
+using Newtonsoft.Json;
+
 namespace Game
 {
 	public class PlayFabCore : Core.Module
@@ -261,12 +263,52 @@ namespace Game
                     ShowLocations = true,
                 };
 
-                public override void Configure(PlayFabCore reference)
+                public override void Configure(TitleProperty reference)
                 {
                     base.Configure(reference);
 
                     Get = new GetRequest();
                     GetAroundPlayer = new GetAroundPlayerRequest();
+                }
+            }
+
+            [SerializeField]
+            protected CatalogProperty catalog;
+            public CatalogProperty Catalog { get { return catalog; } }
+            [Serializable]
+            public class CatalogProperty : Property
+            {
+                [SerializeField]
+                protected string name = "Default";
+                public string Name { get { return name; } }
+
+                public GetRequest Get { get; protected set; }
+                public class GetRequest : Request<GetCatalogItemsRequest, GetCatalogItemsResult>
+                {
+                    public override MethodDelegate Method => PlayFabClientAPI.GetCatalogItems;
+
+                    public CatalogProperty Catalog { get; protected set; }
+
+                    public virtual void Request()
+                    {
+                        var request = GenerateRequest();
+
+                        request.CatalogVersion = Catalog.Name;
+
+                        Send(request);
+                    }
+
+                    public GetRequest(CatalogProperty catalog)
+                    {
+                        this.Catalog = catalog;
+                    }
+                }
+
+                public override void Configure(TitleProperty reference)
+                {
+                    base.Configure(reference);
+
+                    Get = new GetRequest(this);
                 }
             }
 
@@ -317,52 +359,19 @@ namespace Game
                 }
             }
 
-            [SerializeField]
-            protected CatalogProperty catalog;
-            public CatalogProperty Catalog { get { return catalog; } }
-            [Serializable]
-            public class CatalogProperty : Property
+            public class Property : Core.Property<TitleProperty>
             {
-                [SerializeField]
-                protected string name = "Default";
-                public string Name { get { return name; } }
+                public TitleProperty Title => Reference;
 
-                public GetRequest Get { get; protected set; }
-                public class GetRequest : Request<GetCatalogItemsRequest, GetCatalogItemsResult>
-                {
-                    public override MethodDelegate Method => PlayFabClientAPI.GetCatalogItems;
-
-                    public CatalogProperty Catalog { get; protected set; }
-
-                    public virtual void Request()
-                    {
-                        var request = GenerateRequest();
-
-                        request.CatalogVersion = Catalog.Name;
-
-                        Send(request);
-                    }
-
-                    public GetRequest(CatalogProperty catalog)
-                    {
-                        this.Catalog = catalog;
-                    }
-                }
-
-                public override void Configure(PlayFabCore reference)
-                {
-                    base.Configure(reference);
-
-                    Get = new GetRequest(this);
-                }
+                public PlayFabCore PlayFab => Title.PlayFab;
             }
 
             public override void Configure(PlayFabCore reference)
             {
                 base.Configure(reference);
 
-                Register(PlayFab, leaderboards);
-                Register(PlayFab, catalog);
+                Register(this, leaderboards);
+                Register(this, catalog);
 
                 Data = new DataRequest();
                 News = new NewsRequest();
@@ -386,23 +395,165 @@ namespace Game
                 public string DisplayName { get; protected set; }
                 public bool HasDisplayName => String.IsNullOrEmpty(DisplayName) == false;
 
+                public StatisticsProperty Statistics { get; protected set; }
+                [Serializable]
+                public class StatisticsProperty : Property
+                {
+                    public List<StatisticValue> List { get; protected set; }
+
+                    public virtual bool Contains(string name)
+                    {
+                        for (int i = 0; i < List.Count; i++)
+                            if (List[i].StatisticName == name)
+                                return true;
+
+                        return false;
+                    }
+                    public virtual StatisticValue Find(string name)
+                    {
+                        for (int i = 0; i < List.Count; i++)
+                            if (List[i].StatisticName == name)
+                                return List[i];
+
+                        return null;
+                    }
+
+                    public override void Configure(ProfileProperty reference)
+                    {
+                        base.Configure(reference);
+
+                        List = new List<StatisticValue>();
+                    }
+
+                    public override void Init()
+                    {
+                        base.Init();
+
+                        Debug.Log(Profile);
+                        Debug.Log(Profile.Player);
+                        Debug.Log(Profile.Player.Statistics);
+                        Debug.Log(Profile.Player.Statistics.Update);
+
+                        Profile.Player.Statistics.Update.OnResult.Add(StatisticUpdateCallback);
+                    }
+
+                    private void StatisticUpdateCallback(UpdatePlayerStatisticsResult result)
+                    {
+                        var request = result.Request as UpdatePlayerStatisticsRequest;
+
+                        if(request.Statistics != null && request.Statistics.Count > 0)
+                        {
+                            for (int i = 0; i < request.Statistics.Count; i++)
+                                Set(request.Statistics[i].StatisticName, request.Statistics[i].Value);
+
+                            InvokeUpdate();
+                        }
+                    }
+
+                    public virtual int Evalute(string name) => Evalute(name, 0);
+                    public virtual int Evalute(string name, int defaultValue)
+                    {
+                        for (int i = 0; i < List.Count; i++)
+                            if (List[i].StatisticName == name)
+                                return List[i].Value;
+
+                        return defaultValue;
+                    }
+
+                    public virtual void Update(IEnumerable<StatisticValue> source)
+                    {
+                        Set(source);
+
+                        InvokeUpdate();
+                    }
+                    public virtual void Update(StatisticValue source) => Update(source.StatisticName, source.Value);
+                    public virtual void Update(string name, int value)
+                    {
+                        Set(name, value);
+
+                        InvokeUpdate();
+                    }
+
+                    protected virtual void Set(IEnumerable<StatisticValue> source)
+                    {
+                        foreach (var element in source)
+                            Set(element);
+                    }
+                    protected virtual void Set(StatisticValue source) => Set(source.StatisticName, source.Value);
+                    protected virtual void Set(string name, int value)
+                    {
+                        var element = Find(name);
+
+                        if (element == null)
+                        {
+                            element = new StatisticValue()
+                            {
+                                StatisticName = name,
+                                Value = value,
+                                Version = 0,
+                            };
+
+                            List.Add(element);
+                        }
+                        else
+                        {
+                            element.Value = value;
+                        }
+                    }
+
+                    public event Action OnUpdate;
+                    protected virtual void InvokeUpdate()
+                    {
+                        OnUpdate?.Invoke();
+                    }
+
+                    public virtual void Clear()
+                    {
+                        List.Clear();
+                    }
+                }
+
+                public class Property : Core.Property<ProfileProperty>
+                {
+                    public ProfileProperty Profile => Reference;
+                }
+
+                public override void Configure(PlayerProperty reference)
+                {
+                    base.Configure(reference);
+
+                    Statistics = new StatisticsProperty();
+                    Register(this, Statistics);
+                    Statistics.OnUpdate += InvokeUpdate;
+                }
+
                 public virtual void Update(UpdateUserTitleDisplayNameResult result)
                 {
                     DisplayName = result.DisplayName;
 
-                    Update();
+                    InvokeUpdate();
                 }
                 public virtual void Update(LoginResult result)
                 {
-                    ID = result.PlayFabId;
+                    var json = result.ToJson();
 
-                    DisplayName = result?.InfoResultPayload?.PlayerProfile?.DisplayName;
+                    Debug.Log("Login Result: " + json);
 
-                    Update();
+                    Update(result.InfoResultPayload);
+                }
+                public virtual void Update(GetPlayerCombinedInfoResultPayload payload)
+                {
+                    ID = payload.AccountInfo.PlayFabId;
+
+                    DisplayName = payload?.PlayerProfile?.DisplayName;
+
+                    Statistics.Update(payload.PlayerStatistics);
+
+                    InvokeUpdate();
                 }
 
                 public event Action OnUpdate;
-                protected virtual void Update()
+                protected virtual void InvokeUpdate()
                 {
                     OnUpdate?.Invoke();
                 }
@@ -412,6 +563,8 @@ namespace Game
                     ID = null;
 
                     DisplayName = null;
+
+                    Statistics.Clear();
                 }
             }
 
@@ -448,7 +601,7 @@ namespace Game
                     }
                 }
 
-                public override void Configure(PlayFabCore reference)
+                public override void Configure(PlayerProperty reference)
                 {
                     base.Configure(reference);
 
@@ -477,7 +630,7 @@ namespace Game
                     }
                 }
 
-                public override void Configure(PlayFabCore reference)
+                public override void Configure(PlayerProperty reference)
                 {
                     base.Configure(reference);
 
@@ -506,7 +659,7 @@ namespace Game
                         Send(request);
                     }
                 }
-                public override void Configure(PlayFabCore reference)
+                public override void Configure(PlayerProperty reference)
                 {
                     base.Configure(reference);
 
@@ -555,6 +708,13 @@ namespace Game
                 }
             }
 
+            public class Property : Core.Property<PlayerProperty>
+            {
+                public PlayerProperty Player => Reference;
+
+                public PlayFabCore PlayFab => Player.PlayFab;
+            }
+
             public ClearRequest Clear { get; protected set; }
             public class ClearRequest : CloudScriptRequest
             {
@@ -586,10 +746,10 @@ namespace Game
             {
                 base.Configure(reference);
 
-                Register(PlayFab, profile);
-                Register(PlayFab, statistics);
-                Register(PlayFab, info);
-                Register(PlayFab, link);
+                Register(this, profile);
+                Register(this, statistics);
+                Register(this, info);
+                Register(this, link);
 
                 Clear = new ClearRequest();
             }

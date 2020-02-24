@@ -50,12 +50,13 @@ namespace Game
             {
                 public abstract string ID { get; }
 
+                protected int _value = 0;
                 public virtual int Value
                 {
-                    get => PlayerPrefs.GetInt(ID, DefaultValue);
+                    get => _value;
                     set
                     {
-                        PlayerPrefs.SetInt(ID, value);
+                        _value = value;
 
                         if (Core.PlayFab.IsLoggedIn) Core.PlayFab.Player.Statistics.Update.Request(ID, value);
 
@@ -67,6 +68,30 @@ namespace Game
                 public event ValueChangeDelegate OnValueChanged;
 
                 public virtual int DefaultValue => 0;
+
+                public override void Configure(StatisticsProperty reference)
+                {
+                    base.Configure(reference);
+
+                    Core.PlayFab.Player.Profile.OnUpdate += ProfileUpdateCallback;
+                }
+
+                public override void Init()
+                {
+                    base.Init();
+
+                    Load();
+                }
+
+                public virtual void Load()
+                {
+                    Value = PlayerPrefs.GetInt(ID, DefaultValue);
+                }
+
+                protected virtual void ProfileUpdateCallback()
+                {
+                    //if(Core.PlayFab.Player.Profile.)
+                }
             }
 
             [Serializable]
