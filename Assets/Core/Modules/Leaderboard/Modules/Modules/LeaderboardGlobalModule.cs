@@ -21,7 +21,7 @@ using PlayFab.ClientModels;
 
 namespace Game
 {
-	public class LeaderboardGlobalModule : LeaderboardModule.Element<GetLeaderboardResult>
+	public class LeaderboardGlobalModule : LeaderboardModule.Element<GetLeaderboardRequest, GetLeaderboardResult>
     {
         [SerializeField]
         protected int max = 4;
@@ -29,13 +29,21 @@ namespace Game
 
         public override string ID => "Global";
 
+        public override void Configure(LeaderboardModule reference)
+        {
+            base.Configure(reference);
+
+            Core.PlayFab.Title.Leaderboards.Get.OnResponse.Add(ResponseCallback);
+        }
+
         public override void Request()
         {
             base.Request();
-
-            Core.PlayFab.Title.Leaderboards.Get.OnResponse.Enque(ResponseCallback);
+            
             Core.PlayFab.Title.Leaderboards.Get.Request(Leaderboard.ID, max);
         }
+
+        protected override bool CheckID(GetLeaderboardRequest request) => request.StatisticName == Leaderboard.ID;
 
         public override IList<PlayerLeaderboardEntry> ResultToList(GetLeaderboardResult result) => result.Leaderboard;
     }

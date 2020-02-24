@@ -102,7 +102,8 @@ namespace Game
         {
             public Core Core => Core.Instance;
 
-            public TModule Reference { get; protected set; }
+            [NonSerialized]
+            protected TModule Reference;
 
             protected virtual void Register<TReference>(TReference reference, IReference<TReference> module)
             {

@@ -82,7 +82,7 @@ namespace Game
                 IsProcessing = true;
             }
 
-            protected virtual void ProcessResult(IList<PlayerLeaderboardEntry> result)
+            protected virtual void Process(IList<PlayerLeaderboardEntry> result)
             {
                 List.Clear();
 
@@ -109,7 +109,8 @@ namespace Game
                 OnUpdate.Invoke(this);
             }
         }
-        public abstract class Element<TResult> : Element
+        public abstract class Element<TRequest, TResult> : Element
+            where TRequest : PlayFabRequestCommon
             where TResult : PlayFabResultCommon
         {
             public abstract IList<PlayerLeaderboardEntry> ResultToList(TResult result);
@@ -117,10 +118,21 @@ namespace Game
             protected virtual void ResponseCallback(TResult result, PlayFabError error)
             {
                 if (error == null)
-                    ProcessResult(ResultToList(result));
+                {
+                    var request = result.Request as TRequest;
+
+                    if(CheckID(request))
+                    {
+                        var list = ResultToList(result);
+
+                        Process(list);
+                    }
+                }
                 else
                     InvokeError(error);
             }
+
+            protected abstract bool CheckID(TRequest request);
         }
 
         public IEnumerable<LeaderboardEntry> IEnumerate() => IEnumerate(true);

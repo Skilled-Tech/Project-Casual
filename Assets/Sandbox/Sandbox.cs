@@ -39,6 +39,12 @@ namespace Game
             }
         }
 
+        [Button("Execute")]
+        void Execute()
+        {
+            PlayerPrefs.SetInt("High Score", 100);
+        }
+
         private void Start()
         {
             Run = new RunCoroutine();

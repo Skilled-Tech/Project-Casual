@@ -22,7 +22,7 @@ using PlayFab.ClientModels;
 
 namespace Game
 {
-	public class LeaderboardPersonalModule : LeaderboardModule.Element<GetLeaderboardAroundPlayerResult>
+	public class LeaderboardPersonalModule : LeaderboardModule.Element<GetLeaderboardAroundPlayerRequest, GetLeaderboardAroundPlayerResult>
     {
         [SerializeField]
         protected int max = 3;
@@ -30,13 +30,21 @@ namespace Game
 
         public override string ID => "Personal";
 
+        public override void Configure(LeaderboardModule reference)
+        {
+            base.Configure(reference);
+
+            Core.PlayFab.Title.Leaderboards.GetAroundPlayer.OnResponse.Add(ResponseCallback);
+        }
+
         public override void Request()
         {
             base.Request();
-
-            Core.PlayFab.Title.Leaderboards.GetAroundPlayer.OnResponse.Enque(ResponseCallback);
+            
             Core.PlayFab.Title.Leaderboards.GetAroundPlayer.Request(Leaderboard.ID, max);
         }
+
+        protected override bool CheckID(GetLeaderboardAroundPlayerRequest request) => request.StatisticName == Leaderboard.ID;
 
         public override IList<PlayerLeaderboardEntry> ResultToList(GetLeaderboardAroundPlayerResult result) => result.Leaderboard;
     }

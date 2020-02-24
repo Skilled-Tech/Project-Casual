@@ -423,16 +423,19 @@ namespace Game
                         base.Configure(reference);
 
                         List = new List<StatisticValue>();
+
+                        Core.StartCoroutine(Procedure());
+                        IEnumerator Procedure()
+                        {
+                            yield return new WaitForSecondsRealtime(0.2f);
+
+                            Selection.activeGameObject = Core.PlayFab.gameObject;
+                        }
                     }
 
                     public override void Init()
                     {
                         base.Init();
-
-                        Debug.Log(Profile);
-                        Debug.Log(Profile.Player);
-                        Debug.Log(Profile.Player.Statistics);
-                        Debug.Log(Profile.Player.Statistics.Update);
 
                         Profile.Player.Statistics.Update.OnResult.Add(StatisticUpdateCallback);
                     }
@@ -441,7 +444,7 @@ namespace Game
                     {
                         var request = result.Request as UpdatePlayerStatisticsRequest;
 
-                        if(request.Statistics != null && request.Statistics.Count > 0)
+                        if (request.Statistics != null && request.Statistics.Count > 0)
                         {
                             for (int i = 0; i < request.Statistics.Count; i++)
                                 Set(request.Statistics[i].StatisticName, request.Statistics[i].Value);
@@ -462,24 +465,14 @@ namespace Game
 
                     public virtual void Update(IEnumerable<StatisticValue> source)
                     {
-                        Set(source);
-
-                        InvokeUpdate();
-                    }
-                    public virtual void Update(StatisticValue source) => Update(source.StatisticName, source.Value);
-                    public virtual void Update(string name, int value)
-                    {
-                        Set(name, value);
-
-                        InvokeUpdate();
-                    }
-
-                    protected virtual void Set(IEnumerable<StatisticValue> source)
-                    {
                         foreach (var element in source)
-                            Set(element);
+                            Set(element.StatisticName, element.Value);
+
+                        InvokeUpdate();
                     }
-                    protected virtual void Set(StatisticValue source) => Set(source.StatisticName, source.Value);
+
+                    public delegate void SetDelegate(string name, int value);
+                    public event SetDelegate OnSet;
                     protected virtual void Set(string name, int value)
                     {
                         var element = Find(name);
@@ -499,6 +492,8 @@ namespace Game
                         {
                             element.Value = value;
                         }
+
+                        OnSet?.Invoke(name, value);
                     }
 
                     public event Action OnUpdate;
@@ -533,14 +528,7 @@ namespace Game
 
                     InvokeUpdate();
                 }
-                public virtual void Update(LoginResult result)
-                {
-                    var json = result.ToJson();
-
-                    Debug.Log("Login Result: " + json);
-
-                    Update(result.InfoResultPayload);
-                }
+                public virtual void Update(LoginResult result) => Update(result.InfoResultPayload);
                 public virtual void Update(GetPlayerCombinedInfoResultPayload payload)
                 {
                     ID = payload.AccountInfo.PlayFabId;

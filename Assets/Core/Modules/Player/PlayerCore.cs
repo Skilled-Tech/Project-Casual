@@ -17,6 +17,8 @@ using UnityEditorInternal;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
+using NaughtyAttributes;
+
 namespace Game
 {
 	public class PlayerCore : Core.Module
@@ -49,16 +51,15 @@ namespace Game
             public abstract class Element : Property
             {
                 public abstract string ID { get; }
-
-                protected int _value = 0;
+                
                 public virtual int Value
                 {
-                    get => _value;
+                    get => PlayerPrefs.GetInt(ID, DefaultValue);
                     set
                     {
-                        _value = value;
+                        Save(value);
 
-                        if (Core.PlayFab.IsLoggedIn) Core.PlayFab.Player.Statistics.Update.Request(ID, value);
+                        Upload(value);
 
                         OnValueChanged?.Invoke(value);
                     }
@@ -69,28 +70,58 @@ namespace Game
 
                 public virtual int DefaultValue => 0;
 
-                public override void Configure(StatisticsProperty reference)
-                {
-                    base.Configure(reference);
-
-                    Core.PlayFab.Player.Profile.OnUpdate += ProfileUpdateCallback;
-                }
+                public PlayFabCore PlayFab => Core.PlayFab;
 
                 public override void Init()
                 {
                     base.Init();
 
-                    Load();
+                    PlayFab.Player.Profile.Statistics.OnSet += PlayFabStatisticSetCallback;
                 }
 
-                public virtual void Load()
+                protected virtual void Save(int value)
                 {
-                    Value = PlayerPrefs.GetInt(ID, DefaultValue);
+                    if(value != DefaultValue) PlayerPrefs.SetInt(ID, value);
                 }
 
-                protected virtual void ProfileUpdateCallback()
+                protected virtual void Upload(int value)
                 {
-                    //if(Core.PlayFab.Player.Profile.)
+                    if(PlayFab.IsLoggedIn) PlayFab.Player.Statistics.Update.Request(ID, value);
+                }
+
+                public virtual void Clear()
+                {
+                    PlayerPrefs.DeleteKey(ID);
+                }
+
+                private void PlayFabStatisticSetCallback(string name, int cloudValue)
+                {
+                    if(name == ID)
+                    {
+                        //Values match, nothing to change here
+                        if (Value == cloudValue) 
+                        {
+
+                        }
+
+                        //Our local value is higher than the cloud value
+                        //Upload local to cloud
+                        if (Value > cloudValue)
+                        {
+                            Upload(Value);
+
+                            Debug.Log("Uploading");
+                        }
+
+                        //Our local value is lower than the cloud value
+                        //Store cloud value
+                        if(Value < cloudValue)
+                        {
+                            Save(cloudValue);
+
+                            Debug.Log("Saving");
+                        }
+                    }
                 }
             }
 
@@ -101,8 +132,25 @@ namespace Game
 
                 public PlayerCore Player => Statistics.Player;
             }
+
+            public override void Configure(PlayerCore reference)
+            {
+                base.Configure(reference);
+
+                Register(this, score);
+                Register(this, highScore);
+            }
+
+            public virtual void Clear()
+            {
+                score.Clear();
+                highScore.Clear();
+            }
         }
         
+        [Button("Clear Statistics")]
+        void ClearStatistics() => statistics.Clear();
+
         [Serializable]
         public class Property : Core.Property<PlayerCore>
         {
@@ -117,6 +165,8 @@ namespace Game
         public override void Configure(Core reference)
         {
             base.Configure(reference);
+
+            Register(this, statistics);
 
             References.Configure(this);
         }

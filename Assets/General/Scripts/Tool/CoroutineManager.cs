@@ -49,6 +49,12 @@ namespace Game
 
         public static Coroutine Yield(Action action, object instruction)
         {
+            if(Instance == null)
+            {
+                Debug.Log("Coroutine Manager system not initialized yet, ignoring call");
+                return null;
+            }
+
             return Start(Procedure());
 
             IEnumerator Procedure()

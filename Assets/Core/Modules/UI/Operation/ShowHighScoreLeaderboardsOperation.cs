@@ -19,7 +19,7 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-    public class ShowScoreLeaderboardsOperation : Operation
+    public class ShowHighScoreLeaderboardsOperation : Operation
     {
         public Core Core => Core.Instance;
 
