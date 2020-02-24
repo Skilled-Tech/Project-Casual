@@ -109,8 +109,6 @@ namespace Game
                         if (Value > cloudValue)
                         {
                             Upload(Value);
-
-                            Debug.Log("Uploading");
                         }
 
                         //Our local value is lower than the cloud value
@@ -118,8 +116,6 @@ namespace Game
                         if(Value < cloudValue)
                         {
                             Save(cloudValue);
-
-                            Debug.Log("Saving");
                         }
                     }
                 }
