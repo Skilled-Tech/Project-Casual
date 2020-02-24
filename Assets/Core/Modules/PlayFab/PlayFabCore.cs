@@ -423,14 +423,6 @@ namespace Game
                         base.Configure(reference);
 
                         List = new List<StatisticValue>();
-
-                        Core.StartCoroutine(Procedure());
-                        IEnumerator Procedure()
-                        {
-                            yield return new WaitForSecondsRealtime(0.2f);
-
-                            Selection.activeGameObject = Core.PlayFab.gameObject;
-                        }
                     }
 
                     public override void Init()
