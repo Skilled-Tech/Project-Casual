@@ -115,6 +115,7 @@ namespace Game
                 GetPlayerProfile = true,
                 GetPlayerStatistics = true,
                 GetUserInventory = true,
+                GetUserVirtualCurrency = true,
             };
 
             public override void Configure(PlayFabCore reference)
