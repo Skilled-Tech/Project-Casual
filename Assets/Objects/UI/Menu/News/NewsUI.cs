@@ -200,22 +200,12 @@ namespace Game
         }
 
         public virtual void Show() => Show(Core.News.Reports);
-        public virtual void Show(IList<NewsReport> list)
+        public virtual void Show(IEnumerable<NewsReport> collection)
         {
-            if (list.Count == 0)
-            {
-                Debug.LogWarning("Trying to show news UI with zero news reports, ignoring");
-                return;
-            }
-
             Queue.Clear();
 
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (Core.News.Occurrence.CanDisplay(list[i]) == false) continue;
-
-                Queue.Enqueue(list[i]);
-            }
+            foreach (var report in collection)
+                Queue.Enqueue(report);
 
             if(Queue.Count == 0)
             {

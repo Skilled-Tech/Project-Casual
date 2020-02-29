@@ -39,44 +39,17 @@ namespace Game
         [Serializable]
         public class ListenerProperty : Property, IStoreListener
         {
-            public delegate void InitializeDelegate(IStoreController controller, IExtensionProvider extensions);
-            public event InitializeDelegate InitializeEvent;
             void IStoreListener.OnInitialized(IStoreController controller, IExtensionProvider extensions)
-            {
-                if (InitializeEvent != null) InitializeEvent(controller, extensions);
-            }
+                => IAP.InitializeCompleteCallback(controller, extensions);
 
-            public delegate void InitializeFailDelegate(InitializationFailureReason reason);
-            public event InitializeFailDelegate InitializeFailEvent;
             void IStoreListener.OnInitializeFailed(InitializationFailureReason reason)
-            {
-                if (InitializeFailEvent != null) InitializeFailEvent(reason);
-            }
-
-            public delegate void PurchasePrcoessEventDelegate(Product product);
-            public event PurchasePrcoessEventDelegate PurchaseProcessEvent;
-
-            public delegate PurchaseProcessingResult PurchasePrcoessHandlerDelegate(Product product);
-            public PurchasePrcoessHandlerDelegate PurchaseProcessHandler;
+                => IAP.InitializeFailedCallback(reason);
 
             PurchaseProcessingResult IStoreListener.ProcessPurchase(PurchaseEventArgs args)
-            {
-                if (PurchaseProcessEvent != null) PurchaseProcessEvent(args.purchasedProduct);
+                => IAP.ProcessPurchaseHandler(args.purchasedProduct);
 
-                return PurchaseProcessHandler(args.purchasedProduct);
-            }
-
-            public delegate void PurchaseFailDelegate(Product product, PurchaseFailureReason reason);
-            public event PurchaseFailDelegate PurchaseFailEvent;
             void IStoreListener.OnPurchaseFailed(Product product, PurchaseFailureReason reason)
-            {
-                if (PurchaseFailEvent != null) PurchaseFailEvent(product, reason);
-            }
-
-            public ListenerProperty(PurchasePrcoessHandlerDelegate PurchaseHandler)
-            {
-                this.PurchaseProcessHandler = PurchaseHandler;
-            }
+                => IAP.PurchaseFailedCallback(product, reason);
         }
 
         public ValidateProperty Validate { get; protected set; }
@@ -89,7 +62,7 @@ namespace Game
 
                 public override MethodDelegate Method => PlayFabClientAPI.ValidateGooglePlayPurchase;
 
-                protected override void FormatRequest(ref ValidateGooglePlayPurchaseRequest request, Product product)
+                protected override void FillRequest(ref ValidateGooglePlayPurchaseRequest request, Product product)
                 {
                     var reciept = Purchase.FromJson(product.receipt);
 
@@ -150,21 +123,6 @@ namespace Game
                 }
             }
 
-            public List<Element> Elements { get; protected set; }
-
-            public Element this[AppStore store] => Get(store);
-
-            public virtual Element Get(AppStore store)
-            {
-                for (int i = 0; i < Elements.Count; i++)
-                    if (Elements[i].AppStore == store)
-                        return Elements[i];
-
-                return null;
-            }
-
-            public Element Module => this[IAP.Store];
-
             public abstract class Element<TRequest, TResult> : Element
                 where TRequest : PlayFabRequestCommon, new()
                 where TResult : PlayFabResultCommon
@@ -177,9 +135,9 @@ namespace Game
                 {
                     var request = GenerateRequest();
 
-                    FormatRequest(ref request, product);
+                    FillRequest(ref request, product);
 
-                    Send(request);
+                    Send(request, product);
                 }
                 protected virtual TRequest GenerateRequest()
                 {
@@ -187,20 +145,22 @@ namespace Game
 
                     return request;
                 }
-                protected abstract void FormatRequest(ref TRequest request, Product product);
-                protected virtual void Send(TRequest request)
+                protected abstract void FillRequest(ref TRequest request, Product product);
+                protected virtual void Send(TRequest request, Product product)
                 {
                     Method.Invoke(request, ResultCallback, ErrorCallback);
+
+                    void ResultCallback(TResult result) => this.ResultCallback(result, product);
                 }
 
                 public abstract IList<PurchaseReceiptFulfillment> ExtractFulFillments(TResult result);
 
                 public MoeEvent<ResultData> OnResult { get; protected set; } = new MoeEvent<ResultData>();
-                protected virtual void ResultCallback(TResult result)
+                protected virtual void ResultCallback(TResult result, Product product)
                 {
                     var fulfillments = ExtractFulFillments(result);
 
-                    var data = new ResultData(result, fulfillments);
+                    var data = new ResultData(result, product, fulfillments);
 
                     OnResult.Invoke(data);
 
@@ -208,7 +168,7 @@ namespace Game
                 }
 
                 public MoeEvent<PlayFabError> OnError { get; protected set; } = new MoeEvent<PlayFabError>();
-                protected virtual  void ErrorCallback(PlayFabError error)
+                protected virtual void ErrorCallback(PlayFabError error)
                 {
                     OnError.Invoke(error);
 
@@ -233,11 +193,15 @@ namespace Game
                 {
                     public PlayFabResultCommon Source { get; protected set; }
 
+                    public Product Product { get; protected set; }
+
                     public IList<PurchaseReceiptFulfillment> Fulfillments { get; protected set; }
 
-                    public ResultData(PlayFabResultCommon result, IList<PurchaseReceiptFulfillment> fulfillments)
+                    public ResultData(PlayFabResultCommon result, Product product, IList<PurchaseReceiptFulfillment> fulfillments)
                     {
                         this.Source = result;
+
+                        this.Product = product;
 
                         this.Fulfillments = fulfillments;
                     }
@@ -260,6 +224,21 @@ namespace Game
                     }
                 }
             }
+
+            public List<Element> Elements { get; protected set; }
+
+            public Element this[AppStore store] => Get(store);
+
+            public virtual Element Get(AppStore store)
+            {
+                for (int i = 0; i < Elements.Count; i++)
+                    if (Elements[i].AppStore == store)
+                        return Elements[i];
+
+                return null;
+            }
+
+            public Element Module => this[IAP.Store];
 
             public class Property : Core.Property<ValidateProperty>
             {
@@ -294,6 +273,8 @@ namespace Game
             protected virtual void ResultCallback(Element element, Element.ResultData result)
             {
                 OnResult.Invoke(element, result);
+
+                IAP.ConfirmPendingPurchase(result.Product);
             }
 
             public MoeEvent<Element, PlayFabError> OnError { get; protected set; } = new MoeEvent<Element, PlayFabError>();
@@ -323,7 +304,7 @@ namespace Game
         {
             base.Configure(reference);
 
-            Listener = new ListenerProperty(ProcessPurchaseHandler);
+            Listener = new ListenerProperty();
             Validate = new ValidateProperty();
 
             Register(this, Listener);
@@ -332,40 +313,12 @@ namespace Game
             PlayFab.Title.Catalog.Get.OnResult.Add(CatalogRetriveCallback);
         }
 
-        public override void Init()
-        {
-            base.Init();
-
-            Listener.InitializeEvent += InitializeCompleteCallback;
-            Listener.InitializeFailEvent += InitializeFailCallback;
-            Listener.PurchaseFailEvent += PurchaseFailedCallback;
-
-            Validate.OnResponse.Add(ValidateResponse);
-        }
-
+        #region Initialize
         void CatalogRetriveCallback(GetCatalogItemsResult result) => Initialize(result.Catalog);
 
         void Initialize(IList<CatalogItem> items)
         {
-            switch (Application.platform)
-            {
-                case RuntimePlatform.Android:
-                    Store = AppStore.GooglePlay;
-                    break;
-
-                case RuntimePlatform.IPhonePlayer:
-                    Store = AppStore.AppleAppStore;
-                    break;
-
-                case RuntimePlatform.WindowsEditor:
-                case RuntimePlatform.WindowsPlayer:
-                    Store = AppStore.fake;
-                    break;
-
-                default:
-                    Store = AppStore.NotSpecified;
-                    break;
-            }
+            Store = RunTimePlatformToAppStore(Application.platform);
 
             var module = StandardPurchasingModule.Instance(Store);
 
@@ -383,17 +336,28 @@ namespace Game
             UnityPurchasing.Initialize(Listener, builder);
         }
 
+        public delegate void InitializeDelegate(IStoreController controller, IExtensionProvider extensions);
+        public event InitializeDelegate OnInitialize;
         void InitializeCompleteCallback(IStoreController controller, IExtensionProvider extensions)
         {
             Debug.Log("IAP Initialzed Correctly");
 
             StoreController = controller;
-        }
-        void InitializeFailCallback(InitializationFailureReason error)
-        {
-            Debug.LogError("Store initialization failed, reason: " + error);
+
+            OnInitialize?.Invoke(controller, extensions);
         }
 
+        public delegate void InitializeFailedDelegate(InitializationFailureReason reason);
+        public event InitializeFailedDelegate OnInitializeFailed;
+        void InitializeFailedCallback(InitializationFailureReason reason)
+        {
+            Debug.LogError("Store initialization failed, reason: " + reason);
+
+            OnInitializeFailed.Invoke(reason);
+        }
+        #endregion
+
+        #region Purchase
         public void Purchase(string productID)
         {
             if (Active == false) throw new Exception("IAP Core is not initialized");
@@ -417,32 +381,65 @@ namespace Game
 
             if (Validate.Module == null)
             {
-                Debug.LogError("No validation module defined for store: " + Store);
-                return PurchaseProcessingResult.Complete;
+                if(Application.isEditor)
+                {
+                    Debug.LogWarning("IAP purchases won't be validated in editor");
+                    return PurchaseProcessingResult.Complete;
+                }
+                else
+                {
+                    Debug.LogError("No validation module defined for store: " + Store);
+                    return PurchaseProcessingResult.Complete;
+                }
             }
 
             Debug.Log("Processing purchase validation for item: " + product.definition.storeSpecificId + " with transaction ID: " + product.transactionID);
 
             Validate.Module.Request(product);
 
-            return PurchaseProcessingResult.Complete;
+            return PurchaseProcessingResult.Pending;
         }
 
-        void ValidateResponse(ValidateProperty.Element element, ValidateProperty.Element.ResponseData response)
+        void ConfirmPendingPurchase(Product product)
         {
-            if(response.Success)
+            if(StoreController == null)
             {
-                Debug.Log("Successfully Validated Purchase");
+                Debug.LogError("No Store Controller set for Pending Purchase Confirmation");
+                return;
             }
-            else
-            {
-                Debug.Log("Error Validating Purchase: " + response.Error.GenerateErrorReport());
-            }
-        }
 
+            StoreController.ConfirmPendingPurchase(product);
+            Debug.Log("Confirming Purchase for: " + product.definition.id);
+        }
+        #endregion
+
+        public delegate void PurchaseFailedDelegate(Product product, PurchaseFailureReason reason);
+        public event PurchaseFailedDelegate OnPurchaseFailed;
         void PurchaseFailedCallback(Product product, PurchaseFailureReason reason)
         {
             Debug.LogError("Purchase of prodcut " + product.definition.storeSpecificId + " failed, reason: " + reason);
+
+            OnPurchaseFailed?.Invoke(product, reason);
+        }
+
+        //Static Utility
+        public static AppStore RunTimePlatformToAppStore(RuntimePlatform platform)
+        {
+            switch (platform)
+            {
+                case RuntimePlatform.Android:
+                    return AppStore.GooglePlay;
+
+                case RuntimePlatform.IPhonePlayer:
+                    return AppStore.AppleAppStore;
+
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.WindowsPlayer:
+                    return AppStore.fake;
+
+                default:
+                    return AppStore.NotSpecified;
+            }
         }
     }
 
@@ -453,24 +450,12 @@ namespace Game
         [RuntimeInitializeOnLoadMethod()]
         static void IAPLoad()
         {
-            Core.Unity.IAP.Listener.InitializeEvent += IAPInitializeCallback;
-
             Core.PlayFab.Login.OnResult.Add(LoginCallback);
         }
 
         static void LoginCallback(LoginResult result)
         {
             Core.PlayFab.Title.Catalog.Get.Request();
-        }
-
-        static void IAPInitializeCallback(IStoreController controller, IExtensionProvider extensions)
-        {
-            /*
-            CoroutineManager.YieldSeconds(() =>
-            {
-                Core.Unity.IAP.Purchase("premium_pass");
-            }, 0.2f);
-            */
         }
     }
 }

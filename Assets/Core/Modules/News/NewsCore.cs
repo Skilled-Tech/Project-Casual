@@ -85,6 +85,7 @@ namespace Game
                 Pref = json;
             }
 
+            public virtual bool Contains(NewsReport report) => Contains(report.ID);
             public virtual bool Contains(string ID) => Hash.Contains(ID);
 
             public virtual void Add(string ID)
@@ -128,35 +129,6 @@ namespace Game
             {
                 Pref = string.Empty;
             }
-
-            public virtual bool CanDisplay(NewsReport report)
-            {
-                if (report.Recurrence == NewsReportRecurrence.Constant)
-                    return true;
-                else if (report.Recurrence == NewsReportRecurrence.Once)
-                    return Contains(report.ID) == false;
-                else
-                {
-                    Debug.LogWarning("News Report Reccurence Type: " + report.Recurrence + " Not Handeled withing the News Report Occurence Property, returning true");
-                    return true;
-                }
-            }
-        }
-
-        public bool ContainsUnseenReports
-        {
-            get
-            {
-                for (int i = 0; i < reports.Count; i++)
-                {
-                    if (occurrence.Contains(reports[i].ID))
-                        continue;
-                    else
-                        return true;
-                }
-
-                return false;
-            }
         }
 
         [Button("Clear Occurences")]
@@ -165,6 +137,69 @@ namespace Game
             occurrence.Clear();
         }
 
+        public bool ContainsUnseenReports
+        {
+            get
+            {
+                for (int i = 0; i < reports.Count; i++)
+                {
+                    if (occurrence.Contains(reports[i].ID)) continue;
+
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        [SerializeField]
+        protected PopupsProperty popups;
+        public PopupsProperty Popups { get { return popups; } }
+        [Serializable]
+        public class PopupsProperty : Property
+        {
+            public bool ContainsUnseenReports
+            {
+                get
+                {
+                    for (int i = 0; i < News.Reports.Count; i++)
+                    {
+                        if (News.Reports[i].Popup == false) continue;
+
+                        if (News.Occurrence.Contains(News.Reports[i])) continue;
+
+                        return true;
+                    }
+
+                    return false;
+                }
+            }
+
+            public virtual IEnumerable<NewsReport> Iterate()
+            {
+                for (int i = 0; i < News.Reports.Count; i++)
+                {
+                    if (News.Reports[i].Popup == false) continue;
+
+                    if (News.Occurrence.Contains(News.Reports[i])) continue;
+
+                    yield return News.Reports[i];
+                }
+            }
+
+            public override void Init()
+            {
+                base.Init();
+
+                News.OnUpdate.Add(UpdateCallback);
+            }
+
+            private void UpdateCallback()
+            {
+                if (ContainsUnseenReports) Core.UI.News.Show(Iterate());
+            }
+        }
+        
         [Serializable]
         public class Property : Core.Property<NewsCore>
         {
@@ -183,6 +218,7 @@ namespace Game
             PlayFab.Login.OnResult.Add(LoginCallback);
 
             Register(this, occurrence);
+            Register(this, popups);
         }
 
         public void Request()
@@ -262,10 +298,10 @@ namespace Game
         public bool HasText => string.IsNullOrEmpty(text) == false;
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-        [DefaultValue(NewsReportRecurrence.Once)]
+        [DefaultValue(false)]
         [SerializeField]
-        private NewsReportRecurrence recurrence;
-        public NewsReportRecurrence Recurrence { get { return recurrence; } }
+        private bool popup;
+        public bool Popup { get { return popup; } }
 
         [JsonProperty]
         [SerializeField]
