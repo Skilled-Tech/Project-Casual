@@ -82,7 +82,7 @@ namespace Game
 
                 return true;
             }
-            else if (Core.PlayFab.Player.Profile.HasDisplayName == false)
+            else if (Core.PlayFab.Player.Profile.DisplayName.IsValid == false)
             {
                 if(execute) RequestDisplayNameUpdate();
 

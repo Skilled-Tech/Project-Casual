@@ -86,7 +86,7 @@ namespace Game
 
                 protected virtual void Upload(int value)
                 {
-                    if(PlayFab.IsLoggedIn) PlayFab.Player.Statistics.Update.Request(ID, value);
+                    if(PlayFab.IsLoggedIn) PlayFab.Player.Profile.Statistics.Update.Request(ID, value);
                 }
 
                 public virtual void Clear()

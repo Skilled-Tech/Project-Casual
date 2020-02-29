@@ -154,8 +154,8 @@ namespace Game
             {
                 Popup.Lock("Updating Profile Info");
 
-                PlayFab.Player.Info.UpdateDisplayName.OnResponse.Enque(Callback);
-                PlayFab.Player.Info.UpdateDisplayName.Request(name);
+                PlayFab.Player.Profile.DisplayName.Update.OnResponse.Enque(Callback);
+                PlayFab.Player.Profile.DisplayName.Update.Request(name);
 
                 void Callback(UpdateUserTitleDisplayNameResult result, PlayFabError error)
                 {

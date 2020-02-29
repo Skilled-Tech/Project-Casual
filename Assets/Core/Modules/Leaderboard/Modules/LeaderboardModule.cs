@@ -168,7 +168,7 @@ namespace Game
 
             PlayFab.Login.OnResult.Add(LoginResultCallback);
             PlayFab.OnLogout.Add(LogoutCallback);
-            PlayFab.Player.Statistics.Update.OnResult.Add(PlayerUpdateStatisticCallback);
+            PlayFab.Player.Profile.Statistics.Update.OnResult.Add(PlayerUpdateStatisticCallback);
 
             References.Configure(this);
         }

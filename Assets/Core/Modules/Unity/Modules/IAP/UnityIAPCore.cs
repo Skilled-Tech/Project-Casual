@@ -310,7 +310,7 @@ namespace Game
             Register(this, Listener);
             Register(this, Validate);
 
-            PlayFab.Title.Catalog.Get.OnResult.Add(CatalogRetriveCallback);
+            PlayFab.Title.Catalog.Retrieve.OnResult.Add(CatalogRetriveCallback);
         }
 
         #region Initialize
@@ -455,7 +455,7 @@ namespace Game
 
         static void LoginCallback(LoginResult result)
         {
-            Core.PlayFab.Title.Catalog.Get.Request();
+            Core.PlayFab.Title.Catalog.Retrieve.Request();
         }
     }
 }
