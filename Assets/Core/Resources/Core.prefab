@@ -1066,7 +1066,7 @@ MonoBehaviour:
       _ID:
         _override:
           enabled: 1
-          value: SANDMAN
+          value: MOB
   link: {}
 --- !u!1 &6478464170344696841
 GameObject:
