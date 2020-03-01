@@ -19,10 +19,85 @@ using Random = UnityEngine.Random;
 
 using NaughtyAttributes;
 
+using PlayFab;
+using PlayFab.ClientModels;
+
 namespace Game
 {
 	public class PlayerCore : Core.Module
 	{
+        public UpdateDisplayNameProcedure UpdateDisplayName { get; protected set; }
+        [Serializable]
+        public class UpdateDisplayNameProcedure : Procedure
+        {
+            public PlayFabCore PlayFab => Core.PlayFab;
+
+            public TextInputUI TextInput => Core.UI.TextInput;
+
+            public virtual void Require() => Require("Updating Display Name");
+
+            public override void Start()
+            {
+                base.Start();
+
+                DisplayInput();
+            }
+
+            void DisplayInput()
+            {
+                Popup.Hide();
+                TextInput.Show("Enter Display Name", Callback);
+
+                void Callback(TextInputUI.Response response)
+                {
+                    if (response.Success)
+                        PlayFabRequest(response.Text);
+                    else if (response.Canceled)
+                        Cancel();
+                    else
+                    {
+                        Debug.LogError("Unknown Condition Met");
+                        InvokeError("Unknown Error");
+                    }
+                }
+            }
+
+            void PlayFabRequest(string name)
+            {
+                Popup.Lock("Updating Profile Info");
+
+                PlayFab.Player.Profile.DisplayName.Update.OnResponse.Enque(Callback);
+                PlayFab.Player.Profile.DisplayName.Update.Request(name);
+
+                void Callback(UpdateUserTitleDisplayNameResult result, PlayFabError error)
+                {
+                    if (error == null)
+                        End();
+                    else
+                    {
+                        if (error.Error == PlayFabErrorCode.NameNotAvailable)
+                            Popup.Show("Name Not Available, Please Try A Different Name", "Okay");
+                        else
+                            InvokeError(error.ErrorMessage);
+                    }
+                }
+            }
+
+            protected override void Stop()
+            {
+                base.Stop();
+
+                Popup.Hide();
+
+                TextInput.Hide();
+            }
+        }
+
+        public class Procedure : Core.Procedure<PlayerCore>
+        {
+            public PlayerCore Player => Reference;
+        }
+
         [SerializeField]
         protected StatisticsProperty statistics;
         public StatisticsProperty Statistics { get { return statistics; } }
@@ -162,6 +237,9 @@ namespace Game
         {
             base.Configure(reference);
 
+            UpdateDisplayName = new UpdateDisplayNameProcedure();
+
+            Register(this, UpdateDisplayName);
             Register(this, statistics);
 
             References.Configure(this);

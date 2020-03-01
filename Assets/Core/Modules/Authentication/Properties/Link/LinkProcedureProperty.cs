@@ -23,7 +23,7 @@ using PlayFab.SharedModels;
 
 namespace Game
 {
-    public partial class ProceduresCore
+    public partial class AuthenticationCore
     {
         [Serializable]
         public class LinkProperty : Property
@@ -42,7 +42,7 @@ namespace Game
 
                     if (PlayFab.IsLoggedIn == false)
                         InvokeError("Must Be Logged In To Link Account");
-                    else if (Procedures.Facebook.Login.Complete)
+                    else if (Core.Facebook.Login.Complete)
                         PlayFabLink();
                     else
                         FacebookLogin();
@@ -50,14 +50,14 @@ namespace Game
 
                 void FacebookLogin()
                 {
-                    RelyOn(Procedures.Facebook.Login, Callback);
+                    RelyOn(Core.Facebook.Login, Callback);
 
                     void Callback(Response response)
                     {
                         if (response.Success)
                             PlayFabLink();
                         else
-                            ApplyResponse(response);
+                            ReplicateResponse(response);
                     }
                 }
 
@@ -83,14 +83,12 @@ namespace Game
 
             public abstract class Element : Procedure
             {
-                public LinkProperty Link => Procedures.Link;
-
                 public PlayFabCore PlayFab => Core.PlayFab;
 
                 public abstract LoginMethod Method { get; }
 
                 public virtual void Require() => Require("Linking " + Method);
-                
+
                 protected virtual void PromtToExistantLogin()
                 {
                     Popup.Hide();
@@ -113,12 +111,12 @@ namespace Game
                     var previousData = new
                     {
                         playfabID = Core.PlayFab.Player.Profile.ID,
-                        customID = Procedures.Login.CustomID.ID.Value
+                        customID = Authentication.Login.CustomID.ID.Value
                     };
 
                     PlayFab.Logout();
 
-                    RelyOn(Procedures.Login[Method], Callback);
+                    RelyOn(Authentication.Login[Method], Callback);
 
                     void Callback(Response response)
                     {
@@ -133,9 +131,16 @@ namespace Game
                             End();
                         }
                         else
-                            ApplyResponse(response);
+                            ReplicateResponse(response);
                     }
                 }
+            }
+
+            public class Procedure : Core.Procedure<LinkProperty>
+            {
+                public LinkProperty Link => Reference;
+
+                public AuthenticationCore Authentication => Link.Authentication;
             }
 
             #region List
@@ -153,7 +158,7 @@ namespace Game
             }
             #endregion
 
-            public override void Configure(ProceduresCore reference)
+            public override void Configure(AuthenticationCore reference)
             {
                 base.Configure(reference);
 
@@ -166,14 +171,14 @@ namespace Game
             {
                 List.Add(element);
 
-                Register(Procedures, element);
+                base.Register(this, element);
 
-                element.OnResponse.Add((Procedure.Response response) => ResponseCallback(element, response));
+                element.OnResponse.Add((Core.Procedure.Response response) => ResponseCallback(element, response));
             }
 
             #region Events
-            public MoeEvent<Element, Procedure.Response> OnResponse { get; protected set; }
-            void ResponseCallback(Element element, Procedure.Response response)
+            public MoeEvent<Element, Core.Procedure.Response> OnResponse { get; protected set; }
+            void ResponseCallback(Element element, Core.Procedure.Response response)
             {
                 if (response.HasError)
                     ErrorCallback(element, response.Error);
@@ -206,7 +211,7 @@ namespace Game
 
             public LinkProperty()
             {
-                OnResponse = new MoeEvent<Element, Procedure.Response>();
+                OnResponse = new MoeEvent<Element, Core.Procedure.Response>();
 
                 OnEnd = new MoeEvent<Element>();
 

@@ -52,20 +52,20 @@ namespace Game
         public PlayerCore Player { get; protected set; }
         public PlayFabCore PlayFab { get; protected set; }
         public LeaderboardsCore Leaderboards { get; protected set; }
-        public ProceduresCore Procedures { get; protected set; }
+        public AuthenticationCore Authentication { get; protected set; }
         public CountriesCore Countries { get; protected set; }
         public FacebookCore Facebook { get; protected set; }
         public NewsCore News { get; protected set; }
         public UnityCore Unity { get; protected set; }
 
         #region Modules
-        public class Module<TModule> : MonoBehaviour, IReference<TModule>
+        public class Module<TReference> : MonoBehaviour, IReference<TReference>
         {
             public Core Core => Core.Instance;
 
-            public TModule Reference { get; protected set; }
+            public TReference Reference { get; protected set; }
 
-            protected virtual void Register<TReference>(TReference reference, IReference<TReference> module)
+            protected virtual void Register<TThis>(TThis reference, IReference<TThis> module)
             {
                 References.Configure(reference, module);
 
@@ -79,7 +79,7 @@ namespace Game
                 }
             }
 
-            public virtual void Configure(TModule reference)
+            public virtual void Configure(TReference reference)
             {
                 this.Reference = reference;
             }
@@ -98,14 +98,14 @@ namespace Game
 
         #region Property
         [Serializable]
-        public class Property<TModule> : IReference<TModule>
+        public class Property<TReference> : IReference<TReference>
         {
             public Core Core => Core.Instance;
 
             [NonSerialized]
-            protected TModule Reference;
+            protected TReference Reference;
 
-            protected virtual void Register<TReference>(TReference reference, IReference<TReference> module)
+            protected virtual void Register<TThis>(TThis reference, IReference<TThis> module)
             {
                 References.Configure(reference, module);
 
@@ -119,7 +119,7 @@ namespace Game
                 }
             }
 
-            public virtual void Configure(TModule reference)
+            public virtual void Configure(TReference reference)
             {
                 this.Reference = reference;
             }
@@ -134,6 +134,177 @@ namespace Game
         public class Property : Module<Core>
         {
 
+        }
+        #endregion
+
+        #region Procedure
+        [Serializable]
+        public abstract class Procedure
+        {
+            public bool IsProcessing { get; protected set; }
+
+            public Core Core => Core.Instance;
+            public PopupUI Popup => Core.UI.Popup;
+            public ChoiceUI Choice => Core.UI.Choice;
+
+            public virtual void Request()
+            {
+                if (IsProcessing)
+                {
+
+                }
+                else
+                {
+                    Start();
+                }
+            }
+
+            public virtual void Require(string message)
+            {
+                Popup.Lock(message);
+
+                OnResponse.Enque(Callback);
+                Request();
+
+                void Callback(Response response)
+                {
+                    if (response.Success || response.Canceled)
+                        Popup.Hide();
+                    else
+                        Popup.Show(response.Error, "Okay");
+                }
+            }
+
+            public virtual void RelyOn(Procedure element, Action<Response> action)
+            {
+                element.OnResponse.Enque(Callback);
+
+                void Callback(Response response) => action(response);
+
+                element.Request();
+            }
+
+            public event Action OnStart;
+            public virtual void Start()
+            {
+                IsProcessing = true;
+
+                OnStart?.Invoke();
+            }
+
+            protected virtual void InvokeError(string error)
+            {
+                Stop();
+
+                Debug.LogError(error);
+
+                OnError.Invoke(error);
+
+                Respond(error, false);
+            }
+            public MoeEvent<string> OnError { get; protected set; }
+
+            protected virtual void Stop()
+            {
+                IsProcessing = false;
+            }
+
+            protected virtual void Cancel()
+            {
+                Stop();
+
+                OnCancel.Invoke();
+
+                Respond(null, true);
+            }
+            public MoeEvent OnCancel { get; protected set; }
+
+            protected virtual void End()
+            {
+                Stop();
+
+                OnEnd.Invoke();
+
+                Respond(null, false);
+            }
+            public MoeEvent OnEnd { get; protected set; }
+
+            #region Response
+            protected virtual void Respond(string error, bool canceled)
+            {
+                var response = new Response(error, canceled);
+
+                Respond(response);
+            }
+            protected virtual void Respond(Response response)
+            {
+                OnResponse.Invoke(response);
+            }
+
+            public MoeEvent<Response> OnResponse { get; protected set; }
+
+            public class Response
+            {
+                public bool Canceled { get; protected set; }
+
+                public string Error { get; protected set; }
+                public bool HasError => Error != null;
+
+                public bool Success => Canceled == false && HasError == false;
+
+                public Response(string error, bool canceled)
+                {
+                    this.Canceled = canceled;
+
+                    this.Error = error;
+                }
+            }
+
+            protected virtual void ReplicateResponse(Response response)
+            {
+                if (response.HasError)
+                    InvokeError(response.Error);
+                else if (response.Canceled)
+                    Cancel();
+                else
+                    End();
+            }
+            protected virtual void ReplicateResponse(Response response, Action callback)
+            {
+                if (response.Success)
+                    callback.Invoke();
+                else
+                    ReplicateResponse(response);
+            }
+            #endregion
+
+            public Procedure()
+            {
+                OnError = new MoeEvent<string>();
+
+                OnEnd = new MoeEvent();
+
+                OnCancel = new MoeEvent();
+
+                OnResponse = new MoeEvent<Response>();
+            }
+        }
+
+        [Serializable]
+        public abstract class Procedure<TReference> : Procedure, IReference<TReference>
+        {
+            [NonSerialized]
+            protected TReference Reference;
+
+            public virtual void Configure(TReference reference)
+            {
+                this.Reference = reference;
+            }
+
+            public virtual void Init()
+            {
+
+            }
         }
         #endregion
 
@@ -159,7 +330,7 @@ namespace Game
             Leaderboards = this.GetDependancy<LeaderboardsCore>();
             Player = this.GetDependancy<PlayerCore>();
             PlayFab = this.GetDependancy<PlayFabCore>();
-            Procedures = this.GetDependancy<ProceduresCore>();
+            Authentication = this.GetDependancy<AuthenticationCore>();
             Countries = this.GetDependancy<CountriesCore>();
             Facebook = this.GetDependancy<FacebookCore>();
             News = this.GetDependancy<NewsCore>();

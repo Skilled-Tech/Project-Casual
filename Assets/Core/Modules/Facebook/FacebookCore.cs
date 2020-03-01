@@ -24,30 +24,113 @@ namespace Game
 {
 	public class FacebookCore : Core.Module
 	{
-        public bool Active => FB.IsInitialized;
+        public bool Active => Activation.Complete;
 
-        public LoginProperty Login { get; protected set; }
-        public class LoginProperty : Property
+        public ActivationProcedure Activation { get; protected set; }
+        [Serializable]
+        public class ActivationProcedure : Procedure
         {
-            public bool Active => FB.IsLoggedIn && Facebook.HasAccessToken;
+            public bool Complete => FB.IsInitialized;
+
+            public override void Start()
+            {
+                base.Start();
+
+                if (Complete)
+                    End();
+                else
+                    Action();
+            }
+
+            protected virtual void Action()
+            {
+                FB.Init(Callback, Facebook.HideCallback);
+
+                void Callback()
+                {
+                    Debug.Log("Facebook Initiliazed");
+
+#if UNITY_EDITOR
+                    FB.ActivateApp();
+#endif
+
+                    End();
+                }
+            }
+        }
+
+        public LoginProcedure Login { get; protected set; }
+        public class LoginProcedure : Procedure
+        {
+            public bool Complete => FB.IsLoggedIn && Facebook.HasAccessToken;
 
             public static readonly List<string> Permissions = new List<string>()
             {
                 "public_profile"
             };
 
-            public void Request()
+            public override void Start()
             {
-                FB.LogInWithReadPermissions(Permissions, ResultCallback);
+                base.Start();
+
+                Facebook.StartCoroutine(Procedure());
+
+                IEnumerator Procedure()
+                {
+                    while (true)
+                    {
+                        if (Core.UI.Popup.Element.Visible)
+                        {
+                            if (Core.UI.Popup.Element.Transition.Value == 1f)
+                                break;
+                        }
+                        else
+                            break;
+
+                        yield return new WaitForEndOfFrame();
+                    }
+
+                    if (Facebook.Active == false)
+                        Activate();
+                    else if (Facebook.Login.Complete == false)
+                        Action();
+                    else
+                        End();
+                }
             }
 
-            public MoeEvent<ILoginResult> OnResult { get; protected set; } = new MoeEvent<ILoginResult>();
-            void ResultCallback(ILoginResult result)
+            protected virtual void Activate()
             {
-                Facebook.AccessToken = result?.AccessToken;
+                RelyOn(Facebook.Activation, Callback);
 
-                OnResult.Invoke(result);
+                void Callback(Response response) => ReplicateResponse(response, Action);
             }
+
+            protected virtual void Action()
+            {
+                FB.LogInWithReadPermissions(Permissions, Callback);
+
+                void Callback(ILoginResult result)
+                {
+                    if (result == null) //No Response
+                        InvokeError("No Response Recieved");
+                    else if (result.Cancelled) //Canceled
+                        Cancel();
+                    else if (string.IsNullOrEmpty(result.Error) == false) //Error
+                        InvokeError(result.Error);
+                    else
+                    {
+                        Facebook.AccessToken = result.AccessToken;
+
+                        End();
+                    }
+                }
+            }
+        }
+
+        public class Procedure : Core.Procedure<FacebookCore>
+        {
+            public FacebookCore Facebook => Reference;
         }
 
         public AccessToken AccessToken { get; protected set; }
@@ -63,27 +146,15 @@ namespace Game
         {
             base.Configure(reference);
 
-            Login = new LoginProperty();
+            AccessToken = null;
+
+            Activation = new ActivationProcedure();
+            Login = new LoginProcedure();
+
+            Register(this, Activation);
             Register(this, Login);
         }
-
-        public void Activate()
-        {
-            FB.Init(InitCallback, HideCallback);
-        }
-
-        public MoeEvent OnActivate { get; protected set; } = new MoeEvent();
-        private void InitCallback()
-        {
-            Debug.Log("Facebook Initiliazed");
-
-#if UNITY_EDITOR
-            FB.ActivateApp();
-#endif
-
-            OnActivate.Invoke();
-        }
-
+        
         private void HideCallback(bool isUnityShown)
         {
 

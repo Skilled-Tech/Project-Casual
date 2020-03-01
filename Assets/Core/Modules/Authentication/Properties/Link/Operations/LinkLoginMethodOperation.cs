@@ -27,7 +27,7 @@ namespace Game
 
         public Core Core => Core.Instance;
 
-        public ProceduresCore.LinkProperty.Element Link => Core.Procedures.Link[method];
+        public AuthenticationCore.LinkProperty.Element Link => Core.Authentication.Link[method];
 
         public override void Execute()
         {

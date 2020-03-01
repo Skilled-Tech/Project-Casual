@@ -43,7 +43,7 @@ namespace Game
             button = GetComponent<Button>();
             button.onClick.AddListener(Action);
 
-            if (Core.Procedures.Login.IsProcessing)
+            if (Core.Authentication.Login.IsProcessing)
                 WaitForCurrentLogin();
         }
 
@@ -51,9 +51,9 @@ namespace Game
         {
             Interactable = false;
 
-            Core.Procedures.Login.OnResponse.Enque(Callback);
+            Core.Authentication.Login.OnResponse.Enque(Callback);
 
-            void Callback(ProceduresCore.LoginProperty.Element element, Procedure.Response response)
+            void Callback(AuthenticationCore.LoginProperty.Element element, Core.Procedure.Response response)
             {
                 if (this == null) return; //Counter measure if the gameobject got destroyed mid procedure
 
@@ -63,13 +63,13 @@ namespace Game
 
         void Action()
         {
-            if (Core.Procedures.Login.IsProcessing)
+            if (Core.Authentication.Login.IsProcessing)
             {
                 Debug.LogWarning("Cannot process new login request untill the old one is finished");
 
                 //TODO Provide Feedback ?
             }
-            if (Core.Procedures.Login.IsComplete == false)
+            if (Core.Authentication.Login.IsComplete == false)
                 Login();
             else
                 Link();
@@ -79,10 +79,10 @@ namespace Game
         {
             Interactable = false;
 
-            Core.Procedures.Login.OnResponse.Enque(Callback);
-            Core.Procedures.Login[method].Require();
+            Core.Authentication.Login.OnResponse.Enque(Callback);
+            Core.Authentication.Login[method].Require();
 
-            void Callback(ProceduresCore.LoginProperty.Element element, Procedure.Response response)
+            void Callback(AuthenticationCore.LoginProperty.Element element, Core.Procedure.Response response)
             {
                 if (this == null) return; //Counter measure if the gameobject got destroyed mid procedure
 
@@ -95,10 +95,10 @@ namespace Game
         {
             Interactable = false;
 
-            Core.Procedures.Link.OnResponse.Enque(Callback);
-            Core.Procedures.Link[method].Require();
+            Core.Authentication.Link.OnResponse.Enque(Callback);
+            Core.Authentication.Link[method].Require();
 
-            void Callback(ProceduresCore.LinkProperty.Element element, Procedure.Response response)
+            void Callback(AuthenticationCore.LinkProperty.Element element, Core.Procedure.Response response)
             {
                 if (this == null) return; //Counter measure if the gameobject got destroyed mid procedure
 

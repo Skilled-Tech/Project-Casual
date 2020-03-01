@@ -23,13 +23,13 @@ using PlayFab.SharedModels;
 
 namespace Game
 {
-    public partial class ProceduresCore
+    public partial class AuthenticationCore
     {
         [Serializable]
         public class LoginProperty : Property
         {
             [SerializeField]
-            protected bool auto;
+            protected bool auto = true;
             public bool Auto { get { return auto; } }
 
             [SerializeField]
@@ -77,7 +77,7 @@ namespace Game
 
             public bool IsComplete => Core.PlayFab.IsLoggedIn;
 
-            public bool IsProcessing => Procedure.IsProcessing;
+            public bool IsProcessing => Module.IsProcessing;
 
             [Header("Procedures")]
 
@@ -166,7 +166,7 @@ namespace Game
                 {
                     base.Start();
 
-                    if (Procedures.Facebook.Login.Complete == false)
+                    if (Core.Facebook.Login.Complete == false)
                         FacebookLogin();
                     else
                         PlayFabLogin();
@@ -174,14 +174,14 @@ namespace Game
 
                 void FacebookLogin()
                 {
-                    RelyOn(Procedures.Facebook.Login, Callback);
+                    RelyOn(Core.Facebook.Login, Callback);
 
                     void Callback(Response response)
                     {
                         if (response.Success)
                             PlayFabLogin();
                         else
-                            ApplyResponse(response);
+                            ReplicateResponse(response);
                     }
                 }
 
@@ -217,18 +217,23 @@ namespace Game
 
             public abstract class Element : Procedure
             {
-                public LoginProperty Login => Procedures.Login;
-
                 public PlayFabCore PlayFab => Core.PlayFab;
 
                 public abstract LoginMethod Method { get; }
 
                 public virtual void Require() => Require("Loggin In");
             }
-            
-            public Element Procedure => Find(Method.Value);
 
-            public override void Configure(ProceduresCore reference)
+            public class Procedure : Core.Procedure<LoginProperty>
+            {
+                public LoginProperty Login => Reference;
+
+                public AuthenticationCore Authentication => Login.Authentication;
+            }
+
+            public Element Module => Find(Method.Value);
+
+            public override void Configure(AuthenticationCore reference)
             {
                 base.Configure(reference);
 
@@ -237,16 +242,16 @@ namespace Game
                 Register(customID);
                 Register(facebook);
 
-                Procedures.Link.OnEnd.Add(LinkResultCallback);
+                Authentication.Link.OnEnd.Add(LinkResultCallback);
             }
 
             public virtual void Register(Element element)
             {
                 List.Add(element);
 
-                Register(Procedures, element);
+                base.Register(this, element);
 
-                element.OnResponse.Add((Procedure.Response response) => ResponseCallback(element, response));
+                element.OnResponse.Add((Core.Procedure.Response response) => ResponseCallback(element, response));
             }
 
             public override void Init()
@@ -258,18 +263,18 @@ namespace Game
                 if (auto) Request();
             }
 
-            public virtual void Request() => Procedure.Request();
-            public virtual void Require() => Procedure.Require();
-            public virtual void Start() => Procedure.Start();
+            public virtual void Request() => Module.Request();
+            public virtual void Require() => Module.Require();
+            public virtual void Start() => Module.Start();
 
-#region Callbacks
+            #region Callbacks
             private void LinkResultCallback(LinkProperty.Element result)
             {
                 Method.Value = result.Method;
             }
-#endregion
+            #endregion
 
-#region Events
+            #region Events
             public MoeEvent<Element, Procedure.Response> OnResponse { get; protected set; }
             void ResponseCallback(Element element, Procedure.Response response)
             {
@@ -302,11 +307,11 @@ namespace Game
             {
                 OnError.Invoke(element, error);
             }
-#endregion
+            #endregion
 
             public LoginProperty()
             {
-                OnResponse = new MoeEvent<Element, Procedure.Response>();
+                OnResponse = new MoeEvent<Element, Core.Procedure.Response>();
 
                 OnEnd = new MoeEvent<Element>();
 

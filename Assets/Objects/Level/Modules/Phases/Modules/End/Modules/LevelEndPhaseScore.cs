@@ -103,10 +103,10 @@ namespace Game
 
         private void RequireLogin()
         {
-            Core.Procedures.Login.OnResponse.Enque(Callback);
-            Core.Procedures.Login.Require();
+            Core.Authentication.Login.OnResponse.Enque(Callback);
+            Core.Authentication.Login.Require();
 
-            void Callback(ProceduresCore.LoginProperty.Element result, Procedure.Response response)
+            void Callback(AuthenticationCore.LoginProperty.Element result, Core.Procedure.Response response)
             {
                 if(response.Success)
                     ProcessManualSubmit();
@@ -119,10 +119,10 @@ namespace Game
 
         private void RequestDisplayNameUpdate()
         {
-            Core.Procedures.UpdateDisplayName.OnResponse.Enque(Callback);
-            Core.Procedures.UpdateDisplayName.Require();
+            Core.Player.UpdateDisplayName.OnResponse.Enque(Callback);
+            Core.Player.UpdateDisplayName.Require();
 
-            void Callback(Procedure.Response response)
+            void Callback(Core.Procedure.Response response)
             {
                 if (response.Success)
                     ProcessManualSubmit();
