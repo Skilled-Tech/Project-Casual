@@ -34,7 +34,7 @@ namespace Game
             [Serializable]
             public class FacebookElement : Element
             {
-                public override LoginMethod Method => LoginMethod.Facebook;
+                public override AuthenticationMethod Method => AuthenticationMethod.Facebook;
 
                 public override void Start()
                 {
@@ -85,7 +85,7 @@ namespace Game
             {
                 public PlayFabCore PlayFab => Core.PlayFab;
 
-                public abstract LoginMethod Method { get; }
+                public abstract AuthenticationMethod Method { get; }
 
                 public virtual void Require() => Require("Linking " + Method);
 
@@ -146,9 +146,9 @@ namespace Game
             #region List
             public List<Element> List { get; protected set; }
 
-            public Element this[LoginMethod method] => Find(method);
+            public Element this[AuthenticationMethod method] => Find(method);
 
-            public virtual Element Find(LoginMethod method)
+            public virtual Element Find(AuthenticationMethod method)
             {
                 for (int i = 0; i < List.Count; i++)
                     if (List[i].Method == method)

@@ -22,8 +22,8 @@ namespace Game
 	public class LinkLoginMethodOperation : Operation
 	{
         [SerializeField]
-        protected LoginMethod method;
-        public LoginMethod Method { get { return method; } }
+        protected AuthenticationMethod method;
+        public AuthenticationMethod Method { get { return method; } }
 
         public Core Core => Core.Instance;
 

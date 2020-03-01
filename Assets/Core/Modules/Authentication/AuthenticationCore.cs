@@ -44,4 +44,9 @@ namespace Game
             Register(this, link);
         }
     }
+
+    public enum AuthenticationMethod
+    {
+        CustomID, Facebook
+    }
 }

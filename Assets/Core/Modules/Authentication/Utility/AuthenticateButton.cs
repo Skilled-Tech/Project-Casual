@@ -19,8 +19,7 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-    [RequireComponent(typeof(Button))]
-	public class LoginButton : MonoBehaviour
+	public class AuthenticateButton : MonoBehaviour
 	{
         [SerializeField]
         protected AuthenticationMethod method;
@@ -69,8 +68,10 @@ namespace Game
                 return;
             }
 
-            Login();
-
+            if (Core.Authentication.Login.IsComplete)
+                Link();
+            else
+                Login();
         }
 
         protected virtual void Login()
@@ -81,6 +82,22 @@ namespace Game
             Core.Authentication.Login[method].Require();
 
             void Callback(AuthenticationCore.LoginProperty.Element element, Core.Procedure.Response response)
+            {
+                if (this == null) return; //Counter measure if the gameobject got destroyed mid procedure
+
+                Interactable = true;
+                //TODO Provide Feedback
+            }
+        }
+
+        protected virtual void Link()
+        {
+            Interactable = false;
+
+            Core.Authentication.Link.OnResponse.Enque(Callback);
+            Core.Authentication.Link[method].Require();
+
+            void Callback(AuthenticationCore.LinkProperty.Element element, Core.Procedure.Response response)
             {
                 if (this == null) return; //Counter measure if the gameobject got destroyed mid procedure
 

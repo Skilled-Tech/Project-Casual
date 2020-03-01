@@ -42,7 +42,7 @@ namespace Game
                 protected LoginMethodToggleValue _override;
                 public LoginMethodToggleValue Override { get { return _override; } }
 
-                public virtual LoginMethod Evaluate(LoginMethodToggleValue toggle)
+                public virtual AuthenticationMethod Evaluate(LoginMethodToggleValue toggle)
                 {
                     if (toggle.Enabled)
                         return toggle.Value;
@@ -50,7 +50,7 @@ namespace Game
                     return Value;
                 }
 
-                public LoginMethod Value
+                public AuthenticationMethod Value
                 {
                     get
                     {
@@ -58,7 +58,7 @@ namespace Game
                         if (Override.Enabled) return Override.Value;
 #endif
 
-                        return (LoginMethod)Pref;
+                        return (AuthenticationMethod)Pref;
                     }
                     set
                     {
@@ -80,7 +80,6 @@ namespace Game
             public bool IsProcessing => Module.IsProcessing;
 
             [Header("Procedures")]
-
             [SerializeField]
             protected CustomIDElement customID;
             public CustomIDElement CustomID { get { return customID; } }
@@ -130,7 +129,7 @@ namespace Game
                     }
                 }
 
-                public override LoginMethod Method => LoginMethod.CustomID;
+                public override AuthenticationMethod Method => AuthenticationMethod.CustomID;
 
                 public override void Start()
                 {
@@ -160,7 +159,7 @@ namespace Game
             [Serializable]
             public class FacebookElement : Element
             {
-                public override LoginMethod Method => LoginMethod.Facebook;
+                public override AuthenticationMethod Method => AuthenticationMethod.Facebook;
 
                 public override void Start()
                 {
@@ -203,9 +202,9 @@ namespace Game
             #region List
             public List<Element> List { get; protected set; }
 
-            public Element this[LoginMethod method] => Find(method);
+            public Element this[AuthenticationMethod method] => Find(method);
 
-            public virtual Element Find(LoginMethod method)
+            public virtual Element Find(AuthenticationMethod method)
             {
                 for (int i = 0; i < List.Count; i++)
                     if (List[i].Method == method)
@@ -219,7 +218,7 @@ namespace Game
             {
                 public PlayFabCore PlayFab => Core.PlayFab;
 
-                public abstract LoginMethod Method { get; }
+                public abstract AuthenticationMethod Method { get; }
 
                 public virtual void Require() => Require("Loggin In");
             }
@@ -322,11 +321,6 @@ namespace Game
         }
     }
 
-    public enum LoginMethod
-    {
-        CustomID, Facebook
-    }
-
     [Serializable]
-    public class LoginMethodToggleValue : ToggleValue<LoginMethod> { }
+    public class LoginMethodToggleValue : ToggleValue<AuthenticationMethod> { }
 }
