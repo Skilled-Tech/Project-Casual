@@ -32,9 +32,9 @@ namespace Game
         {
             public bool Complete => FB.IsInitialized;
 
-            public override void Start()
+            public override void Request()
             {
-                base.Start();
+                base.Request();
 
                 if (Complete)
                     End();
@@ -69,9 +69,9 @@ namespace Game
                 "public_profile"
             };
 
-            public override void Start()
+            public override void Request()
             {
-                base.Start();
+                base.Request();
 
                 Facebook.StartCoroutine(Procedure());
 

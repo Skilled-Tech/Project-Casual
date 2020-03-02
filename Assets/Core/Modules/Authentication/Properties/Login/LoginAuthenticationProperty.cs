@@ -131,9 +131,9 @@ namespace Game
 
                 public override AuthenticationMethod Method => AuthenticationMethod.CustomID;
 
-                public override void Start()
+                public override void Request()
                 {
-                    base.Start();
+                    base.Request();
 
                     PlayFabLogin();
                 }
@@ -161,9 +161,9 @@ namespace Game
             {
                 public override AuthenticationMethod Method => AuthenticationMethod.Facebook;
 
-                public override void Start()
+                public override void Request()
                 {
-                    base.Start();
+                    base.Request();
 
                     if (Core.Facebook.Login.Complete == false)
                         FacebookLogin();
@@ -175,13 +175,7 @@ namespace Game
                 {
                     RelyOn(Core.Facebook.Login, Callback);
 
-                    void Callback(Response response)
-                    {
-                        if (response.Success)
-                            PlayFabLogin();
-                        else
-                            ReplicateResponse(response);
-                    }
+                    void Callback(Response response) => ReplicateResponse(response, PlayFabLogin);
                 }
 
                 void PlayFabLogin()
@@ -259,12 +253,11 @@ namespace Game
 
                 Debug.Log("Login Method: " + Method.Value);
 
-                if (auto) Request();
+                if (auto) if (IsProcessing == false) Request();
             }
 
-            public virtual void Request() => Module.Request();
             public virtual void Require() => Module.Require();
-            public virtual void Start() => Module.Start();
+            public virtual void Request() => Module.Request();
 
             #region Callbacks
             private void LinkResultCallback(LinkProperty.Element result)

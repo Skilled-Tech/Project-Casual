@@ -147,24 +147,13 @@ namespace Game
             public PopupUI Popup => Core.UI.Popup;
             public ChoiceUI Choice => Core.UI.Choice;
 
-            public virtual void Request()
-            {
-                if (IsProcessing)
-                {
-
-                }
-                else
-                {
-                    Start();
-                }
-            }
-
             public virtual void Require(string message)
             {
                 Popup.Lock(message);
 
                 OnResponse.Enque(Callback);
-                Request();
+
+                if(IsProcessing == false) Request();
 
                 void Callback(Response response)
                 {
@@ -181,15 +170,18 @@ namespace Game
 
                 void Callback(Response response) => action(response);
 
-                element.Request();
+                if (IsProcessing == false) Request();
             }
 
-            public event Action OnStart;
-            public virtual void Start()
+            public event Action OnRequest;
+            public virtual void Request()
             {
+                if (IsProcessing)
+                    throw new InvalidOperationException("Cannot Start Procedure " + GetType().Name + " When it's Already Processing");
+
                 IsProcessing = true;
 
-                OnStart?.Invoke();
+                OnRequest?.Invoke();
             }
 
             protected virtual void InvokeError(string error)

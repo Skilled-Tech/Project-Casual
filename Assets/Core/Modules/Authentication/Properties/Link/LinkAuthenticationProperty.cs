@@ -36,29 +36,23 @@ namespace Game
             {
                 public override AuthenticationMethod Method => AuthenticationMethod.Facebook;
 
-                public override void Start()
+                public override void Request()
                 {
-                    base.Start();
+                    base.Request();
 
                     if (PlayFab.IsLoggedIn == false)
                         InvokeError("Must Be Logged In To Link Account");
-                    else if (Core.Facebook.Login.Complete)
-                        PlayFabLink();
-                    else
+                    else if (Core.Facebook.Login.Complete == false)
                         FacebookLogin();
+                    else
+                        PlayFabLink();
                 }
 
                 void FacebookLogin()
                 {
                     RelyOn(Core.Facebook.Login, Callback);
 
-                    void Callback(Response response)
-                    {
-                        if (response.Success)
-                            PlayFabLink();
-                        else
-                            ReplicateResponse(response);
-                    }
+                    void Callback(Response response) => ReplicateResponse(response, PlayFabLink);
                 }
 
                 void PlayFabLink()
@@ -124,7 +118,7 @@ namespace Game
                         {
                             if (Core.PlayFab.Player.Profile.ID != previousData.playfabID)
                             {
-                                Debug.Log("Clearing out old account");
+                                Debug.Log("Clearing Out Old Account");
                                 Core.PlayFab.Player.Clear.Request(previousData.playfabID, previousData.customID);
                             }
 

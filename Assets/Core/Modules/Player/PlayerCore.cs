@@ -36,9 +36,9 @@ namespace Game
 
             public virtual void Require() => Require("Updating Display Name");
 
-            public override void Start()
+            public override void Request()
             {
-                base.Start();
+                base.Request();
 
                 DisplayInput();
             }

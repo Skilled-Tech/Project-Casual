@@ -52,8 +52,8 @@ namespace Game
                 => IAP.PurchaseFailedCallback(product, reason);
         }
 
-        public ValidateProperty Validate { get; protected set; }
-        public class ValidateProperty : Property
+        public ValidationProperty Validation { get; protected set; }
+        public class ValidationProperty : Property
         {
             public GoogleProperty Google { get; protected set; }
             public class GoogleProperty : Element<ValidateGooglePlayPurchaseRequest, ValidateGooglePlayPurchaseResult>
@@ -238,11 +238,20 @@ namespace Game
                 return null;
             }
 
+            public virtual bool Contains(AppStore store)
+            {
+                for (int i = 0; i < Elements.Count; i++)
+                    if (Elements[i].AppStore == store)
+                        return true;
+
+                return false;
+            }
+
             public Element Module => this[IAP.Store];
 
-            public class Property : Core.Property<ValidateProperty>
+            public class Property : Core.Property<ValidationProperty>
             {
-                public ValidateProperty Validate => Reference;
+                public ValidationProperty Validate => Reference;
             }
 
             public override void Configure(UnityIAPCore reference)
@@ -267,7 +276,12 @@ namespace Game
                 element.OnResponse.Add((Element.ResponseData data) => ResponseCallback(element, data));
             }
 
-            public virtual void Request(Product product) => Module.Request(product);
+            public virtual void Request(Product product)
+            {
+                if (Module == null) throw new NullReferenceException("No Validation Module Available");
+
+                Module.Request(product);
+            }
 
             public MoeEvent<Element, Element.ResultData> OnResult { get; protected set; } = new MoeEvent<Element, Element.ResultData>();
             protected virtual void ResultCallback(Element element, Element.ResultData result)
@@ -305,10 +319,10 @@ namespace Game
             base.Configure(reference);
 
             Listener = new ListenerProperty();
-            Validate = new ValidateProperty();
+            Validation = new ValidationProperty();
 
             Register(this, Listener);
-            Register(this, Validate);
+            Register(this, Validation);
 
             PlayFab.Title.Catalog.Retrieve.OnResult.Add(CatalogRetriveCallback);
         }
@@ -360,7 +374,7 @@ namespace Game
         #region Purchase
         public void Purchase(string productID)
         {
-            if (Active == false) throw new Exception("IAP Core is not initialized");
+            if (Active == false) throw new InvalidOperationException("IAP Not Initialized");
 
             StoreController.InitiatePurchase(productID);
         }
@@ -379,7 +393,7 @@ namespace Game
                 return PurchaseProcessingResult.Complete;
             }
 
-            if (Validate.Module == null)
+            if (Validation.Contains(Store) == false)
             {
                 if(Application.isEditor)
                 {
@@ -395,23 +409,18 @@ namespace Game
 
             Debug.Log("Processing purchase validation for item: " + product.definition.storeSpecificId + " with transaction ID: " + product.transactionID);
 
-            Validate.Module.Request(product);
+            Validation.Request(product);
 
             return PurchaseProcessingResult.Pending;
         }
 
         void ConfirmPendingPurchase(Product product)
         {
-            if(StoreController == null)
-            {
-                Debug.LogError("No Store Controller set for Pending Purchase Confirmation");
-                return;
-            }
+            if (Active == false) throw new InvalidOperationException("IAP Not Initialized");
 
             StoreController.ConfirmPendingPurchase(product);
             Debug.Log("Confirming Purchase for: " + product.definition.id);
         }
-        #endregion
 
         public delegate void PurchaseFailedDelegate(Product product, PurchaseFailureReason reason);
         public event PurchaseFailedDelegate OnPurchaseFailed;
@@ -421,6 +430,7 @@ namespace Game
 
             OnPurchaseFailed?.Invoke(product, reason);
         }
+        #endregion
 
         //Static Utility
         public static AppStore RunTimePlatformToAppStore(RuntimePlatform platform)
@@ -436,10 +446,9 @@ namespace Game
                 case RuntimePlatform.WindowsEditor:
                 case RuntimePlatform.WindowsPlayer:
                     return AppStore.fake;
-
-                default:
-                    return AppStore.NotSpecified;
             }
+
+            return AppStore.NotSpecified;
         }
     }
 
