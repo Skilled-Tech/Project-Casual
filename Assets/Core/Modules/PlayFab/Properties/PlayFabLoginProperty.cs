@@ -116,6 +116,9 @@ namespace Game
                 GetPlayerStatistics = true,
                 GetUserInventory = true,
                 GetUserVirtualCurrency = true,
+                GetTitleData = true,
+                GetUserData = true,
+                GetUserReadOnlyData = true,
             };
 
             public override void Configure(PlayFabCore reference)
@@ -157,7 +160,7 @@ namespace Game
             public MoeEvent<LoginResult> OnResult { get; protected set; }
             void ResultCallback(LoginResult result)
             {
-                PlayFab.Player.Profile.Update(result);
+                PlayFab.Player.Profile.Load(result);
 
                 OnResult.Invoke(result);
             }

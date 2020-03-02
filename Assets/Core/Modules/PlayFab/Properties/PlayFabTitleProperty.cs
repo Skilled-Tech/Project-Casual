@@ -60,6 +60,11 @@ namespace Game
 
                         Send(request);
                     }
+
+                    protected override void ApplyDefaults(ref GetLeaderboardRequest request)
+                    {
+                        request.ProfileConstraints = DefaultPlayerProfileConstraints;
+                    }
                 }
 
                 public GetAroundPlayerRequest GetAroundPlayer { get; protected set; }
@@ -85,6 +90,27 @@ namespace Game
 
                         Send(request);
                     }
+
+                    protected override void ApplyDefaults(ref GetLeaderboardAroundPlayerRequest request)
+                    {
+                        request.ProfileConstraints = DefaultPlayerProfileConstraints;
+                    }
+                }
+
+                public abstract class Request<TRequest, TResult> : PlayFabCore.Request<TRequest, TResult>
+                    where TRequest : PlayFabRequestCommon, new()
+                    where TResult : PlayFabResultCommon
+                {
+                    protected override TRequest GenerateRequest()
+                    {
+                        var request = base.GenerateRequest();
+
+                        ApplyDefaults(ref request);
+
+                        return request;
+                    }
+
+                    protected abstract void ApplyDefaults(ref TRequest request);
                 }
 
                 public static readonly PlayerProfileViewConstraints DefaultPlayerProfileConstraints = new PlayerProfileViewConstraints()

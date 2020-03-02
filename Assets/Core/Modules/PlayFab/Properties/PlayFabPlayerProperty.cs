@@ -349,8 +349,7 @@ namespace Game
                     base.Register(this, element);
                 }
 
-                public virtual void Update(LoginResult result) => Load(result.InfoResultPayload);
-
+                public virtual void Load(LoginResult result) => Load(result.InfoResultPayload);
                 public delegate void LoadDelegate(GetPlayerCombinedInfoResultPayload payload);
                 public event LoadDelegate OnLoad;
                 protected virtual void Load(GetPlayerCombinedInfoResultPayload payload)
