@@ -25,6 +25,8 @@ namespace Game
         static void OnLoad()
         {
             SceneManager.sceneLoaded += SceneLoadCallback;
+
+            ScriptableObjectInitializer.Load();
         }
 
         static void SceneLoadCallback(Scene scene, LoadSceneMode mode)
@@ -45,13 +47,11 @@ namespace Game
 
             Perform(targets);
         }
-        static void Perform(IList<IInitialize> list)
+        public static void Perform(IList<IInitialize> list)
         {
-            for (int i = 0; i < list.Count; i++)
-                list[i].Configure();
+            Configure(list);
 
-            for (int i = 0; i < list.Count; i++)
-                list[i].Init();
+            Init(list);
         }
 
         public static void Configure(GameObject gameObject)
@@ -60,10 +60,16 @@ namespace Game
 
             Configure(targets);
         }
-        static void Configure(IList<IInitialize> list)
+        public static void Configure(IList<IInitialize> list)
         {
             for (int i = 0; i < list.Count; i++)
-                list[i].Configure();
+                Configure(list[i]);
+        }
+        public static void Configure(IInitialize instance)
+        {
+            if (instance == null) return;
+
+            instance.Configure();
         }
 
         public static void Init(GameObject gameObject)
@@ -72,10 +78,16 @@ namespace Game
 
             Init(targets);
         }
-        static void Init(IList<IInitialize> list)
+        public static void Init(IList<IInitialize> list)
         {
             for (int i = 0; i < list.Count; i++)
-                list[i].Init();
+                Init(list[i]);
+        }
+        public static void Init(IInitialize instance)
+        {
+            if (instance == null) return;
+
+            instance.Init();
         }
     }
 

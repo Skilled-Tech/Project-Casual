@@ -170,7 +170,7 @@ namespace Game
 
                 void Callback(Response response) => action(response);
 
-                if (IsProcessing == false) Request();
+                if (element.IsProcessing == false) element.Request();
             }
 
             public event Action OnRequest;
