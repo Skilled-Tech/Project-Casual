@@ -67,14 +67,14 @@ namespace Game
             if(Value > Statistics.HighScore.Value)
             {
                 Statistics.HighScore.Value = Value;
-
                 Statistics.HighScore.Upload();
             }
         }
 
         public virtual void Roundup()
         {
-            Core.Player.Statistics.Score.Value += Value;
+            Statistics.Score.Value += Value;
+            Statistics.Score.Upload();
         }
     }
 }
