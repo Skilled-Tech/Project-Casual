@@ -42,21 +42,32 @@ namespace Game
         [Button("Execute")]
         void Execute()
         {
-            PlayerPrefs.SetInt("High Score", 100);
+            StartCoroutine(Procedure());
+
+            IEnumerator Procedure()
+            {
+                var ping = new Ping("8.8.8.8");
+                var time = 0f;
+
+                while(ping.isDone == false)
+                {
+                    time += Time.deltaTime;
+
+                    yield return new WaitForEndOfFrame();
+                }
+
+                Debug.Log("Ping Complete in: " + time + "s");
+            }
         }
 
         private void Start()
         {
-            Run = new RunCoroutine();
-            Run.Configure(this);
-
-            Run.Start();
+            
         }
 
         private void Update()
         {
-            if (Run.IsProcessing)
-                Debug.Log("Is Running");
+            
         }
     }
 }

@@ -12,10 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40ede18670c0489409ce0a138f89a30a, type: 3}
   m_Name: Scriptable Object Initializer
   m_EditorClassIdentifier: 
-  targets:
-  - {fileID: 11400000, guid: 02523ed7b96756b4eb32048a4346852a, type: 2}
-  - {fileID: 11400000, guid: d464e0e45e45055428066c36713adeb8, type: 2}
-  - {fileID: 11400000, guid: 5de614a9cf457b34697d7eaa1b41a261, type: 2}
-  - {fileID: 11400000, guid: 702a54a830055b74090ce47cc52a2094, type: 2}
-  - {fileID: 11400000, guid: 965ecb552e5d63147b44659575b87005, type: 2}
-  - {fileID: 11400000, guid: 2118f8bf372b1cf42add7def4646a420, type: 2}
+  targets: []
