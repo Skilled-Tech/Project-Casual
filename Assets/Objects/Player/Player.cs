@@ -42,6 +42,7 @@ namespace Game
         }
 
         public Core Core => Core.Instance;
+
         public Level Level => Level.Instance;
 
         public virtual void Configure()

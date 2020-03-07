@@ -103,7 +103,7 @@ namespace Game
                 {
                     [SerializeField]
                     protected List<StatisticValue> list;
-                    public List<StatisticValue> List => list;
+                    public IReadOnlyList<StatisticValue> List => list;
 
                     public virtual bool Contains(string name)
                     {
@@ -172,7 +172,7 @@ namespace Game
 
                     public delegate void SetDelegate(string name, int value);
                     public event SetDelegate OnSet;
-                    public virtual void Set(string name, int value)
+                    protected virtual void Set(string name, int value)
                     {
                         var element = Find(name);
 
@@ -196,6 +196,7 @@ namespace Game
 
                         InvokeUpdate();
                     }
+                    protected virtual void Set(StatisticValue item) => Set(item.StatisticName, item.Value);
 
                     public virtual int Evalute(string name) => Evalute(name, 0);
                     public virtual int Evalute(string name, int defaultValue)
@@ -221,16 +222,8 @@ namespace Game
                         }
                         else
                         {
-                            foreach (var element in collection)
-                            {
-                                var instance = new StatisticValue()
-                                {
-                                    StatisticName = element.StatisticName,
-                                    Value = element.Value,
-                                };
-
-                                list.Add(instance);
-                            }
+                            foreach (var item in collection)
+                                Set(item);
                         }
                     }
 
@@ -313,7 +306,7 @@ namespace Game
                     {
                         base.Init();
 
-                        Profile.OnLoad += Load;
+                        Profile.OnLoad += LoadCallback;
                     }
 
                     public event Action OnUpdate;
@@ -322,6 +315,13 @@ namespace Game
                         OnUpdate?.Invoke();
                     }
 
+                    protected virtual void LoadCallback(GetPlayerCombinedInfoResultPayload payload)
+                    {
+                        Load(payload);
+
+                        OnLoad?.Invoke();
+                    }
+                    public event Action OnLoad;
                     protected abstract void Load(GetPlayerCombinedInfoResultPayload payload);
 
                     public abstract void Clear();
@@ -371,9 +371,11 @@ namespace Game
                 {
                     ID = null;
 
-                    displayName = null;
+                    displayName.Clear();
 
                     statistics.Clear();
+
+                    inventory.Clear();
                 }
             }
 

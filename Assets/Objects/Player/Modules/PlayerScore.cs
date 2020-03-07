@@ -41,6 +41,8 @@ namespace Game
             }
         }
 
+        public PlayerCore.StatisticsProperty Statistics => Core.Player.Statistics;
+
         public delegate void ValueChangeDelegate(int value, int change);
         public event ValueChangeDelegate OnValueChange;
 
@@ -62,9 +64,11 @@ namespace Game
 
         public virtual void UpdateStatistic()
         {
-            if(Value > Core.Player.Statistics.HighScore.Value)
+            if(Value > Statistics.HighScore.Value)
             {
-                Core.Player.Statistics.HighScore.Value = Value;
+                Statistics.HighScore.Value = Value;
+
+                Statistics.HighScore.Upload();
             }
         }
 

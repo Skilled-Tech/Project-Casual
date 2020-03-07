@@ -743,7 +743,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a1e4b6ad8f268b4080d7c4d895b1894, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statistics: {}
+  statistics:
+    score:
+      _value: 0
+    highScore:
+      _value: 0
 --- !u!1 &3858382941793665081
 GameObject:
   m_ObjectHideFlags: 0
@@ -1066,7 +1070,7 @@ MonoBehaviour:
       _ID:
         _override:
           enabled: 1
-          value: MOB
+          value: SANDMAN
   link: {}
 --- !u!1 &6478464170344696841
 GameObject:

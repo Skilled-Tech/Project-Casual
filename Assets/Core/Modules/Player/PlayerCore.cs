@@ -76,7 +76,7 @@ namespace Game
                     else
                     {
                         if (error.Error == PlayFabErrorCode.NameNotAvailable)
-                            Popup.Show("Name Not Available, Please Try A Different Name", "Okay");
+                            Popup.Show("Name Not Available, Please Try A Different Name");
                         else
                             InvokeError(error.ErrorMessage);
                     }
@@ -126,17 +126,19 @@ namespace Game
             public abstract class Element : Property
             {
                 public abstract string ID { get; }
-                
+
+                [SerializeField]
+                protected int _value;
                 public virtual int Value
                 {
-                    get => PlayerPrefs.GetInt(ID, DefaultValue);
+                    get => _value;
                     set
                     {
+                        _value = value;
+
                         Save(value);
 
-                        Upload(value);
-
-                        OnValueChanged?.Invoke(value);
+                        OnValueChanged?.Invoke(Value);
                     }
                 }
 
@@ -147,18 +149,28 @@ namespace Game
 
                 public PlayFabCore PlayFab => Core.PlayFab;
 
+                public override void Configure(StatisticsProperty reference)
+                {
+                    base.Configure(reference);
+
+                    Value = PlayerPrefs.GetInt(ID, DefaultValue);
+                }
+
                 public override void Init()
                 {
                     base.Init();
 
                     PlayFab.Player.Profile.Statistics.OnSet += PlayFabStatisticSetCallback;
+
+                    PlayFab.Player.Profile.Statistics.OnLoad += PlayFabStatisticsLoadCallback;
                 }
 
                 protected virtual void Save(int value)
                 {
-                    if(value != DefaultValue) PlayerPrefs.SetInt(ID, value);
+                    if (value != DefaultValue) PlayerPrefs.SetInt(ID, value);
                 }
 
+                public virtual void Upload() => Upload(Value);
                 protected virtual void Upload(int value)
                 {
                     if(PlayFab.IsLoggedIn) PlayFab.Player.Profile.Statistics.Update.Request(ID, value);
@@ -169,30 +181,20 @@ namespace Game
                     PlayerPrefs.DeleteKey(ID);
                 }
 
-                private void PlayFabStatisticSetCallback(string name, int cloudValue)
+                protected virtual void PlayFabStatisticsLoadCallback()
                 {
-                    if(name == ID)
-                    {
-                        //Values match, nothing to change here
-                        if (Value == cloudValue) 
-                        {
+                    var eval = PlayFab.Player.Profile.Statistics.Evalute(ID);
 
-                        }
+                    if (Value != eval) Value = eval;
+                }
 
-                        //Our local value is higher than the cloud value
-                        //Upload local to cloud
-                        if (Value > cloudValue)
-                        {
-                            Upload(Value);
-                        }
-
-                        //Our local value is lower than the cloud value
-                        //Store cloud value
-                        if(Value < cloudValue)
-                        {
-                            Save(cloudValue);
-                        }
-                    }
+                protected virtual void PlayFabStatisticSetCallback(string name, int value)
+                {
+                    if (name == ID) PlayFabStatisticSetCallback(value);
+                }
+                protected virtual void PlayFabStatisticSetCallback(int cloudValue)
+                {
+                    if (Value != cloudValue) Value = cloudValue;
                 }
             }
 
@@ -203,6 +205,8 @@ namespace Game
 
                 public PlayerCore Player => Statistics.Player;
             }
+
+            public PlayFabCore PlayFab => Core.PlayFab;
 
             public override void Configure(PlayerCore reference)
             {
@@ -224,11 +228,6 @@ namespace Game
 
         [Serializable]
         public class Property : Core.Property<PlayerCore>
-        {
-            public PlayerCore Player => Reference;
-        }
-
-        public class Module : Core.Module<PlayerCore>
         {
             public PlayerCore Player => Reference;
         }
