@@ -57,6 +57,7 @@ namespace Game
         public FacebookCore Facebook { get; protected set; }
         public NewsCore News { get; protected set; }
         public UnityCore Unity { get; protected set; }
+        public InternetCore Internet { get; protected set; }
 
         #region Modules
         public class Module<TReference> : MonoBehaviour, IReference<TReference>
@@ -327,6 +328,7 @@ namespace Game
             Facebook = this.GetDependancy<FacebookCore>();
             News = this.GetDependancy<NewsCore>();
             Unity = this.GetDependancy<UnityCore>();
+            Internet = this.GetDependancy<InternetCore>();
 
             Application.targetFrameRate = 60;
 
