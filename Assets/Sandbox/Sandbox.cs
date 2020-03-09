@@ -28,35 +28,28 @@ namespace Game
 {
 	public partial class Sandbox : MonoBehaviour
 	{
-        public RunCoroutine Run { get; protected set; }
-        public class RunCoroutine : MoeCoroutine
-        {
-            public override IEnumerator Function()
-            {
-                yield return new WaitForSeconds(2f);
+        public GameObject marker;
 
-                Debug.Log("Hello");
-            }
-        }
+        public float ammount;
+
+        public float spacing;
 
         [Button("Execute")]
         void Execute()
         {
-            StartCoroutine(Procedure());
+            var transform = new GameObject("A").transform;
 
-            IEnumerator Procedure()
+            transform.SetParent(this.transform);
+
+            transform.localPosition = Vector3.zero;
+
+            for (int i = 0; i < ammount; i++)
             {
-                var ping = new Ping("8.8.8.8");
-                var time = 0f;
+                var instance = Instantiate(marker);
 
-                while(ping.isDone == false)
-                {
-                    time += Time.deltaTime;
+                instance.transform.SetParent(transform);
 
-                    yield return new WaitForEndOfFrame();
-                }
-
-                Debug.Log("Ping Complete in: " + time + "s");
+                instance.transform.localPosition = Vector3.forward * i * spacing;
             }
         }
 

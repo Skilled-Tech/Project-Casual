@@ -19,14 +19,24 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class DestroyObjectOperation : Operation
+	public class PlayerJump : Player.Module
 	{
         [SerializeField]
-        Object target = null;
+        float force = 5;
 
-        public override void Execute()
+        [SerializeField]
+        Vector3 direction = Vector3.up;
+
+        public override void Init()
         {
-            Destroy(target);
+            base.Init();
+
+            Player.Controls.Click.OnClick += ClickCallback;
+        }
+
+        private void ClickCallback()
+        {
+            Player.rigidbody.AddForce(direction * force, ForceMode.VelocityChange);
         }
     }
 }

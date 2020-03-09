@@ -22,15 +22,15 @@ namespace Game
 	public class SinBob : MonoBehaviour
 	{
         [SerializeField]
-        float speed;
+        float speed = 1;
 
         [SerializeField]
-        float scale;
+        float scale = 1;
 
         [SerializeField]
         Vector3 axis = Vector3.up;
 
-        float offset;
+        float offset = 0;
 
         private void Update()
         {

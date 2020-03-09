@@ -22,7 +22,7 @@ namespace Game
 	public class AddPlayerScoreOperation : Operation
 	{
         [SerializeField]
-        int value;
+        int value = 0;
 
         public Player Target => Level.Instance.Player.Instance;
 

@@ -21,20 +21,20 @@ using UnityEngine.EventSystems;
 
 namespace Game
 {
-    public class ClickInputUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+    public class ClickInputUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler, IBeginDragHandler
     {
         public int? PointerID { get; protected set; }
 
         public bool IsDown => PointerID.HasValue;
 
-        public event Action OnClick;
+        public event Action OnDown;
         public void OnPointerDown(PointerEventData eventData)
         {
             if(PointerID == null)
             {
                 PointerID = eventData.pointerId;
 
-                OnClick?.Invoke();
+                OnDown?.Invoke();
             }
         }
 
@@ -47,6 +47,25 @@ namespace Game
 
                 OnRelease?.Invoke();
             }
+        }
+
+        public event Action OnClick;
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if(Drag)
+            {
+                Drag = false;
+            }
+            else
+            {
+                OnClick?.Invoke();
+            }
+        }
+
+        public bool Drag { get; protected set; }
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            Drag = true;
         }
     }
 }
