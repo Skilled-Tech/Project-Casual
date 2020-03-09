@@ -21,13 +21,6 @@ namespace Game
 {
 	public class LevelStartPhase : LevelPhases.Element
     {
-        public override void Begin()
-        {
-            base.Begin();
-
-            Level.Player.Spawn();
-        }
-
         private void Update()
         {
             if(IsProcessing)

@@ -42,11 +42,14 @@ namespace Game
         }
 
         public Core Core => Core.Instance;
-
         public Level Level => Level.Instance;
+
+        public Rigidbody rigidbody { get; protected set; }
 
         public virtual void Configure()
         {
+            rigidbody = GetComponent<Rigidbody>();
+
             Score = this.GetDependancy<PlayerScore>();
 
             References.Configure(this);
@@ -57,6 +60,17 @@ namespace Game
             References.Init(this);
 
             Level.Menu.Input.OnClick += ClickCallback;
+        }
+
+        protected virtual void Update()
+        {
+            Process();
+        }
+
+        public event Action OnProcess;
+        protected virtual void Process()
+        {
+            OnProcess?.Invoke();
         }
 
         private void ClickCallback()

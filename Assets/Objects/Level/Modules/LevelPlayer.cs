@@ -29,7 +29,16 @@ namespace Game
 
         public Transform SpawnPoint => transform;
 
-        public virtual void Spawn()
+        public override void Init()
+        {
+            base.Init();
+
+            Instance = FindObjectOfType<Player>();
+
+            if (Instance == null) Instance = Spawn();
+        }
+
+        public virtual Player Spawn()
         {
             var gameObject = Instantiate(prefab, SpawnPoint.position, SpawnPoint.rotation);
 
@@ -37,7 +46,9 @@ namespace Game
 
             Initializer.Perform(gameObject);
 
-            Instance = gameObject.GetComponent<Player>();
+            var instannce = gameObject.GetComponent<Player>();
+
+            return instannce;
         }
     }
 }
