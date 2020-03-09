@@ -19,10 +19,10 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerDrive : Player.Module
+	public class PlayerSteer : Player.Module
 	{
         [SerializeField]
-        float speed = 5f;
+        float maximum = 5f;
 
         [SerializeField]
         float acceleration = 5f;
@@ -38,7 +38,9 @@ namespace Game
         {
             var velocity = Player.rigidbody.velocity;
             {
-                velocity.z = Mathf.MoveTowards(velocity.z, speed, acceleration * Time.deltaTime);
+                var target = Player.Controls.Swipe.Vector.x * maximum;
+
+                velocity.x = Mathf.MoveTowards(velocity.x, target, acceleration * Time.deltaTime);
             }
             Player.rigidbody.velocity = velocity;
         }

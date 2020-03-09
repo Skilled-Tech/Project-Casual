@@ -57,8 +57,30 @@ namespace Game
             public float TimeOut { get { return timeout; } }
 
             [SerializeField]
-            protected float interval = 20f;
-            public float Interval { get { return interval; } }
+            protected IntervalData interval = new IntervalData(5f, 40f);
+            public IntervalData Interval { get { return interval; } }
+            [Serializable]
+            public struct IntervalData
+            {
+                [SerializeField]
+                private float fail;
+                public float Fail { get { return fail; } }
+
+                [SerializeField]
+                private float success;
+                public float Success { get { return success; } }
+
+                public float Sample(bool condition)
+                {
+                    return condition ? success : fail;
+                }
+
+                public IntervalData(float fail, float success)
+                {
+                    this.fail = fail;
+                    this.success = success;
+                }
+            }
 
             public override void Request()
             {
@@ -98,14 +120,16 @@ namespace Game
                     if (result.Success) break;
                 }
 
-                bool IsFailed(Result result) => result.Success == false;
+                bool IsSuccess(Result result) => result.Success;
 
-                if (results.All(IsFailed))
-                    Cancel();
-                else
+                bool success = results.Any(IsSuccess);
+
+                if (success)
                     End();
+                else
+                    Cancel();
 
-                yield return new WaitForSecondsRealtime(interval);
+                yield return new WaitForSecondsRealtime(interval.Sample(success));
 
                 Request();
             }

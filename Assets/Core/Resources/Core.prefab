@@ -545,9 +545,9 @@ MonoBehaviour:
   _state: 1
   ping:
     address: 8.8.8.8
-    iterations: 4
+    retries: 4
     timeout: 10
-    interval: 5
+    interval: 30
 --- !u!1 &2898699552517298277
 GameObject:
   m_ObjectHideFlags: 0

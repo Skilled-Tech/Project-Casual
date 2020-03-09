@@ -19,15 +19,18 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class LevelMenu : Level.Module
-	{
-        public LevelEndMenu End { get; protected set; }
+    public class PlayerControls : Player.Module
+    {
+        public SwipeInputUI Swipe { get; protected set; }
 
-        public override void Configure(Level reference)
+        public ClickInputUI Click { get; protected set; }
+
+        public override void Configure(Player reference)
         {
             base.Configure(reference);
 
-            End = this.GetDependancy<LevelEndMenu>();
+            Swipe = FindObjectOfType<SwipeInputUI>();
+            Click = FindObjectOfType<ClickInputUI>();
         }
     }
 }

@@ -1961,7 +1961,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffc6f3417e35cba4c98c69999615114c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  input: {fileID: 1578701697}
 --- !u!1 &1555642762
 GameObject:
   m_ObjectHideFlags: 0
@@ -2021,6 +2020,7 @@ GameObject:
   - component: {fileID: 1578701695}
   - component: {fileID: 1578701694}
   - component: {fileID: 1578701697}
+  - component: {fileID: 1578701698}
   m_Layer: 5
   m_Name: Input
   m_TagString: Untagged
@@ -2110,6 +2110,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c4a8d89c6299e4085f1b3f723fe5c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1578701698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1578701692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9fa4d4a8235e4644b2b8c6c9238db0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sensitivity: {x: 4, y: 4}
 --- !u!1 &1770000215
 GameObject:
   m_ObjectHideFlags: 0

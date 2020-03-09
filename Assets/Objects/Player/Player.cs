@@ -22,6 +22,8 @@ namespace Game
 #pragma warning disable CS0108
     public class Player : MonoBehaviour, IInitialize
     {
+        public PlayerControls Controls { get; protected set; }
+
         public PlayerScore Score { get; protected set; }
 
         public class Module : MonoBehaviour, IReference<Player>
@@ -50,6 +52,8 @@ namespace Game
         {
             rigidbody = GetComponent<Rigidbody>();
 
+            Controls = this.GetDependancy<PlayerControls>();
+
             Score = this.GetDependancy<PlayerScore>();
 
             References.Configure(this);
@@ -58,24 +62,19 @@ namespace Game
         public virtual void Init()
         {
             References.Init(this);
-
-            Level.Menu.Input.OnClick += ClickCallback;
         }
 
         protected virtual void Update()
         {
             Process();
+
+            if (transform.position.y < -5) transform.position = Vector3.up * 0.5f;
         }
 
         public event Action OnProcess;
         protected virtual void Process()
         {
             OnProcess?.Invoke();
-        }
-
-        private void ClickCallback()
-        {
-            Debug.Log("Click");
         }
     }
 #pragma warning restore CS0108

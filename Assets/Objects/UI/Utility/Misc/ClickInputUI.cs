@@ -21,7 +21,7 @@ using UnityEngine.EventSystems;
 
 namespace Game
 {
-    public class SingleInputUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+    public class ClickInputUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         public int? PointerID { get; protected set; }
 
