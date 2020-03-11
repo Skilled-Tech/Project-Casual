@@ -24,6 +24,8 @@ namespace Game
     {
         public PlayerControls Controls { get; protected set; }
 
+        public PlayerJump Jump { get; protected set; }
+
         public PlayerScore Score { get; protected set; }
 
         public class Module : MonoBehaviour, IReference<Player>
@@ -41,6 +43,11 @@ namespace Game
             {
                 
             }
+
+            protected virtual void OnEnable()
+            {
+
+            }
         }
 
         public Core Core => Core.Instance;
@@ -53,6 +60,8 @@ namespace Game
             rigidbody = GetComponent<Rigidbody>();
 
             Controls = this.GetDependancy<PlayerControls>();
+
+            Jump = this.GetDependancy<PlayerJump>();
 
             Score = this.GetDependancy<PlayerScore>();
 

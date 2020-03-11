@@ -34,9 +34,15 @@ namespace Game
             Player.Controls.Click.OnClick += ClickCallback;
         }
 
+        public virtual void Perform() => Perform(1f);
+        public virtual void Perform(float multiplier)
+        {
+            Player.rigidbody.AddForce(direction * (force * multiplier), ForceMode.VelocityChange);
+        }
+
         private void ClickCallback()
         {
-            Player.rigidbody.AddForce(direction * force, ForceMode.VelocityChange);
+            Perform();
         }
     }
 }

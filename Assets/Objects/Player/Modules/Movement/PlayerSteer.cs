@@ -19,24 +19,14 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerRoll : Player.Module
+	public class PlayerSteer : Player.Module, PlayerMovement.IInterface
 	{
         [SerializeField]
-        float multiplier;
+        float force = 5f;
 
-        public Vector3 vec;
-
-        public override void Init()
+        public Vector3 Calculate()
         {
-            base.Init();
-
-            Player.OnProcess += Process;
-        }
-
-        private void Process()
-        {
-            if (enabled == false) return;
-
+            return Player.transform.right * Player.Controls.Swipe.Vector.x * this.force;
         }
     }
 }

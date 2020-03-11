@@ -19,24 +19,20 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerRoll : Player.Module
+	public class AutoRotate : MonoBehaviour
 	{
         [SerializeField]
-        float multiplier;
+        float speed = 20f;
 
-        public Vector3 vec;
+        [SerializeField]
+        Vector3 axis = Vector3.up;
 
-        public override void Init()
+        [SerializeField]
+        Space space;
+
+        void Update()
         {
-            base.Init();
-
-            Player.OnProcess += Process;
-        }
-
-        private void Process()
-        {
-            if (enabled == false) return;
-
+            transform.Rotate(axis * speed, space);
         }
     }
 }

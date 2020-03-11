@@ -19,24 +19,18 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerRoll : Player.Module
+	public class JumpPad : MonoBehaviour
 	{
         [SerializeField]
-        float multiplier;
+        float multiplier = 1f;
 
-        public Vector3 vec;
-
-        public override void Init()
+        private void OnTriggerEnter(Collider collider)
         {
-            base.Init();
+            if (collider.attachedRigidbody == null) return;
 
-            Player.OnProcess += Process;
-        }
+            var player = collider.attachedRigidbody.GetComponent<Player>();
 
-        private void Process()
-        {
-            if (enabled == false) return;
-
+            if (player != null) player.Jump.Perform(multiplier);
         }
     }
 }

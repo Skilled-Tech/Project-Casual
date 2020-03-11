@@ -19,24 +19,18 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerRoll : Player.Module
+	public class PhysicsRewind : MonoBehaviour
 	{
-        [SerializeField]
-        float multiplier;
-
-        public Vector3 vec;
-
-        public override void Init()
+        public event Action<Collider> TriggerEnterEvent;
+        private void OnTriggerEnter(Collider other)
         {
-            base.Init();
-
-            Player.OnProcess += Process;
+            TriggerEnterEvent?.Invoke(other);
         }
 
-        private void Process()
+        public event Action<Collider> TriggerExitEvent;
+        private void OnTriggerExit(Collider other)
         {
-            if (enabled == false) return;
-
+            TriggerExitEvent?.Invoke(other);
         }
     }
 }
