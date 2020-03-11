@@ -21,18 +21,11 @@ namespace Game
 {
 	public class LevelStartPhase : LevelPhases.Element
     {
-        private void Update()
+        public override void Begin()
         {
-            if(IsProcessing)
-            {
-                if (Input.GetKeyDown(KeyCode.E) || Input.touchCount > 1 || (Input.GetMouseButton(0) && Input.GetMouseButton(1)))
-                    End();
-            }
-        }
+            base.Begin();
 
-        protected override void End()
-        {
-            base.End();
+            End();
         }
     }
 }

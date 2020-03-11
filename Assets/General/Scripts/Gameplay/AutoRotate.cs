@@ -28,7 +28,7 @@ namespace Game
         Vector3 axis = Vector3.up;
 
         [SerializeField]
-        Space space;
+        Space space = Space.World;
 
         void Update()
         {

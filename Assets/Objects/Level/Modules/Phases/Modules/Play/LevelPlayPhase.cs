@@ -19,18 +19,20 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerJump : Player.Module
+	public class LevelPlayPhase : LevelPhases.Element
 	{
-        [SerializeField]
-        float force = 5;
-
-        [SerializeField]
-        Vector3 direction = Vector3.up;
-
-        public virtual void Perform() => Perform(1f);
-        public virtual void Perform(float multiplier)
+        public override void Begin()
         {
-            Player.rigidbody.AddForce(direction * (force * multiplier), ForceMode.VelocityChange);
+            base.Begin();
+
+            Level.Player.Instance.OnFail += PlayerFailCallback;
+        }
+
+        private void PlayerFailCallback()
+        {
+            Level.Player.Instance.OnFail -= PlayerFailCallback;
+
+            End();
         }
     }
 }

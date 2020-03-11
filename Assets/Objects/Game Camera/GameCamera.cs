@@ -19,18 +19,18 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerJump : Player.Module
+	public class GameCamera : MonoBehaviour
 	{
-        [SerializeField]
-        float force = 5;
+        public Player Player { get; protected set; }
 
-        [SerializeField]
-        Vector3 direction = Vector3.up;
-
-        public virtual void Perform() => Perform(1f);
-        public virtual void Perform(float multiplier)
+        void Start()
         {
-            Player.rigidbody.AddForce(direction * (force * multiplier), ForceMode.VelocityChange);
+            Player = FindObjectOfType<Player>();
+        }
+
+        void LateUpdate()
+        {
+            transform.position = Player.transform.position;
         }
     }
 }

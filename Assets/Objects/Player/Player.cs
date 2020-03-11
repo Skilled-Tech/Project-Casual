@@ -77,13 +77,19 @@ namespace Game
         {
             Process();
 
-            if (transform.position.y < -5) transform.position = Vector3.up * 0.5f;
+            if (transform.position.y < -5) Fail();
         }
 
         public event Action OnProcess;
         protected virtual void Process()
         {
             OnProcess?.Invoke();
+        }
+
+        public event Action OnFail;
+        public virtual void Fail()
+        {
+            OnFail?.Invoke();
         }
     }
 #pragma warning restore CS0108

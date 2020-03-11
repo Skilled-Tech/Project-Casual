@@ -19,18 +19,21 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerJump : Player.Module
+	public class PlayerGravity : Player.Module
 	{
         [SerializeField]
-        float force = 5;
+        float force = 9.8f;
 
-        [SerializeField]
-        Vector3 direction = Vector3.up;
-
-        public virtual void Perform() => Perform(1f);
-        public virtual void Perform(float multiplier)
+        public override void Init()
         {
-            Player.rigidbody.AddForce(direction * (force * multiplier), ForceMode.VelocityChange);
+            base.Init();
+
+            Player.OnProcess += Process;
+        }
+
+        private void Process()
+        {
+            Player.rigidbody.AddForce(Vector3.down * force, ForceMode.Acceleration);
         }
     }
 }

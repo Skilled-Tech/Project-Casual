@@ -39,6 +39,10 @@ namespace Game
             public LevelStartPhase Start { get { return start; } }
 
             [SerializeField]
+            protected LevelPlayPhase play;
+            public LevelPlayPhase Play { get { return play; } }
+
+            [SerializeField]
             protected LevelEndPhase end;
             public LevelEndPhase End { get { return end; } }
         }

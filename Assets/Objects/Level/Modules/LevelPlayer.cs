@@ -29,9 +29,9 @@ namespace Game
 
         public Transform SpawnPoint => transform;
 
-        public override void Init()
+        public override void Configure(Level reference)
         {
-            base.Init();
+            base.Configure(reference);
 
             Instance = FindObjectOfType<Player>();
 

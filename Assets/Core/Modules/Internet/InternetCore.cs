@@ -174,9 +174,6 @@ namespace Game
         {
             var newState = response.Success ? InternetState.Available : InternetState.Unavailable;
 
-            if(newState == InternetState.Available) Debug.Log("Internet State: " + newState);
-            if(newState == InternetState.Unavailable) Debug.LogError("Internet State: " + newState);
-
             if (State != newState) State = newState;
         }
     }
