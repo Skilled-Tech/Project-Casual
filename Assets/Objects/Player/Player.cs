@@ -24,6 +24,12 @@ namespace Game
     {
         public PlayerControls Controls { get; protected set; }
 
+        public PlayerInput Input { get; protected set; }
+
+        public PlayerDrive Drive { get; protected set; }
+
+        public PlayerSteer Steer { get; protected set; }
+
         public PlayerJump Jump { get; protected set; }
 
         public PlayerScore Score { get; protected set; }
@@ -60,6 +66,12 @@ namespace Game
             rigidbody = GetComponent<Rigidbody>();
 
             Controls = this.GetDependancy<PlayerControls>();
+
+            Input = this.GetDependancy<PlayerInput>();
+
+            Drive = this.GetDependancy<PlayerDrive>();
+
+            Steer = this.GetDependancy<PlayerSteer>();
 
             Jump = this.GetDependancy<PlayerJump>();
 

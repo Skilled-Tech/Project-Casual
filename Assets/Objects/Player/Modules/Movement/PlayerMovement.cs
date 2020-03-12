@@ -22,7 +22,7 @@ namespace Game
 	public class PlayerMovement : Player.Module
 	{
         [SerializeField]
-        float acceleration = 5f;
+        protected float acceleration = 15;
 
         public List<IInterface> Interfaces { get; protected set; }
         public interface IInterface
@@ -46,18 +46,18 @@ namespace Game
 
         private void Process()
         {
-            var vector = Vector3.zero;
+            var target = Vector3.zero;
 
             for (int i = 0; i < Interfaces.Count; i++)
-                vector += Interfaces[i].Calculate();
+                target += Interfaces[i].Calculate();
 
             var velocity = Player.rigidbody.velocity;
             velocity.y = 0f;
             {
-                velocity = Vector3.MoveTowards(velocity, vector, acceleration * Time.deltaTime);
+                velocity = Vector3.MoveTowards(velocity, target, acceleration * Time.deltaTime);
 
-                Debug.DrawRay(Player.transform.position, vector, Color.green);
-                Debug.DrawRay(Player.transform.position, velocity, Color.yellow);
+                Debug.DrawRay(Player.transform.position, target, Color.yellow);
+                Debug.DrawRay(Player.transform.position, velocity, Color.green);
             }
             velocity.y = Player.rigidbody.velocity.y;
             Player.rigidbody.velocity = velocity;

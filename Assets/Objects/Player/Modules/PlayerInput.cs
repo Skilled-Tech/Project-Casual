@@ -19,8 +19,10 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerLookAtVelocity : Player.Module
+	public class PlayerInput : Player.Module
 	{
+		public Vector2 Movement { get; protected set; }
+
         public override void Init()
         {
             base.Init();
@@ -30,15 +32,16 @@ namespace Game
 
         void Process()
         {
-            var direction = Player.rigidbody.velocity;
-            direction.y = 0f;
+            ProcessSway();
+        }
 
-            if(direction.magnitude > 0f)
-            {
-                var rotation = Quaternion.LookRotation(direction);
+        void ProcessSway()
+        {
+            Movement = Player.Controls.Swipe.Vector;
 
-                transform.rotation = rotation;
-            }
+#if UNITY_EDITOR
+            Movement += Vector2.right * Input.GetAxisRaw("Horizontal");
+#endif
         }
     }
 }

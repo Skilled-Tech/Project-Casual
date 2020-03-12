@@ -23,6 +23,7 @@ namespace Game
 	{
         [SerializeField]
         float speed = 5f;
+        public float Speed => speed;
 
         public Vector3 Calculate()
         {

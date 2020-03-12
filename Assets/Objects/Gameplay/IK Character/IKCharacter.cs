@@ -25,7 +25,7 @@ namespace Game
         public Animator Animator { get; protected set; }
 
         [SerializeField]
-        ElementData[] elements;
+        ElementData[] elements = new ElementData[] { };
         [Serializable]
         public class ElementData
         {

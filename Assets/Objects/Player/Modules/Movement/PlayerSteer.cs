@@ -26,7 +26,7 @@ namespace Game
 
         public Vector3 Calculate()
         {
-            return Player.transform.right * Player.Controls.Swipe.Vector.x * this.force;
+            return Player.transform.right * Player.Input.Movement.x * this.force;
         }
     }
 }

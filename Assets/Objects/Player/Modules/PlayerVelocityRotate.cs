@@ -19,8 +19,17 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
-	public class PlayerLookAtVelocity : Player.Module
+	public class PlayerVelocityRotate : Player.Module
 	{
+        [SerializeField]
+        Vector3 axis = Vector3.right;
+
+        [SerializeField]
+        float speed = 10f;
+
+        [SerializeField]
+        Space space = Space.Self;
+
         public override void Init()
         {
             base.Init();
@@ -30,15 +39,7 @@ namespace Game
 
         void Process()
         {
-            var direction = Player.rigidbody.velocity;
-            direction.y = 0f;
-
-            if(direction.magnitude > 0f)
-            {
-                var rotation = Quaternion.LookRotation(direction);
-
-                transform.rotation = rotation;
-            }
+            transform.Rotate(axis * speed * Player.rigidbody.velocity.magnitude, space);
         }
     }
 }

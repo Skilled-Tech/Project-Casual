@@ -24,6 +24,9 @@ namespace Game
 	{
 		public Animator Animator { get; protected set; }
 
+        [SerializeField]
+        protected float maxVelocity = 14f;
+
         public override void Configure(Player reference)
         {
             base.Configure(reference);
@@ -40,11 +43,13 @@ namespace Game
 
         private void Process()
         {
-            var speed = Player.rigidbody.velocity.magnitude;
+            var magnitude = Player.rigidbody.velocity.magnitude;
 
-            Animator.SetFloat("Speed", 2f);
+            var speed = Mathf.LerpUnclamped(0f, 1f, magnitude / maxVelocity);
 
-            Animator.SetFloat("Speed Multiplier", speed / 8f);
+            Animator.SetFloat("Speed", speed);
+
+            Animator.SetFloat("Speed Multiplier", Mathf.Clamp(speed, 1, 10));
         }
     }
 }
