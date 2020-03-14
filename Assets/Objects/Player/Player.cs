@@ -59,9 +59,13 @@ namespace Game
 
         public Rigidbody rigidbody { get; protected set; }
 
+        public Collider collider { get; protected set; }
+
         public virtual void Configure()
         {
             rigidbody = GetComponent<Rigidbody>();
+
+            collider = GetComponent<Collider>();
 
             Controls = this.GetDependancy<PlayerControls>();
 
