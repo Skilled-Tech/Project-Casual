@@ -26,9 +26,7 @@ namespace Game
 
         public PlayerInput Input { get; protected set; }
 
-        public PlayerDrive Drive { get; protected set; }
-
-        public PlayerSteer Steer { get; protected set; }
+        public PlayerMovement Movement { get; protected set; }
 
         public PlayerJump Jump { get; protected set; }
 
@@ -69,9 +67,7 @@ namespace Game
 
             Input = this.GetDependancy<PlayerInput>();
 
-            Drive = this.GetDependancy<PlayerDrive>();
-
-            Steer = this.GetDependancy<PlayerSteer>();
+            Movement = this.GetDependancy<PlayerMovement>();
 
             Jump = this.GetDependancy<PlayerJump>();
 

@@ -21,6 +21,9 @@ namespace Game
 {
 	public class PlayerLookAtVelocity : Player.Module
 	{
+        [SerializeField]
+        float speed = 240f;
+
         public override void Init()
         {
             base.Init();
@@ -30,14 +33,14 @@ namespace Game
 
         void Process()
         {
-            var direction = Player.rigidbody.velocity;
+            var direction = Player.Movement.Velocity;
             direction.y = 0f;
 
             if(direction.magnitude > 0f)
             {
-                var rotation = Quaternion.LookRotation(direction);
+                var target = Quaternion.LookRotation(direction);
 
-                transform.rotation = rotation;
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, target, speed * Time.deltaTime);
             }
         }
     }

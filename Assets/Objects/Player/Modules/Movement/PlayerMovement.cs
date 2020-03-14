@@ -30,11 +30,23 @@ namespace Game
             Vector3 Calculate();
         }
 
+        public Vector3 Target { get; protected set; }
+
+        public Vector3 Velocity => Player.rigidbody.velocity;
+
+        public PlayerDrive Drive { get; protected set; }
+
+        public PlayerSteer Steer { get; protected set; }
+
         public override void Configure(Player reference)
         {
             base.Configure(reference);
 
             Interfaces = Player.GetAllDependancies<IInterface>();
+
+            Drive = Player.GetDependancy<PlayerDrive>();
+
+            Steer = Player.GetDependancy<PlayerSteer>();
         }
 
         public override void Init()
@@ -46,17 +58,17 @@ namespace Game
 
         private void Process()
         {
-            var target = Vector3.zero;
+            Target = Vector3.zero;
 
             for (int i = 0; i < Interfaces.Count; i++)
-                target += Interfaces[i].Calculate();
+                Target += Interfaces[i].Calculate();
 
             var velocity = Player.rigidbody.velocity;
             velocity.y = 0f;
             {
-                velocity = Vector3.MoveTowards(velocity, target, acceleration * Time.deltaTime);
+                velocity = Vector3.MoveTowards(velocity, Target, acceleration * Time.deltaTime);
 
-                Debug.DrawRay(Player.transform.position, target, Color.yellow);
+                Debug.DrawRay(Player.transform.position, Target, Color.yellow);
                 Debug.DrawRay(Player.transform.position, velocity, Color.green);
             }
             velocity.y = Player.rigidbody.velocity.y;
