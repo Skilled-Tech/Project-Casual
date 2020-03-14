@@ -32,7 +32,7 @@ namespace Game
 
         void Update()
         {
-            transform.Rotate(axis * speed, space);
+            transform.Rotate(axis * speed * Time.timeScale, space);
         }
     }
 }

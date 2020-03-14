@@ -32,7 +32,28 @@ namespace Game
 
         public Vector3 Target { get; protected set; }
 
-        public Vector3 Velocity => Player.rigidbody.velocity;
+        public Vector3 Velocity
+        {
+            get => Player.rigidbody.velocity;
+            protected set => Player.rigidbody.velocity = value;
+        }
+        public Vector3 DirectionalVelocity
+        {
+            get
+            {
+                var value = Velocity;
+
+                value.y = 0f;
+
+                return value;
+            }
+            set
+            {
+                value.y = Velocity.y;
+
+                Velocity = value;
+            }
+        }
 
         public PlayerDrive Drive { get; protected set; }
 
@@ -63,16 +84,10 @@ namespace Game
             for (int i = 0; i < Interfaces.Count; i++)
                 Target += Interfaces[i].Calculate();
 
-            var velocity = Player.rigidbody.velocity;
-            velocity.y = 0f;
-            {
-                velocity = Vector3.MoveTowards(velocity, Target, acceleration * Time.deltaTime);
+            DirectionalVelocity = Vector3.MoveTowards(DirectionalVelocity, Target, acceleration * Time.deltaTime);
 
-                Debug.DrawRay(Player.transform.position, Target, Color.yellow);
-                Debug.DrawRay(Player.transform.position, velocity, Color.green);
-            }
-            velocity.y = Player.rigidbody.velocity.y;
-            Player.rigidbody.velocity = velocity;
+            Debug.DrawRay(Player.transform.position, Target, Color.yellow);
+            Debug.DrawRay(Player.transform.position, DirectionalVelocity, Color.green);
         }
     }
 }

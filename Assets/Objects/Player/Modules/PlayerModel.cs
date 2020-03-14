@@ -41,9 +41,9 @@ namespace Game
             Player.OnProcess += Process;
         }
 
-        private void Process()
+        void Process()
         {
-            var magnitude = Player.rigidbody.velocity.magnitude;
+            var magnitude = Player.Movement.DirectionalVelocity.magnitude;
 
             var speed = Mathf.LerpUnclamped(0f, 1f, magnitude / maxVelocity);
 

@@ -39,7 +39,7 @@ namespace Game
 
         void Process()
         {
-            transform.Rotate(axis * speed * Player.rigidbody.velocity.magnitude, space);
+            transform.Rotate(axis * speed * Player.rigidbody.velocity.magnitude * Time.timeScale, space);
         }
     }
 }

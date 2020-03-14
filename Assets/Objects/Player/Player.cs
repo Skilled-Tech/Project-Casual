@@ -26,6 +26,8 @@ namespace Game
 
         public PlayerInput Input { get; protected set; }
 
+        public PlayerGroundCheck GroundCheck { get; protected set; }
+
         public PlayerMovement Movement { get; protected set; }
 
         public PlayerJump Jump { get; protected set; }
@@ -70,6 +72,8 @@ namespace Game
             Controls = this.GetDependancy<PlayerControls>();
 
             Input = this.GetDependancy<PlayerInput>();
+
+            GroundCheck = this.GetDependancy<PlayerGroundCheck>();
 
             Movement = this.GetDependancy<PlayerMovement>();
 
