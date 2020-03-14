@@ -57,8 +57,6 @@ namespace Game
 
             }
 
-            Debug.Log("Grounded: " + IsGrounded);
-
             Debug.DrawRay(Origin, Direction * (range + offset), Color.green);
         }
     }

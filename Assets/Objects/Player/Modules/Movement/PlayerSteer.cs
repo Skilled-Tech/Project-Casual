@@ -22,11 +22,33 @@ namespace Game
 	public class PlayerSteer : Player.Module, PlayerMovement.IInterface
 	{
         [SerializeField]
-        float force = 5f;
+        ForceData force = new ForceData(10f, 3f);
+        [Serializable]
+        public class ForceData
+        {
+            [SerializeField]
+            protected float ground;
+            public float Ground { get { return ground; } }
+
+            [SerializeField]
+            protected float air;
+            public float Air { get { return air; } }
+
+            public float Sample(bool isGrounded)
+            {
+                return isGrounded ? ground : air;
+            }
+
+            public ForceData(float ground, float air)
+            {
+                this.ground = ground;
+                this.air = air;
+            }
+        }
 
         public Vector3 Calculate()
         {
-            return Player.transform.right * Player.Input.Movement.x * this.force;
+            return Player.transform.right * Player.Input.Movement.x * force.Sample(Player.IsGrounded);
         }
     }
 }

@@ -27,6 +27,7 @@ namespace Game
         public PlayerInput Input { get; protected set; }
 
         public PlayerGroundCheck GroundCheck { get; protected set; }
+        public bool IsGrounded => GroundCheck.IsGrounded;
 
         public PlayerMovement Movement { get; protected set; }
 
