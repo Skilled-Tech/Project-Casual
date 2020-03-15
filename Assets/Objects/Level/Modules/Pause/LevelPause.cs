@@ -33,6 +33,8 @@ namespace Game
             {
                 state = value;
 
+                StateChangeCallback(state);
+
                 OnStateChange?.Invoke(state);
             }
         }
@@ -48,19 +50,42 @@ namespace Game
         {
             base.Configure(reference);
 
-            OnStateChange += StateChangeCallback;
+            Level.OnExit += ExitCallback;
+        }
+
+        public override void Init()
+        {
+            base.Init();
+
+            State = LevelPauseState.None;
         }
 
         protected virtual void StateChangeCallback(LevelPauseState state)
         {
-            Time.timeScale = state == LevelPauseState.Hard ? 0f : 1f;
+            Time.timeScale = StateToTimeScale(state);
         }
 
-        protected virtual void OnDestroy()
+        void ExitCallback()
         {
-            OnStateChange -= StateChangeCallback;
+            Level.OnExit -= ExitCallback;
 
             Time.timeScale = 1f;
+        }
+
+        //Static Utility
+        public static float StateToTimeScale(LevelPauseState state)
+        {
+            switch (state)
+            {
+                case LevelPauseState.None:
+                    return 1f;
+                case LevelPauseState.Soft:
+                    return 0f;
+                case LevelPauseState.Hard:
+                    return 0f;
+            }
+
+            return 1f;
         }
     }
 

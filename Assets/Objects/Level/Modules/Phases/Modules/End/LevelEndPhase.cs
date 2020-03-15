@@ -63,6 +63,8 @@ namespace Game
 
             Level.Menu.End.Show();
 
+            Level.Pause.State = LevelPauseState.Soft;
+
             Level.OnExit += End;
         }
 
